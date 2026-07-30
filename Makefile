@@ -30,5 +30,4 @@ lint:
 clean:
 	cargo clean
 
-# Indique à make que ce sont des règles et non des fichiers réels
 .PHONY: all build install run-server run-client run-client-gui lint clean
