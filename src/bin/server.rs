@@ -21,8 +21,16 @@ async fn main() {
             let mut reader = BufReader::new(r_socket);
             let mut line = String::new();
             while reader.read_line(&mut line).await.unwrap() > 0 {
-                println!("Recu : {}", line.trim());
-                line.clear()
+
+                if line.starts_with("CONNECT ") {
+                    let username = line.strip_prefix("CONNECT ").unwrap().trim();
+                    let msg = format!("CONNECT recu de {}", username);
+                    println!("{}", msg);
+                    w_socket.write(b"OK connected\n").await.unwrap();
+                    line.clear();
+                } else {
+                    line.clear();
+                }
             }
             println!("connection closed: {}", addr);
         });
