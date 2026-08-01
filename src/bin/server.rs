@@ -2,12 +2,16 @@ use tokio::net::TcpListener;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
 use tokio::io::AsyncWriteExt;
+use tap::World;
 
 #[tokio::main]
 async fn main() {
     let listener = TcpListener::bind("127.0.0.1:4242").await.unwrap();
     println!("server running on {}", listener.local_addr().unwrap());
 
+    let file = std::fs::read_to_string("world.json").unwrap();
+    let world: World = serde_json::from_str(&file).unwrap();
+    println!("world: {:?}", world);
 
     loop {
         let (socket, addr) = listener.accept().await.unwrap();

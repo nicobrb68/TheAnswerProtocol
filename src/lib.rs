@@ -1,6 +1,7 @@
 use std::collections::HashMap;
+use serde::Deserialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Room {
     id: String,
     name: String,
@@ -11,13 +12,13 @@ pub struct Room {
     npcs: Vec<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub enum PlayerState {
     Alive,
     Dead
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Player {
     name: String,
     inventory: Vec<String>,
@@ -28,8 +29,9 @@ pub struct Player {
     group_id: Option<String>
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct World {
+    #[serde(default)]
     players: HashMap<String, Player>,
     rooms: HashMap<String, Room>
 }

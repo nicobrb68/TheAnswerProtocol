@@ -1,0 +1,26 @@
+{
+  "rooms": {
+    "room.square": {
+      "id": "room.square",
+      "name": "Village Square",
+      "description": "A bustling square with cobblestone paths.",
+      "exits": {
+        "north": "room.tavern"
+      },
+      "players": [],
+      "items": [],
+      "npcs": ["npc.guard"]
+    },
+    "room.tavern": {
+      "id": "room.tavern",
+      "name": "The Prancing Pony",
+      "description": "A cozy tavern filled with warmth and laughter.",
+      "exits": {
+        "south": "room.square"
+      },
+      "players": [],
+      "items": ["item.ale"],
+      "npcs": []
+    }
+  }
+}
