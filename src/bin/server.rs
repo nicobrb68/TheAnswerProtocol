@@ -3,6 +3,8 @@ use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
 use tokio::io::AsyncWriteExt;
 use tap::World;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() {
@@ -13,12 +15,14 @@ async fn main() {
     let world: World = serde_json::from_str(&file).unwrap();
     println!("world: {:?}", world);
 
+    let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
+
     loop {
         let (socket, addr) = listener.accept().await.unwrap();
         println!("accepted connection from {}", addr);
 
 
-
+        let world = Arc::clone(&world);
         tokio::spawn(async move {
             let (r_socket, mut w_socket) = socket.into_split();
             w_socket.write_all(b"OK hello proto=1\n").await.unwrap();
