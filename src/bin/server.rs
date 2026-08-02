@@ -13,9 +13,8 @@ async fn main() {
 
     let file = std::fs::read_to_string("world.json").unwrap();
     let world: World = serde_json::from_str(&file).unwrap();
-    // println!("world: {:?}", world);
-
     let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
+    // let world: Arc<Mutex<World>> = Arc::new(Mutex::new(serde_json::from_str(&file).unwrap())); PEUT ETRE REFACTOR COMME CA LES DEUX LIGNES DAVANT mais pas lisible, a voir ce que tu en penses
 
     loop {
         let (socket, addr) = listener.accept().await.unwrap();
@@ -62,7 +61,6 @@ async fn main() {
                         w_socket.write(b"OK connected\n").await.unwrap();
                     }
                     line.clear();
-                    // println!("{:?}", w.players);
                 } else if let Some(name) = &authenticated {
                     if line.starts_with("LOOK") {
                         let w = world.lock().await;
@@ -83,6 +81,7 @@ async fn main() {
             if let Some(name) = &authenticated {
                 println!("{} disconnected", &name);
                 w.players.remove(name);
+                w_socket.write_all(b"OK bye\n").await.unwrap();
             }
         });
 
