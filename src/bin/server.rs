@@ -2,9 +2,12 @@ use tokio::net::TcpListener;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
 use tokio::io::AsyncWriteExt;
-use tap::{Player, PlayerState, World};
+use tap::{Player, World};
 use std::sync::Arc;
 use tokio::sync::Mutex;
+
+use tap::commands::connect::handle_connect;
+use tap::commands::look::handle_look;
 
 #[tokio::main]
 async fn main() {
@@ -40,38 +43,19 @@ async fn main() {
                     }
 
                     let username = line.strip_prefix("CONNECT ").unwrap().trim();
-                    println!("Connection demand for {}", username);
 
-                    let mut w = world.lock().await;
-                    if w.players.contains_key(username) {
-                        w_socket.write(b"ERR 201 NAME_IN_USE\n").await.unwrap();
-                    } else {
-                        let mut user = Player {
-                            name: username.to_string(),
-                            inventory: Vec::new(),
-                            quests_active: Vec::new(),
-                            quests_done: Vec::new(),
-                            hp: 100,
-                            status: PlayerState::Alive,
-                            current_room: "room.square".to_string(),
-                            group_id: None,
-                        };
-                        w.players.insert(username.to_string(), user);
+                    let res = handle_connect(&username, &world).await;
+                    if res.starts_with("OK") {
                         authenticated = Some(username.to_string());
-                        w_socket.write(b"OK connected\n").await.unwrap();
                     }
+                    w_socket.write_all(res.as_bytes()).await.unwrap();
                     line.clear();
+
                 } else if let Some(name) = &authenticated {
                     if line.starts_with("LOOK") {
-                        let w = world.lock().await;
-                        let player = w.players.get(name).unwrap();
-                        let room = w.rooms.get(player.current_room.as_str()).unwrap();
-                        let se_room = serde_json::to_string(room);
-                        w_socket.write_all(format!("OK {}\n", se_room.unwrap()).as_bytes()).await.unwrap();
-                        println!("LOOK from {}", name);
+                        w_socket.write_all(handle_look(&name, &world).await.as_bytes()).await.unwrap();
                         line.clear();
                     }
-
                 } else {
                     line.clear();
                 }
