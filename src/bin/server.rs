@@ -63,6 +63,17 @@ async fn main() {
                     }
                     line.clear();
                     // println!("{:?}", w.players);
+                } else if let Some(name) = &authenticated {
+                    if line.starts_with("LOOK") {
+                        let w = world.lock().await;
+                        let player = w.players.get(name).unwrap();
+                        let room = w.rooms.get(player.current_room.as_str()).unwrap();
+                        let se_room = serde_json::to_string(room);
+                        w_socket.write_all(format!("OK {}\n", se_room.unwrap()).as_bytes()).await.unwrap();
+                        println!("LOOK from {}", name);
+                        line.clear();
+                    }
+
                 } else {
                     line.clear();
                 }
