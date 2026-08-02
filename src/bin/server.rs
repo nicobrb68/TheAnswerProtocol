@@ -13,7 +13,7 @@ async fn main() {
 
     let file = std::fs::read_to_string("world.json").unwrap();
     let world: World = serde_json::from_str(&file).unwrap();
-    println!("world: {:?}", world);
+    // println!("world: {:?}", world);
 
     let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
 
@@ -62,12 +62,17 @@ async fn main() {
                         w_socket.write(b"OK connected\n").await.unwrap();
                     }
                     line.clear();
-                    println!("{:?}", w.players);
+                    // println!("{:?}", w.players);
                 } else {
                     line.clear();
                 }
             }
-            println!("connection closed: {}", addr);
+
+            let mut w = world.lock().await;
+            if let Some(name) = &authenticated {
+                println!("{} disconnected", &name);
+                w.players.remove(name);
+            }
         });
 
 
