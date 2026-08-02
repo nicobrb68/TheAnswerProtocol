@@ -2,7 +2,7 @@ use tokio::net::TcpListener;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
 use tokio::io::AsyncWriteExt;
-use tap::World;
+use tap::{Player, PlayerState, World};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -24,6 +24,9 @@ async fn main() {
 
         let world = Arc::clone(&world);
         tokio::spawn(async move {
+
+            let mut authenticated: Option<String> = None;
+
             let (r_socket, mut w_socket) = socket.into_split();
             w_socket.write_all(b"OK hello proto=1\n").await.unwrap();
             let mut reader = BufReader::new(r_socket);
@@ -31,11 +34,35 @@ async fn main() {
             while reader.read_line(&mut line).await.unwrap() > 0 {
 
                 if line.starts_with("CONNECT ") {
+                    if authenticated.is_some() {
+                        w_socket.write_all(b"ERR already connected\n").await.unwrap();
+                        line.clear();
+                        continue;
+                    }
+
                     let username = line.strip_prefix("CONNECT ").unwrap().trim();
-                    let msg = format!("CONNECT recu de {}", username);
-                    println!("{}", msg);
-                    w_socket.write(b"OK connected\n").await.unwrap();
+                    println!("Connection demand for {}", username);
+
+                    let mut w = world.lock().await;
+                    if w.players.contains_key(username) {
+                        w_socket.write(b"ERR 201 NAME_IN_USE\n").await.unwrap();
+                    } else {
+                        let mut user = Player {
+                            name: username.to_string(),
+                            inventory: Vec::new(),
+                            quests_active: Vec::new(),
+                            quests_done: Vec::new(),
+                            hp: 100,
+                            status: PlayerState::Alive,
+                            current_room: "room.square".to_string(),
+                            group_id: None,
+                        };
+                        w.players.insert(username.to_string(), user);
+                        authenticated = Some(username.to_string());
+                        w_socket.write(b"OK connected\n").await.unwrap();
+                    }
                     line.clear();
+                    println!("{:?}", w.players);
                 } else {
                     line.clear();
                 }
