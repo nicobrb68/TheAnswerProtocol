@@ -2,7 +2,7 @@ use tokio::net::TcpListener;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
 use tokio::io::AsyncWriteExt;
-use tap::{Player, World};
+use tap::{World};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -36,7 +36,7 @@ async fn main() {
             let mut line = String::new();
             while reader.read_line(&mut line).await.unwrap() > 0 {
 
-                let line_trimmed = &line.trim().to_string();
+                // let line_trimmed = &line.trim().to_string();
                 let line_upper = &line.to_uppercase();
 
                 if line_upper.starts_with("CONNECT ") {

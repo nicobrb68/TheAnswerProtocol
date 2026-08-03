@@ -1,12 +1,12 @@
-use std::sync::{Arc, MutexGuard};
-use tokio::sync::Mutex;
-use crate::{Player, World, Room, TapError};
+use std::sync::Arc;
+use tokio::sync::{Mutex, MutexGuard};
+use crate::{World, Room, TapError};
 
 pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<World>>) -> String {
-    let mut w = world.lock().await;
-    let current_room = w.get_mut_player(username).unwrap().current_room.clone();
-    let new_room_id = {
-        let room = w.get_room(&current_room).unwrap();
+    let mut w: MutexGuard<World> = world.lock().await;
+    let current_room: String = w.get_mut_player(username).unwrap().current_room.clone();
+    let new_room_id: String = {
+        let room: &Room = w.get_room(&current_room).unwrap();
         if !room.exits.contains_key(direction) {
             return TapError::NoExit.message();
         }
