@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 # Serveur & Réseau async
 tokio = { version = "1.38", features = ["full"] }
+tokio-tungstenite = "0.21"   # WebSocket pur Rust, peu de deps transitives
+futures-util = "0.3"
 
 # Parsing JSON & Structs
 serde = { version = "1.0", features = ["derive"] }
@@ -14,3 +16,5 @@ serde_json = "1.0"
 # Moteur de logs JSON
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+
+

@@ -30,4 +30,7 @@ lint:
 clean:
 	cargo clean
 
+nc:
+	nc 127.0.0.1 1234
+
 .PHONY: all build install run-server run-client run-client-gui lint clean
