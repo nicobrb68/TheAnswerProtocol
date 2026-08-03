@@ -15,5 +15,7 @@ Ce qu'on a fait :
 Prochaine étape : les structs (Room, Player, World) + Arc<Mutex<T>>
 pour partager l'état entre les clients.
 
+Tous les .write_all(...).await.unwrap() vont paniquer si un client se déconnecte brutalement pendant qu'on lui écrit — or le sujet exige "handle disconnects gracefully". On corrigera ça.
+
 P.S. Claude m'apprend plutot bien et meme si cest merdiquement verbeux le rust
 cest assez fun en vrai
