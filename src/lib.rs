@@ -54,12 +54,25 @@ pub struct World {
 }
 
 impl World {
+
+    // Player impl
+
     pub fn add_player(&mut self, player: Player) {
         self.players.insert(player.name.clone(), player);
     }
 
+    pub fn get_mut_player(&mut self, name: &str) -> Option<&mut Player> {
+        self.players.get_mut(name)
+    }
+
     pub fn has_player(&self, name: &str) -> bool {
         self.players.contains_key(name)
+    }
+
+    // Room impl
+
+    pub fn get_room(&self, id: &str) -> Option<&Room> {
+        self.rooms.get(id)
     }
 }
 #[derive(Debug)]

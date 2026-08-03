@@ -8,6 +8,7 @@ use tokio::sync::Mutex;
 
 use tap::commands::connect::handle_connect;
 use tap::commands::look::handle_look;
+use tap::commands::movement::handle_move;
 
 #[tokio::main]
 async fn main() {
@@ -35,14 +36,17 @@ async fn main() {
             let mut line = String::new();
             while reader.read_line(&mut line).await.unwrap() > 0 {
 
-                if line.starts_with("CONNECT ") {
+                let line_trimmed = &line.trim().to_string();
+                let line_upper = &line.to_uppercase();
+
+                if line_upper.starts_with("CONNECT ") {
                     if authenticated.is_some() {
                         w_socket.write_all(b"ERR already connected\n").await.unwrap();
                         line.clear();
                         continue;
                     }
 
-                    let username = line.strip_prefix("CONNECT ").unwrap().trim();
+                    let username = line_upper.strip_prefix("CONNECT ").unwrap().trim();
 
                     let res = handle_connect(&username, &world).await;
                     if res.starts_with("OK") {
@@ -52,8 +56,12 @@ async fn main() {
                     line.clear();
 
                 } else if let Some(name) = &authenticated {
-                    if line.starts_with("LOOK") {
+                    if line_upper.starts_with("LOOK") {
                         w_socket.write_all(handle_look(&name, &world).await.as_bytes()).await.unwrap();
+                        line.clear();
+                    } else if line_upper.starts_with("MOVE ") {
+                        let direction = line_upper.strip_prefix("MOVE ").unwrap().trim().to_lowercase();
+                        w_socket.write_all(handle_move(&name, &direction, &world).await.as_bytes()).await.unwrap();
                         line.clear();
                     }
                 } else {
