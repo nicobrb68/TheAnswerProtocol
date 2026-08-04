@@ -13,6 +13,7 @@ use tap::{World};
 use tap::commands::connect::handle_connect;
 use tap::commands::look::handle_look;
 use tap::commands::movement::handle_move;
+use tap::commands::who::handle_who;
 
 use tap::utils::fatal;
 
@@ -110,7 +111,17 @@ async fn main() {
                             }
                         };
                         line.clear()
-                    } else {
+                    } else if line_upper.starts_with("WHO") {
+                        match w_socket.write_all(handle_who( &world).await.as_bytes()).await  {
+                            Ok(val) => val,
+                            Err(e) => {
+                                eprintln!("Failed to write on client side: {}", e);
+                                break
+                            }
+                        };
+                        line.clear()
+                    } 
+                    else {
                         line.clear()
                     }
                 } else {
