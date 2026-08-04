@@ -1,0 +1,239 @@
+{
+	"rooms": {
+		"room.square": {
+			"id": "room.square",
+			"name": "Village Square",
+			"description": "A bustling square with cobblestone paths and a lively fountain.",
+			"exits": {
+				"north": "room.tavern",
+				"east": "room.market",
+				"west": "room.blacksmith",
+				"south": "room.gate"
+			},
+			"players": [],
+			"items": [],
+			"npcs": [
+				"npc.guard"
+			]
+		},
+		"room.tavern": {
+			"id": "room.tavern",
+			"name": "The Prancing Pony",
+			"description": "A warm tavern filled with laughter and the smell of fresh meals.",
+			"exits": {
+				"south": "room.square",
+				"north": "room.guest_room"
+			},
+			"players": [],
+			"items": [
+				"item.ale"
+			],
+			"npcs": [
+				"npc.bartender"
+			]
+		},
+		"room.guest_room": {
+			"id": "room.guest_room",
+			"name": "Guest Room",
+			"description": "A quiet upstairs room with a wooden bed.",
+			"exits": {
+				"south": "room.tavern"
+			},
+			"players": [],
+			"items": [
+				"item.key"
+			],
+			"npcs": []
+		},
+		"room.blacksmith": {
+			"id": "room.blacksmith",
+			"name": "Blacksmith",
+			"description": "The forge burns bright as steel is hammered on the anvil.",
+			"exits": {
+				"east": "room.square",
+				"west": "room.mine"
+			},
+			"players": [],
+			"items": [
+				"item.sword"
+			],
+			"npcs": [
+				"npc.blacksmith"
+			]
+		},
+		"room.mine": {
+			"id": "room.mine",
+			"name": "Old Mine",
+			"description": "An abandoned mine with wooden supports creaking overhead.",
+			"exits": {
+				"east": "room.blacksmith",
+				"south": "room.cavern"
+			},
+			"players": [],
+			"items": [
+				"item.pickaxe"
+			],
+			"npcs": []
+		},
+		"room.cavern": {
+			"id": "room.cavern",
+			"name": "Crystal Cavern",
+			"description": "Blue crystals glow faintly from the cave walls.",
+			"exits": {
+				"north": "room.mine",
+				"south": "room.crypt"
+			},
+			"players": [],
+			"items": [
+				"item.crystal"
+			],
+			"npcs": [
+				"npc.goblin"
+			]
+		},
+		"room.crypt": {
+			"id": "room.crypt",
+			"name": "Forgotten Crypt",
+			"description": "Ancient tombs line the walls beneath thick layers of dust.",
+			"exits": {
+				"north": "room.cavern",
+				"east": "room.ruins"
+			},
+			"players": [],
+			"items": [
+				"item.treasure"
+			],
+			"npcs": [
+				"npc.skeleton"
+			]
+		},
+		"room.market": {
+			"id": "room.market",
+			"name": "Marketplace",
+			"description": "Busy merchants sell food, tools and trinkets.",
+			"exits": {
+				"west": "room.square",
+				"east": "room.docks"
+			},
+			"players": [],
+			"items": [
+				"item.apple",
+				"item.bread"
+			],
+			"npcs": [
+				"npc.merchant"
+			]
+		},
+		"room.docks": {
+			"id": "room.docks",
+			"name": "Harbor Docks",
+			"description": "Fishing boats gently rock on the water.",
+			"exits": {
+				"west": "room.market",
+				"south": "room.lighthouse"
+			},
+			"players": [],
+			"items": [
+				"item.rope"
+			],
+			"npcs": [
+				"npc.fisher"
+			]
+		},
+		"room.lighthouse": {
+			"id": "room.lighthouse",
+			"name": "Lighthouse",
+			"description": "A tall lighthouse overlooks the sea.",
+			"exits": {
+				"north": "room.docks",
+				"west": "room.gate"
+			},
+			"players": [],
+			"items": [
+				"item.lantern"
+			],
+			"npcs": [
+				"npc.keeper"
+			]
+		},
+		"room.gate": {
+			"id": "room.gate",
+			"name": "South Gate",
+			"description": "The village gate opens toward the surrounding wilderness.",
+			"exits": {
+				"north": "room.square",
+				"east": "room.lighthouse",
+				"south": "room.forest"
+			},
+			"players": [],
+			"items": [],
+			"npcs": [
+				"npc.guard"
+			]
+		},
+		"room.forest": {
+			"id": "room.forest",
+			"name": "Whispering Forest",
+			"description": "Towering trees sway gently in the breeze.",
+			"exits": {
+				"north": "room.gate",
+				"east": "room.lake",
+				"west": "room.ruins",
+				"south": "room.clearing"
+			},
+			"players": [],
+			"items": [
+				"item.branch"
+			],
+			"npcs": [
+				"npc.wolf"
+			]
+		},
+		"room.lake": {
+			"id": "room.lake",
+			"name": "Crystal Lake",
+			"description": "The lake's surface is perfectly calm.",
+			"exits": {
+				"west": "room.forest",
+				"south": "room.clearing"
+			},
+			"players": [],
+			"items": [
+				"item.fish"
+			],
+			"npcs": []
+		},
+		"room.clearing": {
+			"id": "room.clearing",
+			"name": "Forest Clearing",
+			"description": "A peaceful clearing bathed in sunlight.",
+			"exits": {
+				"north": "room.forest",
+				"east": "room.lake",
+				"west": "room.ruins"
+			},
+			"players": [],
+			"items": [
+				"item.herbs"
+			],
+			"npcs": [
+				"npc.hermit"
+			]
+		},
+		"room.ruins": {
+			"id": "room.ruins",
+			"name": "Ancient Ruins",
+			"description": "Broken pillars and moss-covered stones remain from an ancient civilization.",
+			"exits": {
+				"east": "room.forest",
+				"south": "room.clearing",
+				"west": "room.crypt"
+			},
+			"players": [],
+			"items": [
+				"item.scroll"
+			],
+			"npcs": []
+		}
+	}
+}
