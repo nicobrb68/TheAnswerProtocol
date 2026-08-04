@@ -13,6 +13,8 @@ pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<Worl
         room.exits.get(direction).unwrap().clone()
     };
     w.get_mut_player(username).unwrap().current_room = new_room_id.clone();
+    w.get_mut_room(&current_room).unwrap().players.retain(|p| p != username);
+    w.get_mut_room(&new_room_id).unwrap().players.push(username.to_string());
     format!("OK room={}\n", new_room_id)
 
 }
