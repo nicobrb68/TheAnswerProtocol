@@ -132,12 +132,12 @@ async fn main() {
             let mut w = world.lock().await;
             if let Some(name) = &authenticated {
                 println!("{} disconnected", &name);
+                let room_id = w.get_player(name).unwrap().current_room.clone();
+                w.get_mut_room(&room_id).unwrap().players.retain(|p| p != name);
                 w.players.remove(name);
                 match w_socket.write_all(b"OK bye\n").await {
-                    Ok(val) => val,
-                    Err(e) => {
-                        eprintln!("Failed to write on client side: {}", e);
-                    }
+                    Ok(_) => {},
+                    Err(e) => eprintln!("Failed to write on client side: {}", e),
                 };
             }
             println!("'{}' successfully cut connection", addr);
