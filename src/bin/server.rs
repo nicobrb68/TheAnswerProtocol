@@ -7,7 +7,6 @@ use tokio::sync::Mutex;
 
 use std::sync::Arc;
 use std::collections::HashMap;
-use std::env;
 
 use tap::{World};
 
@@ -48,12 +47,23 @@ async fn main() {
             let mut authenticated: Option<String> = None;
 
             let (r_socket, mut w_socket) = socket.into_split();
-            w_socket.write_all(b"OK hello proto=1\n").await.unwrap();
+            if let Err(e) = w_socket.write_all(b"OK hello proto=1\n").await {
+                eprintln!("Failed to write for message for {}", addr)
+            };
+
             let mut reader = BufReader::new(r_socket);
             let mut line = String::new();
-            while reader.read_line(&mut line).await.unwrap() > 0 {
 
-                // let line_trimmed = &line.trim().to_string();
+            loop {
+                let bytes_read = match reader.read_line(&mut line).await {
+                    Ok(0) => break,          // EOF propre : le client a fermé la connexion
+                    Ok(n) => n,
+                    Err(e) => {
+                        eprintln!("Failed to read user's input: {}", e);
+                        break;
+                    }
+                };
+                            // let line_trimmed = &line.trim().to_string();
                 let line_upper = &line.to_uppercase();
 
                 if line_upper.starts_with("CONNECT ") {
@@ -66,20 +76,43 @@ async fn main() {
                     let username = line_upper.strip_prefix("CONNECT ").unwrap().trim();
 
                     let res = handle_connect(&username, &world).await;
+
                     if res.starts_with("OK") {
                         authenticated = Some(username.to_string());
                     }
-                    w_socket.write_all(res.as_bytes()).await.unwrap();
+
+                    match w_socket.write_all(res.as_bytes()).await {
+                        Ok(val) => val,
+                        Err(e) => {
+                            eprintln!("Failed to write on client side: {}", e);
+                            break
+                        }
+                    };
+                    
                     line.clear();
 
                 } else if let Some(name) = &authenticated {
                     if line_upper.starts_with("LOOK") {
-                        w_socket.write_all(handle_look(&name, &world).await.as_bytes()).await.unwrap();
+                        match w_socket.write_all(handle_look(&name, &world).await.as_bytes()).await {
+                            Ok(val) => val,
+                            Err(e) => {
+                                eprintln!("Failed to write on client side: {}", e);
+                                break
+                            }
+                        };
                         line.clear();
                     } else if line_upper.starts_with("MOVE ") {
                         let direction = line_upper.strip_prefix("MOVE ").unwrap().trim().to_lowercase();
-                        w_socket.write_all(handle_move(&name, &direction, &world).await.as_bytes()).await.unwrap();
-                        line.clear();
+                        match w_socket.write_all(handle_move(&name, &direction, &world).await.as_bytes()).await  {
+                            Ok(val) => val,
+                            Err(e) => {
+                                eprintln!("Failed to write on client side: {}", e);
+                                break
+                            }
+                        };
+                        line.clear()
+                    } else {
+                        line.clear()
                     }
                 } else {
                     line.clear();
@@ -90,10 +123,15 @@ async fn main() {
             if let Some(name) = &authenticated {
                 println!("{} disconnected", &name);
                 w.players.remove(name);
-                w_socket.write_all(b"OK bye\n").await.unwrap();
+                match w_socket.write_all(b"OK bye\n").await {
+                    Ok(val) => val,
+                    Err(e) => {
+                        eprintln!("Failed to write on client side: {}", e);
+                    }
+                };
             }
+            println!("'{}' successfully cut connection", addr);
         });
-
 
     }
 }
