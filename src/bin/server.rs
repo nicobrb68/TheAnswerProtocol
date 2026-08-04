@@ -2,30 +2,43 @@ use tokio::net::TcpListener;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
 use tokio::io::AsyncWriteExt;
-use tap::{World};
-use std::sync::Arc;
-use tokio::sync::Mutex;
-use std::collections::HashMap;
 use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::Mutex;
+
+use std::sync::Arc;
+use std::collections::HashMap;
+use std::env;
+
+use tap::{World};
 
 use tap::commands::connect::handle_connect;
 use tap::commands::look::handle_look;
 use tap::commands::movement::handle_move;
 
+use tap::utils::fatal;
+
 #[tokio::main]
 async fn main() {
-    let listener = TcpListener::bind("127.0.0.1:1234").await.unwrap();
-    println!("server running on {}", listener.local_addr().unwrap());
-
-    let file = std::fs::read_to_string("world.json").unwrap();
-    let world: World = serde_json::from_str(&file).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:1234").await.expect("An error occured while binding TCP listener");
+    println!("Server up, listening on => {}", listener.local_addr().expect("Failed to get local addr"));
+    
+    let args: Vec<String> = std::env::args().collect();
+    let world_path = args.get(1).map(|s| s.as_str()).unwrap_or("src/assets/default_world.json");
+    let file = std::fs::read_to_string(world_path).unwrap_or_else(|_| fatal("Failed to load any world file"));
+    let world: World = serde_json::from_str(&file).unwrap_or_else(|_| fatal("Failed to properly read world file."));
     let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
-    // let world: Arc<Mutex<World>> = Arc::new(Mutex::new(serde_json::from_str(&file).unwrap())); PEUT ETRE REFACTOR COMME CA LES DEUX LIGNES DAVANT mais pas lisible, a voir ce que tu en penses
+
     let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
 
     loop {
-        let (socket, addr) = listener.accept().await.unwrap();
-        println!("accepted connection from {}", addr);
+        let (socket, addr) = match listener.accept().await {
+            Ok(val) => val,
+            Err(e) => {
+                eprintln!("Failed to accept connection: {}", e);
+                continue
+            }
+        };
+        println!("Established connection with '{}'", addr);
 
 
         let world = Arc::clone(&world);

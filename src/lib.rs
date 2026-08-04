@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+
 pub mod commands;
+pub mod utils;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Room {
@@ -74,6 +76,11 @@ impl World {
     pub fn get_room(&self, id: &str) -> Option<&Room> {
         self.rooms.get(id)
     }
+
+    pub fn get_mut_room(&mut self, id: &str) -> Option<&mut Room> {
+        self.rooms.get_mut(id)
+    }
+
 }
 #[derive(Debug)]
 pub enum TapError {
