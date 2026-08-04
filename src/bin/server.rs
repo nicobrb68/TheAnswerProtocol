@@ -48,14 +48,14 @@ async fn main() {
 
             let (r_socket, mut w_socket) = socket.into_split();
             if let Err(e) = w_socket.write_all(b"OK hello proto=1\n").await {
-                eprintln!("Failed to write for message for {}", addr)
+                eprintln!("Failed to write message for {} : {}", addr, e)
             };
 
             let mut reader = BufReader::new(r_socket);
             let mut line = String::new();
 
             loop {
-                let bytes_read = match reader.read_line(&mut line).await {
+                match reader.read_line(&mut line).await {
                     Ok(0) => break,          // EOF propre : le client a fermé la connexion
                     Ok(n) => n,
                     Err(e) => {
