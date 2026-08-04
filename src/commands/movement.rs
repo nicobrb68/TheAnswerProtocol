@@ -1,8 +1,10 @@
 use std::sync::Arc;
 use tokio::sync::{Mutex, MutexGuard};
 use crate::{World, Room, TapError};
+use std::collections::HashMap;
+use tokio::sync::mpsc::UnboundedSender;
 
-pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<World>>) -> String {
+pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<World>>, registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>) -> String {
     let mut w: MutexGuard<World> = world.lock().await;
     let current_room: String = w.get_mut_player(username).unwrap().current_room.clone();
     let new_room_id: String = {

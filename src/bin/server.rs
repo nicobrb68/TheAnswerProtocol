@@ -78,7 +78,7 @@ async fn main() {
                         line.clear();
                     } else if line_upper.starts_with("MOVE ") {
                         let direction = line_upper.strip_prefix("MOVE ").unwrap().trim().to_lowercase();
-                        w_socket.write_all(handle_move(&name, &direction, &world).await.as_bytes()).await.unwrap();
+                        w_socket.write_all(handle_move(&name, &direction, &world, &registry).await.as_bytes()).await.unwrap();
                         line.clear();
                     }
                 } else {
