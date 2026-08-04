@@ -67,6 +67,11 @@ impl World {
         self.players.get_mut(name)
     }
 
+        pub fn get_player(&mut self, name: &str) -> Option<&Player> {
+        self.players.get(name)
+    }
+
+
     pub fn has_player(&self, name: &str) -> bool {
         self.players.contains_key(name)
     }

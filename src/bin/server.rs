@@ -13,6 +13,7 @@ use tap::{World};
 use tap::commands::connect::handle_connect;
 use tap::commands::look::handle_look;
 use tap::commands::movement::handle_move;
+use tap::commands::who::handle_who;
 
 use tap::utils::fatal;
 
@@ -56,14 +57,13 @@ async fn main() {
 
             loop {
                 match reader.read_line(&mut line).await {
-                    Ok(0) => break,          // EOF propre : le client a fermé la connexion
+                    Ok(0) => break,
                     Ok(n) => n,
                     Err(e) => {
                         eprintln!("Failed to read user's input: {}", e);
                         break;
                     }
                 };
-                            // let line_trimmed = &line.trim().to_string();
                 let line_upper = &line.to_uppercase();
 
                 if line_upper.starts_with("CONNECT ") {
@@ -111,7 +111,17 @@ async fn main() {
                             }
                         };
                         line.clear()
-                    } else {
+                    } else if line_upper.starts_with("WHO") {
+                        match w_socket.write_all(handle_who( &world).await.as_bytes()).await  {
+                            Ok(val) => val,
+                            Err(e) => {
+                                eprintln!("Failed to write on client side: {}", e);
+                                break
+                            }
+                        };
+                        line.clear()
+                    } 
+                    else {
                         line.clear()
                     }
                 } else {
@@ -122,12 +132,12 @@ async fn main() {
             let mut w = world.lock().await;
             if let Some(name) = &authenticated {
                 println!("{} disconnected", &name);
+                let room_id = w.get_player(name).unwrap().current_room.clone();
+                w.get_mut_room(&room_id).unwrap().players.retain(|p| p != name);
                 w.players.remove(name);
                 match w_socket.write_all(b"OK bye\n").await {
-                    Ok(val) => val,
-                    Err(e) => {
-                        eprintln!("Failed to write on client side: {}", e);
-                    }
+                    Ok(_) => {},
+                    Err(e) => eprintln!("Failed to write on client side: {}", e),
                 };
             }
             println!("'{}' successfully cut connection", addr);
