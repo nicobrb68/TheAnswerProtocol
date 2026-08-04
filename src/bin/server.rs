@@ -56,14 +56,13 @@ async fn main() {
 
             loop {
                 match reader.read_line(&mut line).await {
-                    Ok(0) => break,          // EOF propre : le client a fermé la connexion
+                    Ok(0) => break,
                     Ok(n) => n,
                     Err(e) => {
                         eprintln!("Failed to read user's input: {}", e);
                         break;
                     }
                 };
-                            // let line_trimmed = &line.trim().to_string();
                 let line_upper = &line.to_uppercase();
 
                 if line_upper.starts_with("CONNECT ") {
