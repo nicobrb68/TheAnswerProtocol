@@ -103,7 +103,7 @@ async fn main() {
                         line.clear();
                     } else if line_upper.starts_with("MOVE ") {
                         let direction = line_upper.strip_prefix("MOVE ").unwrap().trim().to_lowercase();
-                        match w_socket.write_all(handle_move(&name, &direction, &world).await.as_bytes()).await  {
+                        match w_socket.write_all(handle_move(&name, &direction, &world, &registry).await.as_bytes()).await  {
                             Ok(val) => val,
                             Err(e) => {
                                 eprintln!("Failed to write on client side: {}", e);
