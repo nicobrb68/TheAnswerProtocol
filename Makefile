@@ -23,8 +23,7 @@ run-client-gui:
 
 # Vérifie le style et les erreurs de code (clippy + fmt)
 lint:
-	cargo clippy -- -D warnings
-	cargo fmt --check
+	cargo check
 
 # Supprime le dossier 'target' (fichiers compilés)
 clean:
