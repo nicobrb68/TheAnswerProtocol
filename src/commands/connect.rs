@@ -10,6 +10,7 @@ pub async fn handle_connect(username: &str, world: &Arc<Mutex<World>>) -> String
     }
     let user = Player::new(username.to_string(), "room.square".to_string());
     w.add_player(user);
+    w.get_mut_room("room.square").unwrap().players.push(username.to_string());
 
     "OK Connected\n".to_string()
 }

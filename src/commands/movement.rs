@@ -20,12 +20,16 @@ pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<Worl
     let reg = registry.lock().await;
     for player in &w.get_room(&current_room).unwrap().players {
         if let Some(tx) = reg.get(player) {
-            let _ = tx.send(format!("EVT ROOM PRESENCE LEAVE {}\n", username));
+            if player != username {
+                let _ = tx.send(format!("EVT ROOM PRESENCE LEAVE {}\n", username));
+            }
         }
     }
     for player in &w.get_room(&new_room_id).unwrap().players {
         if let Some(tx) = reg.get(player) {
-            let _ = tx.send(format!("EVT ROOM PRESENCE ENTER {}\n", username));
+            if player != username {
+                let _ = tx.send(format!("EVT ROOM PRESENCE ENTER {}\n", username));
+            }
         }
     }
     format!("OK room={}\n", new_room_id)
