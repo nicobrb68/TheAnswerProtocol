@@ -14,6 +14,7 @@ use tap::commands::connect::handle_connect;
 use tap::commands::look::handle_look;
 use tap::commands::movement::handle_move;
 use tap::commands::who::handle_who;
+use tap::commands::disconnect::handle_disconnect;
 
 use tap::utils::fatal;
 
@@ -75,7 +76,7 @@ async fn main() {
 
                 if line_upper.starts_with("CONNECT ") {
                     if authenticated.is_some() {
-                        tx.send("ERR already connected\n");
+                        tx.send("ERR already connected\n".to_string());
                         line.clear();
                         continue;
                     }
@@ -98,6 +99,11 @@ async fn main() {
                     
                     line.clear();
 
+                } else if line_upper.starts_with("QUIT") {
+                    if let Err(e) = tx.send("OK bye\n".to_string()) {
+                        eprintln!("Failed to write on client side: {}", e);
+                    }
+                    break;
                 } else if let Some(name) = &authenticated {
                     if line_upper.starts_with("LOOK") {
                         match tx.send(handle_look(&name, &world).await) {
@@ -136,17 +142,12 @@ async fn main() {
                 }
             }
 
-            let mut w = world.lock().await;
-            if let Some(name) = &authenticated {
-                println!("{} disconnected", &name);
-                let room_id = w.get_player(name).unwrap().current_room.clone();
-                w.get_mut_room(&room_id).unwrap().players.retain(|p| p != name);
-                w.players.remove(name);
-                match tx.send("OK bye\n") {
-                    Ok(_) => {},
-                    Err(e) => eprintln!("Failed to write on client side: {}", e),
-                };
-            }
+            match handle_disconnect(&authenticated, &world).await {
+                Ok(()) => {},
+                Err(e) => eprintln!("Failed to disconnect client: {}", e)
+            };
+
+            
             println!("'{}' successfully cut connection", addr);
         });
 
