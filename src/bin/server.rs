@@ -15,6 +15,7 @@ use tap::commands::look::handle_look;
 use tap::commands::movement::handle_move;
 use tap::commands::who::handle_who;
 use tap::commands::disconnect::handle_disconnect;
+use tap::commands::chat::{handle_chat_global, handle_chat_room};
 
 use tap::utils::fatal;
 
@@ -148,7 +149,19 @@ async fn main() {
                             }
                         };
                         line.clear()
-                    } 
+                    } else if line_upper.starts_with("CHAT ") {
+                        let rest = line_upper.strip_prefix("CHAT ").unwrap().trim();
+                        if rest.starts_with("GLOBAL ") {
+                            let message = rest.strip_prefix("GLOBAL ").unwrap().trim();
+                            let res = handle_chat_global(name, &registry, message).await;
+                            let _ = tx.send(res);
+                        } else if rest.starts_with("ROOM ") {
+                            let message = rest.strip_prefix("ROOM ").unwrap().trim();
+                            let res = handle_chat_room(name, &registry, message, &world).await;
+                            let _ = tx.send(res);
+                        }
+                        line.clear();
+                    }
                     else {
                         line.clear()
                     }
