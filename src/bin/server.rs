@@ -48,7 +48,14 @@ async fn main() {
             let mut authenticated: Option<String> = None;
 
             let (r_socket, mut w_socket) = socket.into_split();
-            if let Err(e) = w_socket.write_all(b"OK hello proto=1\n").await {
+            tokio::spawn(async move {
+                while let Some(message) = rx.recv().await {
+                    if w_socket.write_all(message.as_bytes()).await.is_err() {
+                        break;
+                    }
+                }
+            });
+            if let Err(e) = tx.send("OK hello proto=1\n".to_string()) {
                 eprintln!("Failed to write message for {} : {}", addr, e)
             };
 
@@ -68,7 +75,7 @@ async fn main() {
 
                 if line_upper.starts_with("CONNECT ") {
                     if authenticated.is_some() {
-                        w_socket.write_all(b"ERR already connected\n").await.unwrap();
+                        tx.send("ERR already connected\n");
                         line.clear();
                         continue;
                     }
@@ -81,7 +88,7 @@ async fn main() {
                         authenticated = Some(username.to_string());
                     }
 
-                    match w_socket.write_all(res.as_bytes()).await {
+                    match tx.send(res) {
                         Ok(val) => val,
                         Err(e) => {
                             eprintln!("Failed to write on client side: {}", e);
@@ -93,7 +100,7 @@ async fn main() {
 
                 } else if let Some(name) = &authenticated {
                     if line_upper.starts_with("LOOK") {
-                        match w_socket.write_all(handle_look(&name, &world).await.as_bytes()).await {
+                        match tx.send(handle_look(&name, &world).await) {
                             Ok(val) => val,
                             Err(e) => {
                                 eprintln!("Failed to write on client side: {}", e);
@@ -103,7 +110,7 @@ async fn main() {
                         line.clear();
                     } else if line_upper.starts_with("MOVE ") {
                         let direction = line_upper.strip_prefix("MOVE ").unwrap().trim().to_lowercase();
-                        match w_socket.write_all(handle_move(&name, &direction, &world, &registry).await.as_bytes()).await  {
+                        match tx.send(handle_move(&name, &direction, &world, &registry).await) {
                             Ok(val) => val,
                             Err(e) => {
                                 eprintln!("Failed to write on client side: {}", e);
@@ -112,7 +119,7 @@ async fn main() {
                         };
                         line.clear()
                     } else if line_upper.starts_with("WHO") {
-                        match w_socket.write_all(handle_who( &world).await.as_bytes()).await  {
+                        match tx.send(handle_who( &world).await) {
                             Ok(val) => val,
                             Err(e) => {
                                 eprintln!("Failed to write on client side: {}", e);
@@ -135,7 +142,7 @@ async fn main() {
                 let room_id = w.get_player(name).unwrap().current_room.clone();
                 w.get_mut_room(&room_id).unwrap().players.retain(|p| p != name);
                 w.players.remove(name);
-                match w_socket.write_all(b"OK bye\n").await {
+                match tx.send("OK bye\n") {
                     Ok(_) => {},
                     Err(e) => eprintln!("Failed to write on client side: {}", e),
                 };
