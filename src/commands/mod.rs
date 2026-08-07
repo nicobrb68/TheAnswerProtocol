@@ -6,3 +6,7 @@ pub mod disconnect;
 pub mod chat;
 pub mod group_dispatcher;
 pub mod group;
+pub mod talk;
+pub mod take;
+pub mod drop;
+pub mod inventory;

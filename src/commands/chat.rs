@@ -31,7 +31,7 @@ pub async fn handle_chat_room(
     };
     notify_room(
         &room_id,
-        &format!("EVT ROOM CHAT {} {}\n", username, message),
+        &format!("(ROOM) {}: {}\n", username, message),
         None,
         world,
         registry
