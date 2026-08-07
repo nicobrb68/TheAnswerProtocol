@@ -48,13 +48,36 @@ impl Player {
         }
     }
 }
+#[derive(Debug, Clone, Deserialize)]
+pub struct Group {
+    pub id: String,
+    pub leader: String,
+    pub players: Vec<String>
+}
+
+impl Group {
+    pub fn new(id: String, username: String) -> Group {
+        Group {
+            id,
+            leader: username.clone(),
+            players: vec![username]
+        }
+    }
+
+    pub fn add_player(&mut self, player: String) {
+        self.players.push(player);
+    }
+
+}
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct World {
     #[serde(default)]
     pub players: HashMap<String, Player>,
     pub rooms: HashMap<String, Room>,
-    pub spawn: String
+    pub spawn: String,
+    #[serde(default)]
+    pub groups: HashMap<String, Group>
 }
 
 impl World {
@@ -88,11 +111,24 @@ impl World {
         self.rooms.get_mut(id)
     }
 
+
+    // Group impl
+
+    pub fn add_group(&mut self, group: Group) {
+        self.groups.insert(group.id.clone(), group);
+    }
+
+    pub fn has_group(&self, id: &str) -> bool {
+        self.groups.contains_key(id)
+    }
+
 }
 #[derive(Debug)]
 pub enum TapError {
     NameInUse,
     InvalidUsername,
+    GroupNameInUse,
+    InvalidGroupName,
     NoExit,
     ItemNotFound,
     ItemNotInInventory,
@@ -111,6 +147,8 @@ impl TapError {
         match self {
             TapError::NameInUse        => "ERR 201 NAME_IN_USE\n".to_string(),
             TapError::InvalidUsername  => "ERR 202 INVALID_USER_NAME\n".to_string(),
+            TapError::GroupNameInUse        => "ERR 211 GROUP_NAME_IN_USE\n".to_string(),
+            TapError::InvalidGroupName => "ERR 212 INVALID_GROUP_NAME\n".to_string(),
             TapError::NoExit           => "ERR 301 NO_EXIT\n".to_string(),
             TapError::NotInGroup       => "ERR 401 NOT_IN_GROUP\n".to_string(),
             TapError::AlreadyInGroup   => "ERR 402 ALREADY_IN_GROUP\n".to_string(),

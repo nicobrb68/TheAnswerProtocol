@@ -1,3 +1,4 @@
+use tap::commands::group_dispatcher::handle_group;
 use tokio::net::TcpListener;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
@@ -168,6 +169,10 @@ async fn main() {
                             let res = handle_chat_room(name, &registry, message, &world).await;
                             let _ = tx.send(res);
                         }
+                        line.clear();
+                    } else if line_upper.starts_with("GROUP ") {
+                        let res = handle_group(name, get_args(&line_trimmed), &world).await;
+                        let _ = tx.send(res);
                         line.clear();
                     }
                     else {
