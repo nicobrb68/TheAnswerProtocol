@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use tokio::sync::Mutex;
 use tokio::sync::mpsc::UnboundedSender;
 use crate::{World};
+use crate::events::room::notify_room;
 
 
 pub async fn handle_chat_global(
