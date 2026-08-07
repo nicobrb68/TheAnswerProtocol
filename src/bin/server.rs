@@ -19,6 +19,8 @@ use tap::commands::chat::{handle_chat_global, handle_chat_room};
 
 use tap::utils::fatal;
 
+use tap::events::room::notify_room;
+
 #[tokio::main]
 async fn main() {
     let listener = TcpListener::bind("127.0.0.1:1234").await.expect("An error occured while binding TCP listener");
@@ -93,16 +95,17 @@ async fn main() {
                     if res.starts_with("OK") {
                         authenticated = Some(username.to_string());
                         registry.lock().await.insert(username.to_string(), tx.clone());
-                        let w = world.lock().await;
-                        let room_players = w.get_room("room.square").unwrap().players.clone();
-                        let reg = registry.lock().await;
-                        for player in &room_players {
-                            if player != username {
-                                if let Some(player_tx) = reg.get(player) {
-                                    let _ = player_tx.send(format!("EVT ROOM PRESENCE ENTER {}\n", username));
-                                }
-                            }
-                        }
+                        let player_room = {
+                            let w = world.lock().await;
+                            w.get_player(username).unwrap().current_room.clone()
+                        };
+                        notify_room(
+                            &player_room,
+                            &format!("EVT ROOM PRESENCE ENTER {}\n", username),
+                            Some(username),
+                            &world,
+                            &registry
+                        ).await;
                     }
 
                     match tx.send(res) {
@@ -170,34 +173,11 @@ async fn main() {
                 }
             }
 
-            // match handle_disconnect(&authenticated, &world).await {
-            //     Ok(()) => {},
-            //     Err(e) => eprintln!("Failed to disconnect client: {}", e)
-            // };
+            match handle_disconnect(&authenticated, &world, &registry).await {
+                Ok(()) => {},
+                Err(e) => eprintln!("Failed to disconnect client: {}", e)
+            };
 
-            
-            let mut w = world.lock().await;
-            if let Some(name) = &authenticated {
-                println!("{} disconnected", &name);
-                let room_id = w.get_player(name).unwrap().current_room.clone();
-                let room_players = w.get_room(&room_id).unwrap().players.clone();
-                let reg = registry.lock().await;
-                for player in &room_players {
-                    if player != name {
-                        if let Some(tx) = reg.get(player) {
-                            let _ = tx.send(format!("EVT ROOM PRESENCE LEAVE {}\n", name));
-                        }
-                    }
-                }
-                drop(reg);
-                w.get_mut_room(&room_id).unwrap().players.retain(|p| p != name);
-                w.players.remove(name);
-                registry.lock().await.remove(name);
-                match tx.send("OK bye\n".to_string()) {
-                    Ok(_) => {},
-                    Err(e) => eprintln!("Failed to write on client side: {}", e),
-                };
-            }
             println!("'{}' successfully cut connection", addr);
         });
 

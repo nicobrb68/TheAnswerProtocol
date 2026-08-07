@@ -25,7 +25,7 @@ pub async fn handle_chat_room(
 	world:	&Arc<Mutex<World>> 
 ) -> String {
 
-	let mut w = world.lock().await;
+	let w = world.lock().await;
 	let room_id = w.get_player(username).unwrap().current_room.clone();
 	let room_players = w.get_room(&room_id).unwrap().players.clone();
 	drop(w);

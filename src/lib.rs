@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod commands;
 pub mod utils;
+pub mod events;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Room {
@@ -67,7 +68,7 @@ impl World {
         self.players.get_mut(name)
     }
 
-        pub fn get_player(&mut self, name: &str) -> Option<&Player> {
+    pub fn get_player(&self, name: &str) -> Option<&Player> {
         self.players.get(name)
     }
 
