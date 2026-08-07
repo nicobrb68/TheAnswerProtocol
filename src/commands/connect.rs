@@ -1,11 +1,15 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use crate::{Player, World, TapError};
+use crate::{Player, TapError, World, utils::is_valid_username};
 
 pub async fn handle_connect(username: &str, world: &Arc<Mutex<World>>) -> String {
+    if !is_valid_username(username) {
+        return TapError::InvalidUsername.message();
+    }
+    
     let mut w = world.lock().await;
 
-    if w.has_player(&username) {
+    if w.has_player(username) {
         return TapError::NameInUse.message();
     }
     let spawn = w.spawn.clone();

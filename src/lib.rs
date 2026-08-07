@@ -92,6 +92,7 @@ impl World {
 #[derive(Debug)]
 pub enum TapError {
     NameInUse,
+    InvalidUsername,
     NoExit,
     ItemNotFound,
     ItemNotInInventory,
@@ -109,6 +110,7 @@ impl TapError {
     pub fn message(&self) -> String {
         match self {
             TapError::NameInUse        => "ERR 201 NAME_IN_USE\n".to_string(),
+            TapError::InvalidUsername  => "ERR 202 INVALID_USER_NAME\n".to_string(),
             TapError::NoExit           => "ERR 301 NO_EXIT\n".to_string(),
             TapError::NotInGroup       => "ERR 401 NOT_IN_GROUP\n".to_string(),
             TapError::AlreadyInGroup   => "ERR 402 ALREADY_IN_GROUP\n".to_string(),
