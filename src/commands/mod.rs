@@ -4,3 +4,6 @@ pub mod movement;
 pub mod who;
 pub mod disconnect;
 pub mod chat;
+pub mod talk;
+pub mod take;
+pub mod drop;

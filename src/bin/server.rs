@@ -16,6 +16,9 @@ use tap::commands::movement::handle_move;
 use tap::commands::who::handle_who;
 use tap::commands::disconnect::handle_disconnect;
 use tap::commands::chat::{handle_chat_global, handle_chat_room};
+use tap::commands::talk::handle_talk;
+use tap::commands::take::handle_take;
+use tap::commands::drop::handle_drop;
 
 use tap::utils::{fatal, get_args};
 
@@ -36,7 +39,7 @@ async fn main() {
     let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
 
     let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
-
+    
     loop {
         let (socket, addr) = match listener.accept().await {
             Ok(val) => val,
@@ -168,6 +171,21 @@ async fn main() {
                             let res = handle_chat_room(name, &registry, message, &world).await;
                             let _ = tx.send(res);
                         }
+                        line.clear();
+                    } else if line_upper.starts_with("TALK ") {
+                        let npc_id = get_args(&line_trimmed).to_lowercase();
+                        let res = handle_talk(name, &npc_id, &world).await;
+                        let _ = tx.send(res);
+                        line.clear();
+                    } else if line_upper.starts_with("TAKE ") {
+                        let item_id = get_args(&line_trimmed).to_lowercase();
+                        let res = handle_take(name, &item_id, &world).await;
+                        let _ = tx.send(res);
+                        line.clear();
+                    } else if line_upper.starts_with("DROP ") {
+                        let item_id = get_args(&line_trimmed).to_lowercase();
+                        let res = handle_drop(name, &item_id, &world).await;
+                        let _ = tx.send(res);
                         line.clear();
                     }
                     else {

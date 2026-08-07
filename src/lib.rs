@@ -54,7 +54,9 @@ pub struct World {
     #[serde(default)]
     pub players: HashMap<String, Player>,
     pub rooms: HashMap<String, Room>,
-    pub spawn: String
+    pub spawn: String,
+    #[serde(default)]
+    pub npcs: HashMap<String, Npc>
 }
 
 impl World {
@@ -86,6 +88,16 @@ impl World {
 
     pub fn get_mut_room(&mut self, id: &str) -> Option<&mut Room> {
         self.rooms.get_mut(id)
+    }
+
+    // ncp impl
+
+    pub fn get_npc(&self, id: &str) -> Option<&Npc> {
+        self.npcs.get(id)
+    }
+
+    pub fn get_mut_npc(&mut self, id: &str) -> Option<&mut Npc> {
+        self.npcs.get_mut(id)
     }
 
 }
@@ -124,4 +136,25 @@ impl TapError {
             TapError::NotAuthenticated => "ERR 000 NOT_AUTHENTICATED\n".to_string(),
         }
     }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Npc {
+    pub id: String,
+    pub name: String,
+    pub dialogue: Vec<String>,
+    pub hostile: bool,
+    pub hp: Option<u32>,
+    pub damage: Option<u32>,
+    pub quest: Option<String>
+}
+
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Item {
+    pub id: String,
+    pub name: String,
+    pub damage: Option<u32>,
+    pub armor: Option<u32>,
+    pub heal: Option<u32>,
 }
