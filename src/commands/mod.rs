@@ -7,3 +7,4 @@ pub mod chat;
 pub mod talk;
 pub mod take;
 pub mod drop;
+pub mod inventory;

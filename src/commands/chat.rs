@@ -13,7 +13,7 @@ pub async fn handle_chat_global(
 ) -> String {
 	let r = registry.lock().await; 
 	for (_player, tx) in r.iter() {
-		let _ = tx.send(format!("(GLOBAL) {}: {}\n", username, message));
+		let _ = tx.send(format!("\n(GLOBAL) {}: {}\n", username, message));
 	}
 	"OK\n".to_string()	
 }
@@ -31,7 +31,7 @@ pub async fn handle_chat_room(
     };
     notify_room(
         &room_id,
-        &format!("EVT ROOM CHAT {} {}\n", username, message),
+        &format!("\n(ROOM) {}: {}\n", username, message),
         None,
         world,
         registry

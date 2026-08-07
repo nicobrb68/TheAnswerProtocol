@@ -19,6 +19,7 @@ use tap::commands::chat::{handle_chat_global, handle_chat_room};
 use tap::commands::talk::handle_talk;
 use tap::commands::take::handle_take;
 use tap::commands::drop::handle_drop;
+use tap::commands::inventory::handle_inventory;
 
 use tap::utils::{fatal, get_args};
 
@@ -26,7 +27,7 @@ use tap::events::room::notify_room;
 
 #[tokio::main]
 async fn main() {
-    let listener = TcpListener::bind("127.0.0.1:1234").await.expect("An error occured while binding TCP listener");
+    let listener = TcpListener::bind("0.0.0.0:7534").await.expect("An error occured while binding TCP listener");
     println!("Server up, listening on => {}", listener.local_addr().expect("Failed to get local addr"));
     
     let args: Vec<String> = std::env::args().collect();
@@ -185,6 +186,10 @@ async fn main() {
                     } else if line_upper.starts_with("DROP ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
                         let res = handle_drop(name, &item_id, &world).await;
+                        let _ = tx.send(res);
+                        line.clear();
+                    } else if line_upper.starts_with("INVENTORY") {
+                        let res = handle_inventory(name, &world).await;
                         let _ = tx.send(res);
                         line.clear();
                     }
