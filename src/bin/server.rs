@@ -30,6 +30,9 @@ async fn main() {
     let world_path = args.get(1).map(|s| s.as_str()).unwrap_or("src/assets/default_world.json");
     let file = std::fs::read_to_string(world_path).unwrap_or_else(|_| fatal("Failed to load any world file"));
     let world: World = serde_json::from_str(&file).unwrap_or_else(|_| fatal("Failed to properly read world file."));
+    if !world.rooms.contains_key(&world.spawn) {
+        fatal("Spawn room does not exist in world file");
+    }
     let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
 
     let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));

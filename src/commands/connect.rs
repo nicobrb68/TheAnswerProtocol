@@ -8,7 +8,7 @@ pub async fn handle_connect(username: &str, world: &Arc<Mutex<World>>) -> String
     if w.has_player(&username) {
         return TapError::NameInUse.message();
     }
-    let user = Player::new(username.to_string(), "room.square".to_string());
+    let user = Player::new(username.to_string(), w.spawn.clone());
     w.add_player(user);
     w.get_mut_room("room.square").unwrap().players.push(username.to_string());
 

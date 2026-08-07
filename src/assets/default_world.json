@@ -235,5 +235,6 @@
 			],
 			"npcs": []
 		}
-	}
+	},
+	"spawn": "room.tavern"
 }

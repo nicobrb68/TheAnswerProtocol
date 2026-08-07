@@ -53,7 +53,8 @@ impl Player {
 pub struct World {
     #[serde(default)]
     pub players: HashMap<String, Player>,
-    pub rooms: HashMap<String, Room>
+    pub rooms: HashMap<String, Room>,
+    pub spawn: String
 }
 
 impl World {
