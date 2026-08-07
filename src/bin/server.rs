@@ -17,7 +17,7 @@ use tap::commands::who::handle_who;
 use tap::commands::disconnect::handle_disconnect;
 use tap::commands::chat::{handle_chat_global, handle_chat_room};
 
-use tap::utils::fatal;
+use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
 
@@ -78,7 +78,8 @@ async fn main() {
                         break;
                     }
                 };
-                let line_upper = &line.to_uppercase();
+                let line_trimmed = line.trim().to_string();
+                let line_upper = line_trimmed.to_uppercase();
 
                 if line_upper.starts_with("CONNECT ") {
                     if authenticated.is_some() {
@@ -91,7 +92,7 @@ async fn main() {
                         continue;
                     }
 
-                    let username = line_upper.strip_prefix("CONNECT ").unwrap().trim();
+                    let username = get_args(&line_trimmed);
 
                     let res = handle_connect(&username, &world).await;
 
@@ -137,7 +138,7 @@ async fn main() {
                         };
                         line.clear();
                     } else if line_upper.starts_with("MOVE ") {
-                        let direction = line_upper.strip_prefix("MOVE ").unwrap().trim().to_lowercase();
+                        let direction = get_args(&line_trimmed).to_lowercase();
                         match tx.send(handle_move(&name, &direction, &world, &registry).await) {
                             Ok(val) => val,
                             Err(e) => {
@@ -156,13 +157,14 @@ async fn main() {
                         };
                         line.clear()
                     } else if line_upper.starts_with("CHAT ") {
-                        let rest = line_upper.strip_prefix("CHAT ").unwrap().trim();
-                        if rest.starts_with("GLOBAL ") {
-                            let message = rest.strip_prefix("GLOBAL ").unwrap().trim();
+                        let args = get_args(&line_trimmed);
+                        let args_upper = args.to_uppercase();
+                        if args_upper.starts_with("GLOBAL ") {
+                            let message = get_args(args);
                             let res = handle_chat_global(name, &registry, message).await;
                             let _ = tx.send(res);
-                        } else if rest.starts_with("ROOM ") {
-                            let message = rest.strip_prefix("ROOM ").unwrap().trim();
+                        } else if args_upper.starts_with("ROOM ") {
+                            let message = get_args(args);
                             let res = handle_chat_room(name, &registry, message, &world).await;
                             let _ = tx.send(res);
                         }
