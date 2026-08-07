@@ -7,7 +7,7 @@ pub async fn create_group(
 	world: &Arc<Mutex<World>>,
 	group_name: &str
 ) -> String {
-	let group_id = if group_name.is_empty() {
+	let new_group_id = if group_name.is_empty() {
 		username.to_string()
 	} else {
 		if !is_valid_group_name(group_name) {
@@ -21,9 +21,10 @@ pub async fn create_group(
 		group_name.to_string()
 	};
 	
-	let group = Group::new(group_id.clone(), username.to_string());
+	let group = Group::new(new_group_id.clone(), username.to_string());
 	let mut w = world.lock().await;
+	w.get_mut_player(username).unwrap().group_id = Some(new_group_id.clone());
 	w.add_group(group);
 	
-	format!("OK group={}\n", group_id)
+	format!("OK group={}\n", new_group_id)
 }

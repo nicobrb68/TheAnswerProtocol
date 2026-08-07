@@ -176,7 +176,7 @@ async fn main() {
                         line.clear();
                     } else if line_upper.starts_with("GROUP ") {
                         let res = handle_group(name, get_args(&line_trimmed), &world).await;
-                        
+                        let _ = tx.send(res);
                     } else if line_upper.starts_with("TALK ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
                         let res = handle_talk(name, &npc_id, &world).await;
