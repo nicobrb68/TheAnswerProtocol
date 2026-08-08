@@ -48,7 +48,7 @@ impl Player {
         }
     }
 }
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Group {
     pub id: String,
     pub leader: String,
@@ -124,6 +124,8 @@ impl World {
         self.groups.contains_key(id)
     }
     
+    pub fn get_group(&self, id: &str) -> Option<&Group> { self.groups.get(id) }
+    
     // ncp impl
 
     pub fn get_npc(&self, id: &str) -> Option<&Npc> {
@@ -143,6 +145,7 @@ pub enum TapError {
     InvalidGroupName,
     NoExit,
     ItemNotFound,
+    PlayerNotFound,
     ItemNotInInventory,
     NpcNotFound,
     NpcNotHostile,
@@ -164,6 +167,7 @@ impl TapError {
             TapError::NoExit           => "ERR 301 NO_EXIT\n".to_string(),
             TapError::NotInGroup       => "ERR 401 NOT_IN_GROUP\n".to_string(),
             TapError::AlreadyInGroup   => "ERR 402 ALREADY_IN_GROUP\n".to_string(),
+            TapError::PlayerNotFound => "ERR 404 PLAYER_NOT_FOUND\n".to_string(),
             TapError::ItemNotFound     => "ERR 404 ITEM_NOT_FOUND\n".to_string(),
             TapError::ItemNotInInventory => "ERR 404 ITEM_NOT_IN_INVENTORY\n".to_string(),
             TapError::NpcNotFound      => "ERR 404 NPC_NOT_FOUND\n".to_string(),
