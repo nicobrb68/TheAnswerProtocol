@@ -22,5 +22,5 @@ pub async fn handle_group(
 	}
 
 
-	"nico ta grosse mere".to_string()
+	"nico ta grosse mere\n".to_string()
 }

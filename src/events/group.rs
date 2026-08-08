@@ -4,16 +4,16 @@ use tokio::sync::Mutex;
 use tokio::sync::mpsc::UnboundedSender;
 use crate::World;
 
-pub async fn notify_room(
-    room_id: &str,
+pub async fn notify_group(
+    group_id: &str,
     message: &str,
     exclude: Option<&str>,
     world: &Arc<Mutex<World>>,
     registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>
 ) {
     let w = world.lock().await;
-    let players = match w.get_room(room_id) {
-        Some(room) => room.players.clone(),
+    let players = match w.get_group(group_id) {
+        Some(group) => group.players.clone(),
         None => return,
     };
     let reg = registry.lock().await;

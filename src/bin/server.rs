@@ -16,7 +16,7 @@ use tap::commands::look::handle_look;
 use tap::commands::movement::handle_move;
 use tap::commands::who::handle_who;
 use tap::commands::disconnect::handle_disconnect;
-use tap::commands::chat::{handle_chat_global, handle_chat_room};
+use tap::commands::chat::{handle_chat_global, handle_chat_room, handle_chat_group};
 use tap::commands::talk::handle_talk;
 use tap::commands::take::handle_take;
 use tap::commands::drop::handle_drop;
@@ -171,6 +171,10 @@ async fn main() {
                         } else if args_upper.starts_with("ROOM ") {
                             let message = get_args(args);
                             let res = handle_chat_room(name, &registry, message, &world).await;
+                            let _ = tx.send(res);
+                        } else if args_upper.starts_with("GROUP ") {
+                            let message = get_args(args);
+                            let res = handle_chat_group(name, &registry, message, &world).await;
                             let _ = tx.send(res);
                         }
                         line.clear();
