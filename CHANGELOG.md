@@ -1,21 +1,15 @@
 # Journal de bord - TAP
 
-## 01/08 - 1h22 du mat
+## 2025-08-08
 
-Commencé le projet avec Claude comme prof de Rust.
-Jamais fait de Rust de ma vie, maintenant j'ai un serveur TCP qui tourne.
+### feat: GROUP CREATE et GROUP INFO
+- Création de groupe avec nom custom ou username par défaut
+- Validation du nom (longueur, caractères autorisés)
+- Système de leader — le créateur est automatiquement leader et membre
+- `GROUP INFO` retourne les infos du groupe en JSON
+- `has_group`, `get_group`, `add_group` ajoutés dans `impl World`
 
-Ce qu'on a fait :
-- setup du projet Cargo (tokio, serde, tracing)
-- serveur TCP async qui accepte plusieurs clients en parallèle
-- lecture des commandes ligne par ligne
-- parsing de CONNECT + réponse OK connected
-- greeting proto=1 à la connexion
-
-Prochaine étape : les structs (Room, Player, World) + Arc<Mutex<T>>
-pour partager l'état entre les clients.
-
-Tous les .write_all(...).await.unwrap() vont paniquer si un client se déconnecte brutalement pendant qu'on lui écrit — or le sujet exige "handle disconnects gracefully". On corrigera ça.
-
-P.S. Claude m'apprend plutot bien et meme si cest merdiquement verbeux le rust
-cest assez fun en vrai
+### feat: CHAT GROUP
+- Broadcast au groupe via `notify_group`
+- Gestion erreur `NOT_IN_GROUP` si le joueur est pas dans un groupe
+- `notify_group` dans `src/events/group.rs` — même pattern que `notify_room`
