@@ -13,3 +13,16 @@
 - Broadcast au groupe via `notify_group`
 - Gestion erreur `NOT_IN_GROUP` si le joueur est pas dans un groupe
 - `notify_group` dans `src/events/group.rs` — même pattern que `notify_room`
+
+
+## 2025-08-09
+
+### refactor: group dispatcher
+- `info_group` prend maintenant `group_id` directement au lieu de `username`
+- Fix double lock dans `group_dispatcher` (deadlock potentiel)
+- Ajout `GroupNotFound` (404) et `NotGroupLeader` (403) dans `TapError`
+- Placeholder `invite_group` créé
+
+### feat: GROUP INFO
+- Retourne les infos du groupe en JSON depuis `group_id` du joueur
+- Erreur `GROUP_NOT_FOUND` si le groupe n'existe plus
