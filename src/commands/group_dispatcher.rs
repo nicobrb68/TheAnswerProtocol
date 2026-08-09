@@ -1,10 +1,13 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use crate::{World,
-            commands::group::create::create_group,
-            commands::group::info::info_group,
-            utils::get_args
-			};
+use crate::{
+	World,
+	commands::group::create::create_group,
+	commands::group::info::info_group,
+	commands::group::invite::invite_group,
+	utils::get_args,
+	TapError
+};
 
 
 pub async fn handle_group(
@@ -17,8 +20,23 @@ pub async fn handle_group(
 
 	if args_upper.starts_with("CREATE") {
 		return create_group(username, &world, group_args).await;
-	} else if args_upper.starts_with("INFO") {
-		return info_group(username, &world).await;
+	} else {
+		let group_id = {
+			let w = world.lock().await;
+			match w.get_player(username) {
+				Some(p) => match &p.group_id {
+					Some(id) => id.clone(),
+					None => return TapError::NotInGroup.message()
+				}
+				None => return TapError::PlayerNotFound.message()
+			}
+		};
+
+		if args_upper.starts_with("INFO") {
+			return info_group(&group_id, &world).await;
+		} else if args_upper.starts_with("INVITE") {
+			return invite_group(username, &group_id, &group_args, &world).await;
+		}
 	}
 
 
