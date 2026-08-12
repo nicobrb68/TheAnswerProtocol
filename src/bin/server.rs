@@ -179,7 +179,7 @@ async fn main() {
                         }
                         line.clear();
                     } else if line_upper.starts_with("GROUP ") {
-                        let res = handle_group(name, get_args(&line_trimmed), &world).await;
+                        let res = handle_group(name, get_args(&line_trimmed), &world, &registry).await;
                         let _ = tx.send(res);
                         line.clear();
                     } else if line_upper.starts_with("TALK ") {

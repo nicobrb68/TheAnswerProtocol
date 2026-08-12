@@ -52,7 +52,8 @@ impl Player {
 pub struct Group {
     pub id: String,
     pub leader: String,
-    pub players: Vec<String>
+    pub players: Vec<String>,
+    pub invited: Vec<String>
 }
 
 impl Group {
@@ -60,7 +61,8 @@ impl Group {
         Group {
             id,
             leader: username.clone(),
-            players: vec![username]
+            players: vec![username],
+            invited: Vec::new()
         }
     }
 
@@ -123,8 +125,10 @@ impl World {
     pub fn has_group(&self, id: &str) -> bool {
         self.groups.contains_key(id)
     }
-    
+
     pub fn get_group(&self, id: &str) -> Option<&Group> { self.groups.get(id) }
+
+    pub fn get_mut_group(&mut self, id: &str) -> Option<&mut Group> { self.groups.get_mut(id) }
     
     // ncp impl
 
@@ -153,6 +157,8 @@ pub enum TapError {
     NpcNotHostile,
     NoQuestAvailable,
     NotInGroup,
+    PlayerAlreadyInGroup,
+    CannotInviteSelf,
     AlreadyInGroup,
     ConnectionFailed,
     SendFailed,
@@ -169,6 +175,7 @@ impl TapError {
             TapError::NoExit           => "ERR 301 NO_EXIT\n".to_string(),
             TapError::NotInGroup       => "ERR 401 NOT_IN_GROUP\n".to_string(),
             TapError::AlreadyInGroup   => "ERR 402 ALREADY_IN_GROUP\n".to_string(),
+            TapError::PlayerAlreadyInGroup   => "ERR 402 PLAYER_ALREADY_IN_GROUP\n".to_string(),
             TapError::NotGroupLeader => "ERR 403 NOT_GROUP_LEADER\n".to_string(),
             TapError::PlayerNotFound   => "ERR 404 PLAYER_NOT_FOUND\n".to_string(),
             TapError::GroupNotFound    => "ERR 404 GROUP_NOT_FOUND\n".to_string(),
@@ -177,6 +184,7 @@ impl TapError {
             TapError::NpcNotFound      => "ERR 404 NPC_NOT_FOUND\n".to_string(),
             TapError::NpcNotHostile    => "ERR 405 NPC_NOT_HOSTILE\n".to_string(),
             TapError::NoQuestAvailable => "ERR 406 NO_QUEST_AVAILABLE\n".to_string(),
+            TapError::CannotInviteSelf => "ERR 407 CANNOT_INVITE_SELF\n".to_string(),
             TapError::ConnectionFailed => "ERR 900 CONNECTION_FAILED\n".to_string(),
             TapError::SendFailed       => "ERR 901 SEND_FAILED\n".to_string(),
             TapError::NotAuthenticated => "ERR 000 NOT_AUTHENTICATED\n".to_string(),

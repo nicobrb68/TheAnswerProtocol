@@ -1,4 +1,6 @@
+use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::Mutex;
 use crate::{
 	World,
@@ -14,6 +16,7 @@ pub async fn handle_group(
 	username: &str,
 	args: &str,
 	world: &Arc<Mutex<World>>,
+	registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>
 ) -> String {
 	let args_upper = args.to_uppercase();
 	let group_args = get_args(args);
@@ -35,7 +38,7 @@ pub async fn handle_group(
 		if args_upper.starts_with("INFO") {
 			return info_group(&group_id, &world).await;
 		} else if args_upper.starts_with("INVITE") {
-			return invite_group(username, &group_id, &group_args, &world).await;
+			return invite_group(username, &group_id, &group_args, &world, &registry).await;
 		}
 	}
 
