@@ -1,8 +1,3 @@
-use std::sync::Arc;
-use tokio::sync::Mutex;
-
-use crate::World;
-
 pub fn fatal(msg: &str) -> ! {
     eprintln!("ERROR: {}", msg);
     std::process::exit(1);

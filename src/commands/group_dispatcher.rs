@@ -8,6 +8,7 @@ use crate::{
 	commands::group::info::info_group,
 	commands::group::invite::invite_group,
 	commands::group::join::join_group,
+	commands::group::leave::leave_group,
 	utils::get_args,
 	TapError
 };
@@ -42,6 +43,8 @@ pub async fn handle_group(
 			return info_group(&group_id, &world).await;
 		} else if args_upper.starts_with("INVITE") {
 			return invite_group(username, &group_id, &group_args, &world, &registry).await;
+		} else if args_upper.starts_with("LEAVE") {
+			return leave_group(username, &group_id, &world, &registry).await;
 		}
 	}
 

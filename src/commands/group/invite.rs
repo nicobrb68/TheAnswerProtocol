@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::{Group, TapError, World};
+use crate::{TapError, World};
 use tokio::sync::Mutex;
 use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;

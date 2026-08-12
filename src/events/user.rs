@@ -2,7 +2,6 @@ use std::sync::Arc;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 use tokio::sync::mpsc::UnboundedSender;
-use crate::World;
 
 pub async fn notify_user(
     target: &str,
