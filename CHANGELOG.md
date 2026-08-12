@@ -53,3 +53,10 @@
 - Si dernier membre quitte → appel disband automatique
 - Mise à jour de `player.group_id` à None
 - Broadcast EVT GROUP LEAVE aux membres restants
+
+### feat: GROUP DISBAND
+- Vérification que c'est le leader qui disband
+- Broadcast `EVT GROUP DISBAND` avant suppression du groupe
+- Reset `group_id` à None pour tous les membres
+- Suppression du groupe du world
+- Appelé automatiquement par `leave_group` si dernier membre quitte
