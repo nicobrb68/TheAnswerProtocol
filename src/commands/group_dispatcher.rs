@@ -7,6 +7,7 @@ use crate::{
 	commands::group::create::create_group,
 	commands::group::info::info_group,
 	commands::group::invite::invite_group,
+	commands::group::join::join_group,
 	utils::get_args,
 	TapError
 };
@@ -23,6 +24,8 @@ pub async fn handle_group(
 
 	if args_upper.starts_with("CREATE") {
 		return create_group(username, &world, group_args).await;
+	} else if args_upper.starts_with("JOIN") {
+		return join_group(username, group_args, &world, &registry).await;
 	} else {
 		let group_id = {
 			let w = world.lock().await;

@@ -26,3 +26,15 @@
 ### feat: GROUP INFO
 - Retourne les infos du groupe en JSON depuis `group_id` du joueur
 - Erreur `GROUP_NOT_FOUND` si le groupe n'existe plus
+
+
+## 2025-08-12
+
+### feat: GROUP INVITE
+- Vérification que l'invitant est bien le leader du groupe
+- Impossible de s'inviter soi-même (`CannotInviteSelf` 409)
+- Vérification que le joueur cible existe (`PlayerNotFound` 404)
+- Vérification que le joueur est pas déjà dans le groupe (`PlayerAlreadyInGroup` 409)
+- Ajout du joueur dans `group.invited` après vérifications
+- Envoi de `EVT GROUP INVITE <username> id=<group_id>` au joueur invité via `notify_user`
+- `notify_user` ajouté dans `src/events/user.rs`
