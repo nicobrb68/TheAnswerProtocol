@@ -46,3 +46,10 @@
 - Mise à jour de `player.group_id`
 - Broadcast `EVT GROUP JOIN <username>` à tous les membres
 - Erreur `NOT_INVITED` (407) si pas invité
+
+### feat: GROUP LEAVE
+- Retrait du joueur du groupe
+- Si leader quitte et membres restants → premier membre devient leader + EVT GROUP LEADER
+- Si dernier membre quitte → appel disband automatique
+- Mise à jour de `player.group_id` à None
+- Broadcast EVT GROUP LEAVE aux membres restants
