@@ -12,7 +12,7 @@ use crate::{
 	utils::get_args,
 	TapError
 };
-
+use crate::commands::group::disband::disband_group;
 
 pub async fn handle_group(
 	username: &str,
@@ -45,6 +45,8 @@ pub async fn handle_group(
 			return invite_group(username, &group_id, &group_args, &world, &registry).await;
 		} else if args_upper.starts_with("LEAVE") {
 			return leave_group(username, &group_id, &world, &registry).await;
+		} else if args_upper.starts_with("DISBAND") {
+			return disband_group(username, &group_id, &world, &registry).await;
 		}
 	}
 

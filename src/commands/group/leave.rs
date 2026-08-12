@@ -3,6 +3,7 @@ use crate::{TapError, World};
 use tokio::sync::Mutex;
 use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;
+use crate::commands::group::disband::disband_group;
 use crate::events::group::notify_group;
 
 pub async fn leave_group(
