@@ -81,7 +81,9 @@ pub struct World {
     #[serde(default)]
     pub groups: HashMap<String, Group>,
     #[serde(default)]
-    pub npcs: HashMap<String, Npc>
+    pub npcs: HashMap<String, Npc>,
+    #[serde(default)]
+    pub items: HashMap<String, Item>,
 }
 
 impl World {
