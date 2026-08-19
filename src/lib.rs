@@ -22,6 +22,19 @@ pub enum PlayerState {
     Dead
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Quest {
+    pub id: String,
+    pub description: String,
+    pub giver: String,
+    #[serde(rename = "type")]
+    pub quest_type: String,
+    pub target_item: String,
+    pub target_count: u32,
+    pub reward: String,
+    pub reward_count: u32,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct Player {
     pub name: String,
@@ -84,6 +97,7 @@ pub struct World {
     pub npcs: HashMap<String, Npc>,
     #[serde(default)]
     pub items: HashMap<String, Item>,
+    pub quests: HashMap<String, Quest>
 }
 
 impl World {

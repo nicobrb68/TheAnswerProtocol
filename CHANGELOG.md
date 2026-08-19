@@ -60,3 +60,14 @@
 - Reset `group_id` à None pour tous les membres
 - Suppression du groupe du world
 - Appelé automatiquement par `leave_group` si dernier membre quitte
+
+
+## 2025-08-19
+
+### fix: world loading — serde rename pour Quest
+- Le champ `quest_type` dans la struct `Quest` ne matchait pas la clé `"type"` du JSON
+- Ajout de `#[serde(rename = "type")]` dans `lib.rs` — le serveur charge maintenant le world correctement
+
+### fix: QUEST — résolution du NPC ID
+- `handle_quest` faisait un lookup direct avec l'input user (ex: `"hermit"`) dans `w.npcs` qui utilise des clés préfixées (`"npc.hermit"`)
+- Résolution du full ID via `room.npcs.iter().find()` avant le lookup, même pattern que `handle_talk`
