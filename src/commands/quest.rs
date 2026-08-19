@@ -21,7 +21,10 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
         None => return TapError::NoQuestAvailable.message(),
     };
 
-    let player = w.get_player(username).unwrap();
+    let player = match w.get_player(username) {
+        Some(p) => p,
+        None => return TapError::PlayerNotFound.message(),
+    };
     if player.quests_active.contains(&quest_id) {
         return TapError::NoQuestAvailable.message();
     }
@@ -34,14 +37,20 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
         None => return TapError::NoQuestAvailable.message(),
     };
 
-    w.get_mut_player(username).unwrap().quests_active.push(quest_id);
+    if let Some(p) = w.get_mut_player(username) { p.quests_active.push(quest_id); }
 
-    format!("OK {}\n", serde_json::to_string(&quest).unwrap())
+    match serde_json::to_string(&quest) {
+        Ok(json) => format!("OK {}\n", json),
+        Err(_) => TapError::SendFailed.message(),
+    }
 }
 
 pub async fn handle_quests(username: &str, world: &Arc<Mutex<World>>) -> String {
     let w = world.lock().await;
-    let player = w.get_player(username).unwrap();
+    let player = match w.get_player(username) {
+        Some(p) => p,
+        None => return TapError::PlayerNotFound.message(),
+    };
 
     let mut quest_list: Vec<serde_json::Value> = Vec::new();
 
@@ -62,5 +71,8 @@ pub async fn handle_quests(username: &str, world: &Arc<Mutex<World>>) -> String 
         }));
     }
 
-    format!("OK {}\n", serde_json::to_string(&quest_list).unwrap())
+    match serde_json::to_string(&quest_list) {
+        Ok(json) => format!("OK {}\n", json),
+        Err(_) => TapError::SendFailed.message(),
+    }
 }

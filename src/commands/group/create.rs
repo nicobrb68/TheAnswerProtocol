@@ -23,7 +23,7 @@ pub async fn create_group(
 	
 	let group = Group::new(new_group_id.clone(), username.to_string());
 	let mut w = world.lock().await;
-	w.get_mut_player(username).unwrap().group_id = Some(new_group_id.clone());
+	if let Some(p) = w.get_mut_player(username) { p.group_id = Some(new_group_id.clone()); }
 	w.add_group(group);
 	
 	format!("OK group={}\n", new_group_id)

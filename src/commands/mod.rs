@@ -12,3 +12,4 @@ pub mod drop;
 pub mod inventory;
 pub mod quest;
 pub mod status;
+pub mod attack;

@@ -23,6 +23,7 @@ use tap::commands::drop::handle_drop;
 use tap::commands::inventory::handle_inventory;
 use tap::commands::quest::{handle_quest, handle_quests};
 use tap::commands::status::handle_status;
+use tap::commands::attack::handle_attack;
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -107,7 +108,10 @@ async fn main() {
                         registry.lock().await.insert(username.to_string(), tx.clone());
                         let player_room = {
                             let w = world.lock().await;
-                            w.get_player(username).unwrap().current_room.clone()
+                            match w.get_player(username) {
+                                Some(p) => p.current_room.clone(),
+                                None => { line.clear(); continue; }
+                            }
                         };
                         notify_room(
                             &player_room,
@@ -200,6 +204,11 @@ async fn main() {
                         line.clear();
                     } else if line_upper.starts_with("INVENTORY") {
                         let res = handle_inventory(name, &world).await;
+                        let _ = tx.send(res);
+                        line.clear();
+                    } else if line_upper.starts_with("ATTACK ") {
+                        let npc_id = get_args(&line_trimmed).to_lowercase();
+                        let res = handle_attack(name, &npc_id, &world).await;
                         let _ = tx.send(res);
                         line.clear();
                     } else if line_upper.starts_with("STATUS") {

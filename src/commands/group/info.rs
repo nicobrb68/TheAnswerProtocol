@@ -12,5 +12,8 @@ pub async fn info_group(
         None => return TapError::GroupNotFound.message()
     };
 
-    format!("OK {}\n", serde_json::to_string(&group).unwrap())
+    match serde_json::to_string(&group) {
+        Ok(json) => format!("OK {}\n", json),
+        Err(_) => TapError::SendFailed.message(),
+    }
 }

@@ -32,7 +32,7 @@ pub async fn leave_group(
         group.leader = leader.clone();
     }
 
-    w.get_mut_player(username).unwrap().group_id = None;
+    if let Some(p) = w.get_mut_player(username) { p.group_id = None; }
     drop(w);
 
     if is_empty {

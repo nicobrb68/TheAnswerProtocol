@@ -34,7 +34,7 @@ pub async fn join_group(
     drop(w);
 
     let mut w = world.lock().await;
-    w.get_mut_player(username).unwrap().group_id = Some(group_id.to_string());
+    if let Some(p) = w.get_mut_player(username) { p.group_id = Some(group_id.to_string()); }
     drop(w);
 
     notify_group(group_id, &format!("EVT GROUP JOIN {}\n", username), None, world, registry).await;
