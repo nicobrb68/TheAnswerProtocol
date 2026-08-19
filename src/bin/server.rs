@@ -21,7 +21,7 @@ use tap::commands::talk::handle_talk;
 use tap::commands::take::handle_take;
 use tap::commands::drop::handle_drop;
 use tap::commands::inventory::handle_inventory;
-use tap::commands::quest::handle_quest;
+use tap::commands::quest::{handle_quest, handle_quests};
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -201,7 +201,11 @@ async fn main() {
                         let res = handle_inventory(name, &world).await;
                         let _ = tx.send(res);
                         line.clear();
-                    } else if line_upper.starts_with("QUEST") {
+                    } else if line_upper.starts_with("QUESTS") {
+                        let res = handle_quests(name, &world).await;
+                        let _ = tx.send(res);
+                        line.clear();
+                    } else if line_upper.starts_with("QUEST ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
                         let res = handle_quest(name, &npc_id ,&world).await;
                         let _ = tx.send(res);

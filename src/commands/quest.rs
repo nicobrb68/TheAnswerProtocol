@@ -38,3 +38,29 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
 
     format!("OK {}\n", serde_json::to_string(&quest).unwrap())
 }
+
+pub async fn handle_quests(username: &str, world: &Arc<Mutex<World>>) -> String {
+    let w = world.lock().await;
+    let player = w.get_player(username).unwrap();
+
+    let mut quest_list: Vec<serde_json::Value> = Vec::new();
+
+    for qid in &player.quests_active {
+        if let Some(quest) = w.quests.get(qid) {
+            quest_list.push(serde_json::json!({
+                "quest_id": qid,
+                "status": "active",
+                "progress": format!("0/{}", quest.target_count)
+            }));
+        }
+    }
+
+    for qid in &player.quests_done {
+        quest_list.push(serde_json::json!({
+            "quest_id": qid,
+            "status": "completed"
+        }));
+    }
+
+    format!("OK {}\n", serde_json::to_string(&quest_list).unwrap())
+}
