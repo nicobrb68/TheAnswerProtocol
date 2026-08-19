@@ -12,9 +12,7 @@
 			},
 			"players": [],
 			"items": [],
-			"npcs": [
-				"npc.guard"
-			]
+			"npcs": ["npc.guard"]
 		},
 		"room.tavern": {
 			"id": "room.tavern",
@@ -25,24 +23,16 @@
 				"north": "room.guest_room"
 			},
 			"players": [],
-			"items": [
-				"item.ale"
-			],
-			"npcs": [
-				"npc.bartender"
-			]
+			"items": ["item.ale"],
+			"npcs": ["npc.bartender"]
 		},
 		"room.guest_room": {
 			"id": "room.guest_room",
 			"name": "Guest Room",
 			"description": "A quiet upstairs room with a wooden bed.",
-			"exits": {
-				"south": "room.tavern"
-			},
+			"exits": {"south": "room.tavern"},
 			"players": [],
-			"items": [
-				"item.key"
-			],
+			"items": ["item.key"],
 			"npcs": []
 		},
 		"room.blacksmith": {
@@ -54,12 +44,8 @@
 				"west": "room.mine"
 			},
 			"players": [],
-			"items": [
-				"item.sword"
-			],
-			"npcs": [
-				"npc.blacksmith"
-			]
+			"items": ["item.sword"],
+			"npcs": ["npc.blacksmith"]
 		},
 		"room.mine": {
 			"id": "room.mine",
@@ -70,9 +56,7 @@
 				"south": "room.cavern"
 			},
 			"players": [],
-			"items": [
-				"item.pickaxe"
-			],
+			"items": ["item.pickaxe"],
 			"npcs": []
 		},
 		"room.cavern": {
@@ -84,12 +68,8 @@
 				"south": "room.crypt"
 			},
 			"players": [],
-			"items": [
-				"item.crystal"
-			],
-			"npcs": [
-				"npc.goblin"
-			]
+			"items": ["item.crystal"],
+			"npcs": ["npc.goblin"]
 		},
 		"room.crypt": {
 			"id": "room.crypt",
@@ -100,12 +80,8 @@
 				"east": "room.ruins"
 			},
 			"players": [],
-			"items": [
-				"item.treasure"
-			],
-			"npcs": [
-				"npc.skeleton"
-			]
+			"items": ["item.treasure"],
+			"npcs": ["npc.skeleton"]
 		},
 		"room.market": {
 			"id": "room.market",
@@ -116,13 +92,8 @@
 				"east": "room.docks"
 			},
 			"players": [],
-			"items": [
-				"item.apple",
-				"item.bread"
-			],
-			"npcs": [
-				"npc.merchant"
-			]
+			"items": ["item.apple", "item.bread"],
+			"npcs": ["npc.merchant"]
 		},
 		"room.docks": {
 			"id": "room.docks",
@@ -133,12 +104,8 @@
 				"south": "room.lighthouse"
 			},
 			"players": [],
-			"items": [
-				"item.rope"
-			],
-			"npcs": [
-				"npc.fisher"
-			]
+			"items": ["item.rope"],
+			"npcs": ["npc.fisher"]
 		},
 		"room.lighthouse": {
 			"id": "room.lighthouse",
@@ -149,12 +116,8 @@
 				"west": "room.gate"
 			},
 			"players": [],
-			"items": [
-				"item.lantern"
-			],
-			"npcs": [
-				"npc.keeper"
-			]
+			"items": ["item.lantern"],
+			"npcs": ["npc.keeper"]
 		},
 		"room.gate": {
 			"id": "room.gate",
@@ -167,9 +130,7 @@
 			},
 			"players": [],
 			"items": [],
-			"npcs": [
-				"npc.guard"
-			]
+			"npcs": ["npc.guard"]
 		},
 		"room.forest": {
 			"id": "room.forest",
@@ -182,12 +143,8 @@
 				"south": "room.clearing"
 			},
 			"players": [],
-			"items": [
-				"item.branch"
-			],
-			"npcs": [
-				"npc.wolf"
-			]
+			"items": ["item.branch"],
+			"npcs": ["npc.wolf"]
 		},
 		"room.lake": {
 			"id": "room.lake",
@@ -198,9 +155,7 @@
 				"south": "room.clearing"
 			},
 			"players": [],
-			"items": [
-				"item.fish"
-			],
+			"items": ["item.fish"],
 			"npcs": []
 		},
 		"room.clearing": {
@@ -213,12 +168,8 @@
 				"west": "room.ruins"
 			},
 			"players": [],
-			"items": [
-				"item.herbs"
-			],
-			"npcs": [
-				"npc.hermit"
-			]
+			"items": ["item.herbs"],
+			"npcs": ["npc.hermit"]
 		},
 		"room.ruins": {
 			"id": "room.ruins",
@@ -230,141 +181,223 @@
 				"west": "room.crypt"
 			},
 			"players": [],
-			"items": [
-				"item.scroll"
-			],
+			"items": ["item.scroll"],
 			"npcs": []
 		}
 	},
 	"spawn": "room.gate",
-
 	"npcs": {
-    "npc.guard": {
-        "id": "npc.guard",
-        "name": "Village Guard",
-        "dialogue": ["Stay safe, traveler.", "The roads can be dangerous."],
-        "hostile": false,
-        "hp": null,
-        "damage": null,
-        "quest": null
-    },
-    "npc.goblin": {
-        "id": "npc.goblin",
-        "name": "Cave Goblin",
-        "dialogue": ["*growls*"],
-        "hostile": true,
-        "hp": 30,
-        "damage": 8,
-        "quest": null
-    },
-    "npc.hermit": {
-        "id": "npc.hermit",
-        "name": "Old Hermit",
-        "dialogue": ["I have a task for you, adventurer."],
-        "hostile": false,
-        "hp": null,
-        "damage": null,
-        "quest": "quest.herbs"
-    }
-},
-"items": {
-    "item.ale": {
-        "id": "item.ale",
-        "name": "Frothy Ale",
-        "damage": null,
-        "armor": null,
-        "heal": 10
-    },
-    "item.key": {
-        "id": "item.key",
-        "name": "Old Key",
-        "damage": null,
-        "armor": null,
-        "heal": null
-    },
-    "item.sword": {
-        "id": "item.sword",
-        "name": "Iron Sword",
-        "damage": 15,
-        "armor": null,
-        "heal": null
-    },
-    "item.pickaxe": {
-        "id": "item.pickaxe",
-        "name": "Pickaxe",
-        "damage": 8,
-        "armor": null,
-        "heal": null
-    },
-    "item.crystal": {
-        "id": "item.crystal",
-        "name": "Blue Crystal",
-        "damage": null,
-        "armor": null,
-        "heal": null
-    },
-    "item.treasure": {
-        "id": "item.treasure",
-        "name": "Ancient Treasure",
-        "damage": null,
-        "armor": null,
-        "heal": null
-    },
-    "item.apple": {
-        "id": "item.apple",
-        "name": "Fresh Apple",
-        "damage": null,
-        "armor": null,
-        "heal": 5
-    },
-    "item.bread": {
-        "id": "item.bread",
-        "name": "Loaf of Bread",
-        "damage": null,
-        "armor": null,
-        "heal": 8
-    },
-    "item.rope": {
-        "id": "item.rope",
-        "name": "Hemp Rope",
-        "damage": null,
-        "armor": null,
-        "heal": null
-    },
-    "item.lantern": {
-        "id": "item.lantern",
-        "name": "Oil Lantern",
-        "damage": null,
-        "armor": null,
-        "heal": null
-    },
-    "item.branch": {
-        "id": "item.branch",
-        "name": "Wooden Branch",
-        "damage": 3,
-        "armor": null,
-        "heal": null
-    },
-    "item.fish": {
-        "id": "item.fish",
-        "name": "Fresh Fish",
-        "damage": null,
-        "armor": null,
-        "heal": 6
-    },
-    "item.herbs": {
-        "id": "item.herbs",
-        "name": "Healing Herbs",
-        "damage": null,
-        "armor": null,
-        "heal": 20
-    },
-    "item.scroll": {
-        "id": "item.scroll",
-        "name": "Ancient Scroll",
-        "damage": null,
-        "armor": null,
-        "heal": null
-    }
-}
+		"npc.guard": {
+			"id": "npc.guard",
+			"name": "Village Guard",
+			"dialogue": ["Stay safe, traveler.", "The roads can be dangerous.", "Move along, citizen."],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": null
+		},
+		"npc.bartender": {
+			"id": "npc.bartender",
+			"name": "Tavern Bartender",
+			"dialogue": ["Welcome to The Prancing Pony!", "What can I get you?", "The ale is fresh today."],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": null
+		},
+		"npc.blacksmith": {
+			"id": "npc.blacksmith",
+			"name": "Village Blacksmith",
+			"dialogue": ["Fine steel is made here.", "Need a weapon? I have the best in town.", "The sword is ready, take it."],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.iron"
+		},
+		"npc.merchant": {
+			"id": "npc.merchant",
+			"name": "Market Merchant",
+			"dialogue": ["Fresh goods today!", "Best prices in town.", "Buy something, traveler."],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": null
+		},
+		"npc.fisher": {
+			"id": "npc.fisher",
+			"name": "Old Fisher",
+			"dialogue": ["The sea is calm today.", "Good catch this morning.", "Watch out for the tides."],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": null
+		},
+		"npc.keeper": {
+			"id": "npc.keeper",
+			"name": "Lighthouse Keeper",
+			"dialogue": ["The light must never go out.", "Many ships have I guided to safety.", "Stay clear of the rocks."],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": null
+		},
+		"npc.goblin": {
+			"id": "npc.goblin",
+			"name": "Cave Goblin",
+			"dialogue": ["*growls*", "*hisses*"],
+			"hostile": true,
+			"hp": 30,
+			"damage": 8,
+			"quest": null
+		},
+		"npc.skeleton": {
+			"id": "npc.skeleton",
+			"name": "Skeleton Warrior",
+			"dialogue": ["*rattles*"],
+			"hostile": true,
+			"hp": 40,
+			"damage": 12,
+			"quest": null
+		},
+		"npc.wolf": {
+			"id": "npc.wolf",
+			"name": "Forest Wolf",
+			"dialogue": ["*howls*"],
+			"hostile": true,
+			"hp": 25,
+			"damage": 10,
+			"quest": null
+		},
+		"npc.hermit": {
+			"id": "npc.hermit",
+			"name": "Old Hermit",
+			"dialogue": ["I have a task for you, adventurer.", "Bring me healing herbs and I shall reward you.", "The forest holds many secrets."],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.herbs"
+		}
+	},
+	"items": {
+		"item.ale": {
+			"id": "item.ale",
+			"name": "Frothy Ale",
+			"damage": null,
+			"armor": null,
+			"heal": 10
+		},
+		"item.key": {
+			"id": "item.key",
+			"name": "Old Key",
+			"damage": null,
+			"armor": null,
+			"heal": null
+		},
+		"item.sword": {
+			"id": "item.sword",
+			"name": "Iron Sword",
+			"damage": 15,
+			"armor": null,
+			"heal": null
+		},
+		"item.pickaxe": {
+			"id": "item.pickaxe",
+			"name": "Pickaxe",
+			"damage": 8,
+			"armor": null,
+			"heal": null
+		},
+		"item.crystal": {
+			"id": "item.crystal",
+			"name": "Blue Crystal",
+			"damage": null,
+			"armor": null,
+			"heal": null
+		},
+		"item.treasure": {
+			"id": "item.treasure",
+			"name": "Ancient Treasure",
+			"damage": null,
+			"armor": null,
+			"heal": null
+		},
+		"item.apple": {
+			"id": "item.apple",
+			"name": "Fresh Apple",
+			"damage": null,
+			"armor": null,
+			"heal": 5
+		},
+		"item.bread": {
+			"id": "item.bread",
+			"name": "Loaf of Bread",
+			"damage": null,
+			"armor": null,
+			"heal": 8
+		},
+		"item.rope": {
+			"id": "item.rope",
+			"name": "Hemp Rope",
+			"damage": null,
+			"armor": null,
+			"heal": null
+		},
+		"item.lantern": {
+			"id": "item.lantern",
+			"name": "Oil Lantern",
+			"damage": null,
+			"armor": null,
+			"heal": null
+		},
+		"item.branch": {
+			"id": "item.branch",
+			"name": "Wooden Branch",
+			"damage": 3,
+			"armor": null,
+			"heal": null
+		},
+		"item.fish": {
+			"id": "item.fish",
+			"name": "Fresh Fish",
+			"damage": null,
+			"armor": null,
+			"heal": 6
+		},
+		"item.herbs": {
+			"id": "item.herbs",
+			"name": "Healing Herbs",
+			"damage": null,
+			"armor": null,
+			"heal": 20
+		},
+		"item.scroll": {
+			"id": "item.scroll",
+			"name": "Ancient Scroll",
+			"damage": null,
+			"armor": null,
+			"heal": null
+		}
+	},
+	"quests": {
+		"quest.herbs": {
+			"id": "quest.herbs",
+			"description": "Bring 1 healing herbs to the Old Hermit in the Forest Clearing.",
+			"giver": "npc.hermit",
+			"type": "fetch",
+			"target_item": "item.herbs",
+			"target_count": 1,
+			"reward": "item.crystal",
+			"reward_count": 1
+		},
+		"quest.iron": {
+			"id": "quest.iron",
+			"description": "Bring 1 iron sword to the Blacksmith.",
+			"giver": "npc.blacksmith",
+			"type": "fetch",
+			"target_item": "item.sword",
+			"target_count": 1,
+			"reward": "item.ale",
+			"reward_count": 2
+		}
+	}
 }

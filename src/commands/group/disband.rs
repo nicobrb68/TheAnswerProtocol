@@ -11,7 +11,7 @@ pub async fn disband_group(
     world: &Arc<Mutex<World>>,
     registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>
 ) -> String {
-    let mut w = world.lock().await;
+    let w = world.lock().await;
 
     let group = match w.get_group(group_id) {
         Some(g) => g,
