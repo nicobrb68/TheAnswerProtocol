@@ -22,6 +22,7 @@ use tap::commands::take::handle_take;
 use tap::commands::drop::handle_drop;
 use tap::commands::inventory::handle_inventory;
 use tap::commands::quest::{handle_quest, handle_quests};
+use tap::commands::status::handle_status;
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -199,6 +200,10 @@ async fn main() {
                         line.clear();
                     } else if line_upper.starts_with("INVENTORY") {
                         let res = handle_inventory(name, &world).await;
+                        let _ = tx.send(res);
+                        line.clear();
+                    } else if line_upper.starts_with("STATUS") {
+                        let res = handle_status(name, &world).await;
                         let _ = tx.send(res);
                         line.clear();
                     } else if line_upper.starts_with("QUESTS") {

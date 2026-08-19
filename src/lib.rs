@@ -42,6 +42,7 @@ pub struct Player {
     pub quests_active: Vec<String>,
     pub quests_done: Vec<String>,
     pub hp: u32,
+    pub max_hp: u32,
     pub status: PlayerState,
     pub current_room: String,
     pub group_id: Option<String>
@@ -55,6 +56,7 @@ impl Player {
             quests_active: Vec::new(),
             quests_done: Vec::new(),
             hp: 100,
+            max_hp: 100,
             status: PlayerState::Alive,
             current_room,
             group_id: None,
