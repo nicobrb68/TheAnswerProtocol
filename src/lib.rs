@@ -161,55 +161,67 @@ impl World {
 }
 #[derive(Debug)]
 pub enum TapError {
+    // 0xx - Protocol
+    NotAuthenticated,
+    // 2xx - Authentication
     NameInUse,
     InvalidUsername,
     GroupNameInUse,
     InvalidGroupName,
+    // 3xx - Navigation
     NoExit,
-    ItemNotFound,
+    // 4xx - Game logic
+    NotInGroup,
+    AlreadyInGroup,
+    PlayerAlreadyInGroup,
+    NotGroupLeader,
     PlayerNotFound,
     GroupNotFound,
+    ItemNotFound,
     ItemNotInInventory,
-    NotGroupLeader,
     NpcNotFound,
     NpcNotHostile,
     NoQuestAvailable,
-    NotInGroup,
-    NotInvited,
-    PlayerAlreadyInGroup,
     CannotInviteSelf,
-    AlreadyInGroup,
+    NotInvited,
     PlayerDead,
+    // 9xx - System
     ConnectionFailed,
     SendFailed,
-    NotAuthenticated,
+    Flooding,
 }
 
 impl TapError {
     pub fn message(&self) -> String {
         match self {
-            TapError::NameInUse        => "ERR 201 NAME_IN_USE\n".to_string(),
-            TapError::InvalidUsername  => "ERR 202 INVALID_USER_NAME\n".to_string(),
-            TapError::GroupNameInUse   => "ERR 211 GROUP_NAME_IN_USE\n".to_string(),
-            TapError::InvalidGroupName => "ERR 212 INVALID_GROUP_NAME\n".to_string(),
-            TapError::NoExit           => "ERR 301 NO_EXIT\n".to_string(),
-            TapError::NotInGroup       => "ERR 401 NOT_IN_GROUP\n".to_string(),
-            TapError::NotInvited => "ERR 407 NOT_INVITED\n".to_string(),
-            TapError::AlreadyInGroup   => "ERR 402 ALREADY_IN_GROUP\n".to_string(),
-            TapError::PlayerAlreadyInGroup   => "ERR 402 PLAYER_ALREADY_IN_GROUP\n".to_string(),
-            TapError::NotGroupLeader => "ERR 403 NOT_GROUP_LEADER\n".to_string(),
-            TapError::PlayerNotFound   => "ERR 404 PLAYER_NOT_FOUND\n".to_string(),
-            TapError::GroupNotFound    => "ERR 404 GROUP_NOT_FOUND\n".to_string(),
-            TapError::ItemNotFound     => "ERR 404 ITEM_NOT_FOUND\n".to_string(),
-            TapError::ItemNotInInventory => "ERR 404 ITEM_NOT_IN_INVENTORY\n".to_string(),
-            TapError::NpcNotFound      => "ERR 404 NPC_NOT_FOUND\n".to_string(),
-            TapError::NpcNotHostile    => "ERR 405 NPC_NOT_HOSTILE\n".to_string(),
-            TapError::NoQuestAvailable => "ERR 406 NO_QUEST_AVAILABLE\n".to_string(),
-            TapError::CannotInviteSelf => "ERR 407 CANNOT_INVITE_SELF\n".to_string(),
-            TapError::PlayerDead       => "ERR 408 PLAYER_DEAD\n".to_string(),
-            TapError::ConnectionFailed => "ERR 900 CONNECTION_FAILED\n".to_string(),
-            TapError::SendFailed       => "ERR 901 SEND_FAILED\n".to_string(),
-            TapError::NotAuthenticated => "ERR 000 NOT_AUTHENTICATED\n".to_string(),
+            // 0xx - Protocol
+            TapError::NotAuthenticated     => "ERR 000 NOT_AUTHENTICATED\n".to_string(),
+            // 2xx - Authentication
+            TapError::NameInUse            => "ERR 201 NAME_IN_USE\n".to_string(),
+            TapError::InvalidUsername      => "ERR 202 INVALID_USER_NAME\n".to_string(),
+            TapError::GroupNameInUse       => "ERR 211 GROUP_NAME_IN_USE\n".to_string(),
+            TapError::InvalidGroupName    => "ERR 212 INVALID_GROUP_NAME\n".to_string(),
+            // 3xx - Navigation
+            TapError::NoExit               => "ERR 301 NO_EXIT\n".to_string(),
+            // 4xx - Game logic
+            TapError::NotInGroup           => "ERR 401 NOT_IN_GROUP\n".to_string(),
+            TapError::AlreadyInGroup       => "ERR 402 ALREADY_IN_GROUP\n".to_string(),
+            TapError::PlayerAlreadyInGroup => "ERR 402 PLAYER_ALREADY_IN_GROUP\n".to_string(),
+            TapError::NotGroupLeader      => "ERR 403 NOT_GROUP_LEADER\n".to_string(),
+            TapError::PlayerNotFound       => "ERR 404 PLAYER_NOT_FOUND\n".to_string(),
+            TapError::GroupNotFound        => "ERR 404 GROUP_NOT_FOUND\n".to_string(),
+            TapError::ItemNotFound         => "ERR 404 ITEM_NOT_FOUND\n".to_string(),
+            TapError::ItemNotInInventory  => "ERR 404 ITEM_NOT_IN_INVENTORY\n".to_string(),
+            TapError::NpcNotFound          => "ERR 404 NPC_NOT_FOUND\n".to_string(),
+            TapError::NpcNotHostile        => "ERR 405 NPC_NOT_HOSTILE\n".to_string(),
+            TapError::NoQuestAvailable    => "ERR 406 NO_QUEST_AVAILABLE\n".to_string(),
+            TapError::CannotInviteSelf    => "ERR 407 CANNOT_INVITE_SELF\n".to_string(),
+            TapError::NotInvited           => "ERR 407 NOT_INVITED\n".to_string(),
+            TapError::PlayerDead           => "ERR 408 PLAYER_DEAD\n".to_string(),
+            // 9xx - System
+            TapError::ConnectionFailed    => "ERR 900 CONNECTION_FAILED\n".to_string(),
+            TapError::SendFailed           => "ERR 901 SEND_FAILED\n".to_string(),
+            TapError::Flooding             => "ERR 902 FLOODING\n".to_string(),
         }
     }
 }

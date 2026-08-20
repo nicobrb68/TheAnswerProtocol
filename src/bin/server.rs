@@ -81,6 +81,8 @@ async fn main() {
 
             let mut reader = BufReader::new(r_socket);
             let mut line = String::new();
+            let mut flood_window = tokio::time::Instant::now();
+            let mut flood_count: u32 = 0;
 
             loop {
                 match reader.read_line(&mut line).await {
@@ -95,6 +97,18 @@ async fn main() {
                 let line_upper = line_trimmed.to_uppercase();
 
                 if !line_trimmed.is_empty() {
+                    if flood_window.elapsed().as_secs() >= 1 {
+                        flood_window = tokio::time::Instant::now();
+                        flood_count = 0;
+                    }
+                    flood_count += 1;
+                    if flood_count > 20 {
+                        tracing::error!(event = "abuse_kick", ip = %addr, player = ?authenticated, rate = flood_count, "client kicked for flooding");
+                        let _ = tx.send(tap::TapError::Flooding.message());
+                        break;
+                    } else if flood_count > 10 {
+                        tracing::warn!(event = "abuse_flood", ip = %addr, player = ?authenticated, rate = flood_count, "command flooding detected");
+                    }
                     tracing::info!(event = "command", ip = %addr, player = ?authenticated, command = %line_trimmed, "command received");
                 }
 
