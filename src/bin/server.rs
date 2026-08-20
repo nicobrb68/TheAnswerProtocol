@@ -208,7 +208,7 @@ async fn main() {
                         line.clear();
                     } else if line_upper.starts_with("ATTACK ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
-                        let res = handle_attack(name, &npc_id, &world).await;
+                        let res = handle_attack(name, &npc_id, &world, &registry).await;
                         let _ = tx.send(res);
                         line.clear();
                     } else if line_upper.starts_with("STATUS") {
