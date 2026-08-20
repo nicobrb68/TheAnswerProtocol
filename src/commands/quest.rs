@@ -57,10 +57,13 @@ pub async fn handle_quests(username: &str, world: &Arc<Mutex<World>>) -> String 
 
     for qid in &player.quests_active {
         if let Some(quest) = w.quests.get(qid) {
+            let current = player.inventory.iter()
+                .filter(|i| *i == &quest.target_item)
+                .count() as u32;
             quest_list.push(serde_json::json!({
                 "quest_id": qid,
                 "status": "active",
-                "progress": format!("0/{}", quest.target_count)
+                "progress": format!("{}/{}", current, quest.target_count)
             }));
         }
     }
