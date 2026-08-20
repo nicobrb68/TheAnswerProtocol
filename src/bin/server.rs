@@ -30,8 +30,14 @@ use tap::events::room::notify_room;
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt()
+        .json()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env()
+            .add_directive("info".parse().expect("invalid filter")))
+        .init();
+
     let listener = TcpListener::bind("0.0.0.0:7534").await.expect("An error occured while binding TCP listener");
-    println!("Server up, listening on => {}", listener.local_addr().expect("Failed to get local addr"));
+    tracing::info!(event = "server_start", addr = %listener.local_addr().expect("Failed to get local addr"), "server started");
     
     let args: Vec<String> = std::env::args().collect();
     let world_path = args.get(1).map(|s| s.as_str()).unwrap_or("src/assets/default_world.json");
@@ -52,7 +58,7 @@ async fn main() {
                 continue
             }
         };
-        println!("Established connection with '{}'", addr);
+        tracing::info!(event = "connection", ip = %addr, "client connected");
 
 
         let world = Arc::clone(&world);
@@ -238,7 +244,7 @@ async fn main() {
                 Err(e) => eprintln!("Failed to disconnect client: {}", e)
             };
 
-            println!("'{}' successfully cut connection", addr);
+            tracing::info!(event = "disconnection", ip = %addr, "client disconnected");
         });
 
     }
