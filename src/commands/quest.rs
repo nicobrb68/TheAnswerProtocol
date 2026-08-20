@@ -25,9 +25,7 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
         Some(p) => p,
         None => return TapError::PlayerNotFound.message(),
     };
-    if player.quests_active.contains(&quest_id) {
-        return TapError::NoQuestAvailable.message();
-    }
+
     if player.quests_done.contains(&quest_id) {
         return TapError::NoQuestAvailable.message();
     }
@@ -36,6 +34,37 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
         Some(q) => q.clone(),
         None => return TapError::NoQuestAvailable.message(),
     };
+
+    if player.quests_active.contains(&quest_id) {
+        let current = player.inventory.iter()
+            .filter(|i| *i == &quest.target_item)
+            .count() as u32;
+
+        if current < quest.target_count {
+            return TapError::QuestNotComplete.message();
+        }
+
+        let mut to_remove = quest.target_count;
+        if let Some(p) = w.get_mut_player(username) {
+            p.inventory.retain(|i| {
+                if i == &quest.target_item && to_remove > 0 {
+                    to_remove -= 1;
+                    false
+                } else {
+                    true
+                }
+            });
+            for _ in 0..quest.reward_count {
+                p.inventory.push(quest.reward.clone());
+            }
+            p.quests_active.retain(|q| q != &quest_id);
+            p.quests_done.push(quest_id.clone());
+        }
+        tracing::info!(event = "quest_complete", player = %username, quest = %quest_id, reward = %quest.reward, "quest completed");
+
+        return format!("OK {{\"quest_id\": \"{}\", \"status\": \"completed\", \"reward\": \"{}\", \"reward_count\": {}}}\n",
+            quest_id, quest.reward, quest.reward_count);
+    }
 
     if let Some(p) = w.get_mut_player(username) { p.quests_active.push(quest_id.clone()); }
     tracing::info!(event = "quest_accept", player = %username, quest = %quest_id, "quest accepted");

@@ -184,6 +184,7 @@ pub enum TapError {
     NoQuestAvailable,
     CannotInviteSelf,
     NotInvited,
+    QuestNotComplete,
     PlayerDead,
     // 9xx - System
     ConnectionFailed,
@@ -217,7 +218,8 @@ impl TapError {
             TapError::NoQuestAvailable    => "ERR 406 NO_QUEST_AVAILABLE\n".to_string(),
             TapError::CannotInviteSelf    => "ERR 407 CANNOT_INVITE_SELF\n".to_string(),
             TapError::NotInvited           => "ERR 407 NOT_INVITED\n".to_string(),
-            TapError::PlayerDead           => "ERR 408 PLAYER_DEAD\n".to_string(),
+            TapError::QuestNotComplete    => "ERR 408 QUEST_NOT_COMPLETE\n".to_string(),
+            TapError::PlayerDead           => "ERR 409 PLAYER_DEAD\n".to_string(),
             // 9xx - System
             TapError::ConnectionFailed    => "ERR 900 CONNECTION_FAILED\n".to_string(),
             TapError::SendFailed           => "ERR 901 SEND_FAILED\n".to_string(),
