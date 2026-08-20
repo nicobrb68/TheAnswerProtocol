@@ -46,6 +46,17 @@ async fn main() {
     if !world.rooms.contains_key(&world.spawn) {
         fatal("Spawn room does not exist in world file");
     }
+    for (qid, quest) in &world.quests {
+        if !world.items.contains_key(&quest.target_item) {
+            fatal(&format!("Quest {} references unknown target_item: {}", qid, quest.target_item));
+        }
+        if !world.items.contains_key(&quest.reward) {
+            fatal(&format!("Quest {} references unknown reward: {}", qid, quest.reward));
+        }
+        if !world.npcs.contains_key(&quest.giver) {
+            fatal(&format!("Quest {} references unknown giver: {}", qid, quest.giver));
+        }
+    }
     let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
 
     let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
