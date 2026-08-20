@@ -54,7 +54,7 @@ async fn main() {
         let (socket, addr) = match listener.accept().await {
             Ok(val) => val,
             Err(e) => {
-                eprintln!("Failed to accept connection: {}", e);
+                tracing::error!(event = "accept_failed", error = %e, "failed to accept connection");
                 continue
             }
         };
@@ -76,7 +76,7 @@ async fn main() {
                 }
             });
             if let Err(e) = tx.send("OK hello proto=1\n".to_string()) {
-                eprintln!("Failed to write message for {} : {}", addr, e)
+                tracing::error!(event = "send_failed", ip = %addr, error = %e, "failed to send greeting");
             };
 
             let mut reader = BufReader::new(r_socket);
@@ -87,18 +87,22 @@ async fn main() {
                     Ok(0) => break,
                     Ok(n) => n,
                     Err(e) => {
-                        eprintln!("Failed to read user's input: {}", e);
+                        tracing::error!(event = "read_failed", ip = %addr, error = %e, "failed to read client input");
                         break;
                     }
                 };
                 let line_trimmed = line.trim().to_string();
                 let line_upper = line_trimmed.to_uppercase();
 
+                if !line_trimmed.is_empty() {
+                    tracing::info!(event = "command", ip = %addr, player = ?authenticated, command = %line_trimmed, "command received");
+                }
+
                 if line_upper.starts_with("CONNECT ") {
                     if authenticated.is_some() {
                         match tx.send("ERR already connected\n".to_string()) {
                             Ok(()) => {},
-                            Err(e) => eprintln!("Failed to write on client side: {}",e)
+                            Err(e) => tracing::warn!(event = "send_failed", ip = %addr, error = %e, "failed to send to client")
                         }
 
                         line.clear();
@@ -131,7 +135,7 @@ async fn main() {
                     match tx.send(res) {
                         Ok(val) => val,
                         Err(e) => {
-                            eprintln!("Failed to write on client side: {}", e);
+                            tracing::warn!(event = "send_failed", ip = %addr, error = %e, "failed to send to client");
                             break
                         }
                     };
@@ -140,100 +144,71 @@ async fn main() {
 
                 } else if line_upper.starts_with("QUIT") {
                     if let Err(e) = tx.send("OK bye\n".to_string()) {
-                        eprintln!("Failed to write on client side: {}", e);
+                        tracing::warn!(event = "send_failed", ip = %addr, error = %e, "failed to send to client");
                     }
                     break;
                 } else if let Some(name) = &authenticated {
-                    if line_upper.starts_with("LOOK") {
-                        match tx.send(handle_look(&name, &world).await) {
-                            Ok(val) => val,
-                            Err(e) => {
-                                eprintln!("Failed to write on client side: {}", e);
-                                break
-                            }
-                        };
-                        line.clear();
+                    let res = if line_upper.starts_with("LOOK") {
+                        Some(handle_look(&name, &world).await)
                     } else if line_upper.starts_with("MOVE ") {
                         let direction = get_args(&line_trimmed).to_lowercase();
-                        match tx.send(handle_move(&name, &direction, &world, &registry).await) {
-                            Ok(val) => val,
-                            Err(e) => {
-                                eprintln!("Failed to write on client side: {}", e);
-                                break
-                            }
-                        };
-                        line.clear()
+                        Some(handle_move(&name, &direction, &world, &registry).await)
                     } else if line_upper.starts_with("WHO") {
-                        match tx.send(handle_who( &world).await) {
-                            Ok(val) => val,
-                            Err(e) => {
-                                eprintln!("Failed to write on client side: {}", e);
-                                break
-                            }
-                        };
-                        line.clear()
+                        Some(handle_who(&world).await)
                     } else if line_upper.starts_with("CHAT ") {
                         let args = get_args(&line_trimmed);
                         let args_upper = args.to_uppercase();
                         if args_upper.starts_with("GLOBAL ") {
-                            let message = get_args(args);
-                            let res = handle_chat_global(name, &registry, message).await;
-                            let _ = tx.send(res);
+                            Some(handle_chat_global(name, &registry, get_args(args)).await)
                         } else if args_upper.starts_with("ROOM ") {
-                            let message = get_args(args);
-                            let res = handle_chat_room(name, &registry, message, &world).await;
-                            let _ = tx.send(res);
+                            Some(handle_chat_room(name, &registry, get_args(args), &world).await)
                         } else if args_upper.starts_with("GROUP ") {
-                            let message = get_args(args);
-                            let res = handle_chat_group(name, &registry, message, &world).await;
-                            let _ = tx.send(res);
+                            Some(handle_chat_group(name, &registry, get_args(args), &world).await)
+                        } else {
+                            None
                         }
-                        line.clear();
                     } else if line_upper.starts_with("GROUP ") {
-                        let res = handle_group(name, get_args(&line_trimmed), &world, &registry).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_group(name, get_args(&line_trimmed), &world, &registry).await)
                     } else if line_upper.starts_with("TALK ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
-                        let res = handle_talk(name, &npc_id, &world).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_talk(name, &npc_id, &world).await)
                     } else if line_upper.starts_with("TAKE ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
-                        let res = handle_take(name, &item_id, &world).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_take(name, &item_id, &world).await)
                     } else if line_upper.starts_with("DROP ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
-                        let res = handle_drop(name, &item_id, &world).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_drop(name, &item_id, &world).await)
                     } else if line_upper.starts_with("INVENTORY") {
-                        let res = handle_inventory(name, &world).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_inventory(name, &world).await)
                     } else if line_upper.starts_with("ATTACK ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
-                        let res = handle_attack(name, &npc_id, &world, &registry).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_attack(name, &npc_id, &world, &registry).await)
                     } else if line_upper.starts_with("STATUS") {
-                        let res = handle_status(name, &world).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_status(name, &world).await)
                     } else if line_upper.starts_with("QUESTS") {
-                        let res = handle_quests(name, &world).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_quests(name, &world).await)
                     } else if line_upper.starts_with("QUEST ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
-                        let res = handle_quest(name, &npc_id ,&world).await;
-                        let _ = tx.send(res);
-                        line.clear();
+                        Some(handle_quest(name, &npc_id, &world).await)
+                    } else {
+                        None
+                    };
+
+                    if let Some(res) = res {
+                        if res.starts_with("ERR") {
+                            tracing::warn!(event = "response", ip = %addr, player = %name, response = %res.trim(), "error response sent");
+                        } else {
+                            tracing::info!(event = "response", ip = %addr, player = %name, response = %res.trim(), "response sent");
+                        }
+                        match tx.send(res) {
+                            Ok(()) => {},
+                            Err(e) => {
+                                tracing::warn!(event = "send_failed", ip = %addr, error = %e, "failed to send to client");
+                                break
+                            }
+                        }
                     }
-                    else {
-                        line.clear()
-                    }
+                    line.clear();
                 } else {
                     line.clear();
                 }
@@ -241,7 +216,7 @@ async fn main() {
 
             match handle_disconnect(&authenticated, &world, &registry).await {
                 Ok(()) => {},
-                Err(e) => eprintln!("Failed to disconnect client: {}", e)
+                Err(e) => tracing::error!(event = "disconnect_failed", ip = %addr, error = %e, "failed to disconnect client")
             };
 
             tracing::info!(event = "disconnection", ip = %addr, "client disconnected");

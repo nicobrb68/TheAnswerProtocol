@@ -70,6 +70,8 @@ pub async fn handle_attack(
 		None => return TapError::PlayerNotFound.message(),
 	};
 
+	tracing::info!(event = "combat", player = %username, npc = %npc_name, player_damage = player_damage, npc_damage = npc_damage, player_hp = player_hp, npc_hp = npc_hp, "attack performed");
+
 	let status;
 	let mut spawn_room = String::new();
 
@@ -77,6 +79,7 @@ pub async fn handle_attack(
 		if let Some(room) = w.get_mut_room(&current_room) {
 			room.npcs.retain(|n| n != &npc_full_id);
 		}
+		tracing::info!(event = "combat_victory", player = %username, npc = %npc_name, room = %current_room, "npc defeated");
 		status = "victory";
 	} else if player_hp == 0 {
 		spawn_room = w.spawn.clone();
@@ -91,6 +94,7 @@ pub async fn handle_attack(
 			p.status = PlayerState::Alive;
 			p.current_room = spawn_room.clone();
 		}
+		tracing::info!(event = "combat_death", player = %username, npc = %npc_name, respawn = %spawn_room, "player killed");
 		status = "death";
 	} else {
 		status = "combat";

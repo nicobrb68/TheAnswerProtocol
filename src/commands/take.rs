@@ -18,5 +18,6 @@ pub async fn handle_take(username: &str, item_id: &str, world: &Arc<Mutex<World>
     };
     if let Some(r) = w.get_mut_room(&current_room) { r.items.retain(|i| i != &item_full_id); }
     if let Some(p) = w.get_mut_player(username) { p.inventory.push(item_full_id.clone()); }
+    tracing::info!(event = "item_take", player = %username, item = %item_full_id, room = %current_room, "item taken");
     format!("OK taken={}\n", item_full_id)
 }

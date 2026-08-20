@@ -37,7 +37,8 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
         None => return TapError::NoQuestAvailable.message(),
     };
 
-    if let Some(p) = w.get_mut_player(username) { p.quests_active.push(quest_id); }
+    if let Some(p) = w.get_mut_player(username) { p.quests_active.push(quest_id.clone()); }
+    tracing::info!(event = "quest_accept", player = %username, quest = %quest_id, "quest accepted");
 
     match serde_json::to_string(&quest) {
         Ok(json) => format!("OK {}\n", json),

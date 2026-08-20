@@ -27,6 +27,7 @@ pub async fn handle_disconnect(
                 None => return Err("Failed to fetch user's room".to_string()),
             };
             w.players.remove(name);
+            tracing::info!(event = "player_disconnect", player = %name, room = %player_room_id, "player disconnected");
         },
         None => {}
     }
