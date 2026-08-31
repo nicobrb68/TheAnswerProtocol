@@ -143,7 +143,7 @@ pub async fn handle_attack(
 	}
 
 	if status == "death" {
-		format!("OK {{\"attacker_hp\": 50, \"target_hp\": {}, \"damage\": {}, \"status\": \"death\", \"respawn_room\": \"{}\", \"respawn_hp\": 50}}\n",
+		format!("OK {{\"attacker_hp\": 0, \"target_hp\": {}, \"damage\": {}, \"status\": \"death\", \"respawn_room\": \"{}\", \"respawn_hp\": 50}}\n",
 			npc_hp, player_damage, spawn_room)
 	} else {
 		format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"damage\": {}, \"status\": \"{}\"}}\n",
