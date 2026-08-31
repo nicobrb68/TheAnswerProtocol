@@ -1,30 +1,32 @@
-use crate::{Group, TapError, World, utils::is_valid_group_name};
-use tokio::sync::Mutex;
+use crate::{utils::is_valid_group_name, Group, TapError, World};
 use std::sync::Arc;
+use tokio::sync::Mutex;
 
-pub async fn create_group(
-	username: &str,
-	world: &Arc<Mutex<World>>,
-	group_name: &str
-) -> String {
-	let new_group_id = if group_name.is_empty() {
-		username.to_string()
-	} else {
-		if !is_valid_group_name(group_name) {
-			return TapError::InvalidGroupName.message();
-		}
-		let w = world.lock().await;
-		if w.has_group(group_name) {
-			return TapError::GroupNameInUse.message();
-		}
-		drop(w);
-		group_name.to_string()
-	};
-	
-	let group = Group::new(new_group_id.clone(), username.to_string());
-	let mut w = world.lock().await;
-	if let Some(p) = w.get_mut_player(username) { p.group_id = Some(new_group_id.clone()); }
-	w.add_group(group);
-	
-	format!("OK group={}\n", new_group_id)
+pub async fn create_group(username: &str, world: &Arc<Mutex<World>>, group_name: &str) -> String {
+    let new_group_id = if group_name.is_empty() {
+        username.to_string()
+    } else {
+        if !is_valid_group_name(group_name) {
+            return TapError::InvalidGroupName.message();
+        }
+        let w = world.lock().await;
+        if w.has_group(group_name) {
+            return TapError::GroupNameInUse.message();
+        }
+        drop(w);
+        group_name.to_string()
+    };
+
+    let group = Group::new(new_group_id.clone(), username.to_string());
+    let mut w = world.lock().await;
+    if let Some(p) = w.get_mut_player(username) {
+        if p.group_id.is_some() {
+            return TapError::AlreadyInGroup.message();
+        } else {
+            p.group_id = Some(new_group_id.clone())
+        }
+    }
+    w.add_group(group);
+
+    format!("OK group={}\n", new_group_id)
 }
