@@ -13,6 +13,7 @@ use crate::{
 	TapError
 };
 use crate::commands::group::disband::disband_group;
+use crate::commands::group::kick::kick_group;
 
 pub async fn handle_group(
 	username: &str,
@@ -47,9 +48,14 @@ pub async fn handle_group(
 			return leave_group(username, &group_id, &world, &registry).await;
 		} else if args_upper.starts_with("DISBAND") {
 			return disband_group(username, &group_id, &world, &registry).await;
-		}
+		} else if args_upper.starts_with("KICK") {
+            if group_args.is_empty() {
+                return TapError::PlayerNotFound.message();
+            }
+            return kick_group(username, &group_id, group_args, world, registry).await;
+        }
 	}
 
 
-	"nico ta grosse mere\n".to_string()
+	"UNKNOWN COMMAND\n".to_string()
 }

@@ -26,9 +26,10 @@ impl Highlighter for TapCompleter {
         let single = ["CONNECT", "LOOK", "MOVE", "WHO", "TAKE", "DROP",
             "INVENTORY", "TALK", "ATTACK", "STATUS", "QUEST", "QUESTS", "QUIT"];
         let chat_subs = ["GLOBAL", "ROOM", "GROUP"];
-        let group_subs = ["CREATE", "INVITE", "JOIN", "LEAVE", "DISBAND", "INFO"];
+        let group_subs = ["CREATE", "INVITE", "JOIN", "LEAVE", "DISBAND", "INFO", "KICK"];
 
-        let (valid, cmd_end) = if first == "CHAT" || first == "GROUP" {
+        let (valid, cmd_end) = 
+        if first == "CHAT" || first == "GROUP" {
             if let Some(sub) = parts.get(1) {
                 let sub_upper = sub.to_uppercase();
                 let subs = if first == "CHAT" { &chat_subs[..] } else { &group_subs[..] };
@@ -114,10 +115,10 @@ async fn main() {
                 "WHO".into(), "TAKE".into(), "DROP".into(), "INVENTORY".into(),
                 "TALK".into(), "ATTACK".into(), "STATUS".into(),
                 "QUEST".into(), "QUESTS".into(),
-                "GROUP CREATE".into(), "GROUP INVITE".into(),
+                "GROUP CREATE".into(), "GROUP INVITE".into(), "GROUP KICK".into(),
                 "GROUP JOIN".into(), "GROUP LEAVE".into(), "GROUP DISBAND".into(),
                 "GROUP INFO".into(),
-                "QUIT".into(),
+                "QUIT".into()
             ],
         };
         let mut rl = Editor::new().expect("Failed to create editor");

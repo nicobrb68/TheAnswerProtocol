@@ -147,7 +147,11 @@ impl World {
     pub fn get_group(&self, id: &str) -> Option<&Group> { self.groups.get(id) }
 
     pub fn get_mut_group(&mut self, id: &str) -> Option<&mut Group> { self.groups.get_mut(id) }
-    
+
+    pub fn remove_group(&mut self, id: &str) -> Option<Group> {
+        self.groups.remove(id)
+    }
+
     // ncp impl
 
     pub fn get_npc(&self, id: &str) -> Option<&Npc> {
@@ -171,6 +175,9 @@ pub enum TapError {
     // 3xx - Navigation
     NoExit,
     // 4xx - Game logic
+    CannotKickSelf,
+    PlayerNotInGroup,
+    InviteNotFound,
     NotInGroup,
     AlreadyInGroup,
     PlayerAlreadyInGroup,
@@ -205,6 +212,9 @@ impl TapError {
             // 3xx - Navigation
             TapError::NoExit               => "ERR 301 NO_EXIT\n".to_string(),
             // 4xx - Game logic
+            TapError::CannotKickSelf       => "ERR 407 CANNOT_KICK_SELF\n".to_string(),
+            TapError::PlayerNotInGroup    => "ERR 404 PLAYER_NOT_IN_GROUP\n".to_string(),
+            TapError::InviteNotFound       => "ERR 404 INVITE_NOT_FOUND\n".to_string(),
             TapError::NotInGroup           => "ERR 401 NOT_IN_GROUP\n".to_string(),
             TapError::AlreadyInGroup       => "ERR 402 ALREADY_IN_GROUP\n".to_string(),
             TapError::PlayerAlreadyInGroup => "ERR 402 PLAYER_ALREADY_IN_GROUP\n".to_string(),
