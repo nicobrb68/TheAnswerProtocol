@@ -37,7 +37,17 @@ async fn main() {
             .add_directive("info".parse().expect("invalid filter")))
         .init();
 
-    let listener = TcpListener::bind("0.0.0.0:7534").await.expect("An error occured while binding TCP listener");
+    let port = 7534;
+    let addr = format!("0.0.0.0:{}", port);
+
+    let listener = match TcpListener::bind(&addr).await {
+        Ok(l) => l,
+        Err(e) => {
+            tracing::error!(event = "bind_failed", error = %e, "Failed to bind to {} (port already in use?)", addr);
+            eprintln!("Error: Port {} is already in use. Is another server running?", port);
+            std::process::exit(1);
+        }
+    };
     tracing::info!(event = "server_start", addr = %listener.local_addr().expect("Failed to get local addr"), "server started");
     
     let args: Vec<String> = std::env::args().collect();
