@@ -26,7 +26,7 @@ async fn main() {
         .fallback_service(ServeDir::new("static"));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    println!("TAP web client running on http://{addr}");
+    println!("TAP gui client running on http://{addr}");
 
     let listener = tokio::net::TcpListener::bind(addr)
         .await
