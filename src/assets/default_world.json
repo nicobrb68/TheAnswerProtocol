@@ -186,6 +186,7 @@
 		}
 	},
 	"spawn": "room.gate",
+	"sleep_room": "room.guest_room",
 	"npcs": {
 		"npc.guard": {
 			"id": "npc.guard",

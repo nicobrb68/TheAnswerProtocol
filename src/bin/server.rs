@@ -24,6 +24,7 @@ use tap::commands::inventory::handle_inventory;
 use tap::commands::quest::{handle_quest, handle_quests};
 use tap::commands::status::handle_status;
 use tap::commands::attack::handle_attack;
+use tap::commands::sleep::handle_sleep;
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -45,6 +46,9 @@ async fn main() {
     let world: World = serde_json::from_str(&file).unwrap_or_else(|_| fatal("Failed to properly read world file."));
     if !world.rooms.contains_key(&world.spawn) {
         fatal("Spawn room does not exist in world file");
+    }
+    if !world.rooms.contains_key(&world.sleep_room) {
+        fatal("Sleep room does not exist in world file");
     }
     for (qid, quest) in &world.quests {
         if !world.items.contains_key(&quest.target_item) {
@@ -210,6 +214,8 @@ async fn main() {
                         Some(handle_attack(name, &npc_id, &world, &registry).await)
                     } else if line_upper.starts_with("STATUS") {
                         Some(handle_status(name, &world).await)
+                    } else if line_upper.starts_with("SLEEP") {
+                        Some(handle_sleep(name, &world, &registry).await)
                     } else if line_upper.starts_with("QUESTS") {
                         Some(handle_quests(name, &world).await)
                     } else if line_upper.starts_with("QUEST ") {

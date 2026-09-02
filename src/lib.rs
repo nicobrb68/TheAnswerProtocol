@@ -93,6 +93,7 @@ pub struct World {
     pub players: HashMap<String, Player>,
     pub rooms: HashMap<String, Room>,
     pub spawn: String,
+    pub sleep_room: String,
     #[serde(default)]
     pub groups: HashMap<String, Group>,
     #[serde(default)]
@@ -192,6 +193,7 @@ pub enum TapError {
     CannotInviteSelf,
     NotInvited,
     QuestNotComplete,
+    CannotSleepHere,
     PlayerDead,
     // 9xx - System
     ConnectionFailed,
@@ -212,6 +214,7 @@ impl TapError {
             // 3xx - Navigation
             TapError::NoExit               => "ERR 301 NO_EXIT\n".to_string(),
             // 4xx - Game logic
+            TapError::CannotSleepHere => "ERR 410 CANNOT_SLEEP_HERE\n".to_string(),
             TapError::CannotKickSelf       => "ERR 407 CANNOT_KICK_SELF\n".to_string(),
             TapError::PlayerNotInGroup    => "ERR 404 PLAYER_NOT_IN_GROUP\n".to_string(),
             TapError::InviteNotFound       => "ERR 404 INVITE_NOT_FOUND\n".to_string(),
