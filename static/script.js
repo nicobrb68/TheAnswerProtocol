@@ -1,9 +1,14 @@
 let ws = null
 
-if (ws !== null && ws.readyState == WebSocket.OPEN) {
-	window.addEventListener("beforeunload", () => {
-		ws.send("QUIT")
-	})
+window.addEventListener("beforeunload", () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send("QUIT");
+    }
+});
+
+function toggle_login_form() {
+	const container = document.querySelector("#login-container")
+	container.style.display = container.style.display === "flex" ? "none" : "flex";
 }
 
 function connect_user(host, port, username) {
@@ -21,6 +26,10 @@ function connect_user(host, port, username) {
 
 	ws.addEventListener("message", (event) => {
 		console.log(event.data)
+		if (event.data.startsWith("OK Connected")) {
+			document.querySelector("#login-container").style.display = "none";
+			// toggle_login_form();
+		}
 	})
 }
 
