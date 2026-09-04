@@ -27,7 +27,7 @@ function connect_user(host, port, username) {
 	ws.addEventListener("message", (event) => {
 		console.log(event.data)
 		if (event.data.startsWith("OK Connected")) {
-			document.querySelector("#login-container").style.display = "none";
+			document.querySelector().style.display = "none";
 			// toggle_login_form();
 		}
 	})
