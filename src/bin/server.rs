@@ -214,10 +214,10 @@ async fn main() {
                         Some(handle_talk(name, &npc_id, &world).await)
                     } else if line_upper.starts_with("TAKE ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
-                        Some(handle_take(name, &item_id, &world).await)
+                        Some(handle_take(name, &item_id, &world, &registry).await)
                     } else if line_upper.starts_with("DROP ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
-                        Some(handle_drop(name, &item_id, &world).await)
+                        Some(handle_drop(name, &item_id, &world, &registry).await)
                     } else if line_upper.starts_with("INVENTORY") {
                         Some(handle_inventory(name, &world).await)
                     } else if line_upper.starts_with("EXAMINE") {

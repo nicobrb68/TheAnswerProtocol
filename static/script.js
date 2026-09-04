@@ -527,6 +527,37 @@ function handleEvent(rest) {
     logCombat(rest.slice("ROOM COMBAT ".length));
     return;
   }
+  if (rest.startsWith("ROOM ITEM TAKEN ")) {
+    const m = rest.match(/^ROOM ITEM TAKEN (\S+) (\S+)$/);
+    if (m) {
+      const [, itemId, who] = m;
+      if (state.room) state.room.items = (state.room.items || []).filter((i) => i !== itemId);
+      logEvent(`${who} picks up ${state.itemCache[itemId]?.name || humanize(itemId)}.`);
+      renderRoom();
+    }
+    return;
+  }
+  if (rest.startsWith("ROOM ITEM DROPPED ")) {
+    const m = rest.match(/^ROOM ITEM DROPPED (\S+) (\S+)$/);
+    if (m) {
+      const [, itemId, who] = m;
+      if (state.room && !(state.room.items || []).includes(itemId)) {
+        state.room.items = [...(state.room.items || []), itemId];
+      }
+      logEvent(`${who} drops ${state.itemCache[itemId]?.name || humanize(itemId)}.`);
+      renderRoom();
+    }
+    return;
+  }
+  if (rest.startsWith("ROOM ITEM RESPAWN ")) {
+    const itemId = rest.slice("ROOM ITEM RESPAWN ".length).trim();
+    if (state.room && !(state.room.items || []).includes(itemId)) {
+      state.room.items = [...(state.room.items || []), itemId];
+    }
+    logEvent(`${state.itemCache[itemId]?.name || humanize(itemId)} reappears.`);
+    renderRoom();
+    return;
+  }
   if (rest.startsWith("SLEEP ")) {
     logEvent(`${rest.slice(6).trim()} settles in to rest.`);
     return;
