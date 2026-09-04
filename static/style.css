@@ -9,10 +9,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #1b1b29;
+    background-color: #0a0a0f;
     font-family: 'Courier New', monospace;
     color: #c8c8d0;
 }
+
+/* ── LOGIN ── */
 
 .login {
     background: #12121a;
@@ -20,11 +22,11 @@ body {
     border-radius: 8px;
     padding: 40px;
     width: 360px;
-    box-shadow: 0 0 40px rgba(72, 69, 96, 0.06);
+    box-shadow: 0 0 40px rgba(100, 80, 255, 0.06);
 }
 
 .login::before {
-    content: 'TAP';
+    content: '⚔ TAP';
     display: block;
     text-align: center;
     font-size: 1.6rem;
@@ -40,7 +42,7 @@ body {
     gap: 18px;
 }
 
-label {
+.login label {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -50,7 +52,7 @@ label {
     color: #6b6b80;
 }
 
-input {
+.login input {
     background: #0a0a0f;
     border: 1px solid #2a2a3a;
     border-radius: 4px;
@@ -62,11 +64,11 @@ input {
     transition: border-color 0.2s;
 }
 
-input:focus {
+.login input:focus {
     border-color: #a78bfa;
 }
 
-button[type="submit"] {
+.login button[type="submit"] {
     margin-top: 10px;
     padding: 12px;
     background: #a78bfa;
@@ -82,13 +84,13 @@ button[type="submit"] {
     transition: background 0.2s;
 }
 
-button[type="submit"]:hover {
+.login button[type="submit"]:hover {
     background: #c4b5fd;
 }
 
 #login-error {
     display: none;
-    margin-top: 12px;
+    margin-bottom: 16px;
     padding: 10px;
     background: #1a0a0a;
     border: 1px solid #4a1a1a;
@@ -96,4 +98,243 @@ button[type="submit"]:hover {
     color: #f87171;
     font-size: 0.8rem;
     text-align: center;
+}
+
+/* ── GAME ── */
+
+#game-container {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+}
+
+#game-container.active {
+    display: flex;
+}
+
+/* sidebar */
+
+#game-sidebar {
+    width: 220px;
+    background: #101018;
+    border-right: 1px solid #1e1e2e;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    flex-shrink: 0;
+    overflow-y: auto;
+}
+
+#player-info {
+    padding: 20px 16px;
+    border-bottom: 1px solid #1e1e2e;
+}
+
+#player-name {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #a78bfa;
+    letter-spacing: 1px;
+}
+
+#player-status {
+    font-size: 0.7rem;
+    color: #4a4a5a;
+    margin-top: 4px;
+}
+
+.sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid #1e1e2e;
+}
+
+.sidebar-title {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #4a4a5a;
+    margin-bottom: 10px;
+}
+
+#quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#quick-actions button {
+    background: #16161f;
+    border: 1px solid #2a2a3a;
+    border-radius: 4px;
+    color: #c8c8d0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+#quick-actions button:hover {
+    background: #1e1e2e;
+    border-color: #a78bfa;
+}
+
+#movement-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+}
+
+#movement-pad button {
+    background: #16161f;
+    border: 1px solid #2a2a3a;
+    border-radius: 4px;
+    color: #c8c8d0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 10px 0;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+#movement-pad button:hover {
+    background: #1e1e2e;
+    border-color: #a78bfa;
+}
+
+/* grid: empty / N / empty | W / empty / E | empty / S / empty | Up / empty / Dn */
+#movement-pad button:nth-child(1) { grid-column: 2; }
+#movement-pad button:nth-child(2) { grid-column: 1; grid-row: 2; }
+#movement-pad button:nth-child(3) { grid-column: 3; grid-row: 2; }
+#movement-pad button:nth-child(4) { grid-column: 2; grid-row: 3; }
+#movement-pad button:nth-child(5) { grid-column: 1; grid-row: 4; }
+#movement-pad button:nth-child(6) { grid-column: 3; grid-row: 4; }
+
+#disconnect-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #3a1a1a;
+    border-radius: 4px;
+    color: #f87171;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    padding: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#disconnect-btn:hover {
+    background: #1a0a0a;
+}
+
+/* main area */
+
+#game-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+#game-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.log-line {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.log-line.ok {
+    color: #6ee7b7;
+}
+
+.log-line.err {
+    color: #f87171;
+}
+
+.log-line.evt {
+    color: #93c5fd;
+}
+
+.log-line.evt-chat {
+    color: #fbbf24;
+}
+
+.log-line.cmd {
+    color: #6b6b80;
+}
+
+.log-line.server {
+    color: #c8c8d0;
+}
+
+/* command input */
+
+#command-form {
+    display: flex;
+    border-top: 1px solid #1e1e2e;
+    background: #101018;
+}
+
+#command-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 14px 20px;
+    color: #e0e0e8;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+#command-input::placeholder {
+    color: #3a3a4a;
+}
+
+#command-form button {
+    background: #a78bfa;
+    color: #0a0a0f;
+    border: none;
+    padding: 14px 24px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#command-form button:hover {
+    background: #c4b5fd;
+}
+
+/* scrollbar */
+
+#game-log::-webkit-scrollbar {
+    width: 6px;
+}
+
+#game-log::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#game-log::-webkit-scrollbar-thumb {
+    background: #2a2a3a;
+    border-radius: 3px;
+}
+
+#game-log::-webkit-scrollbar-thumb:hover {
+    background: #3a3a4a;
 }
