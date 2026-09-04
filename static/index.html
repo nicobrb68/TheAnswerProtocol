@@ -1,36 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel=stylesheet type="text/css" href="style.css">
-	<title>TAP</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAP — The Answer Protocol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-	<div  id="login-container" class="login">
-		<div id="login-error"></div>
-		<form id="connect-form">
-			<label for="host">Host
-				<input name="host" type="text">
-			</label>
-			<label for="port">Port
-				<input name="port" type="text">
-			</label>
-			<label for="username">Username
-				<input name="username" type="text">
-			</label>
-			<button type="submit">Send</button>
-		</form>
-	</div>
+<!-- ============================================================ -->
+<!-- LOGIN SCREEN                                                  -->
+<!-- ============================================================ -->
+<main id="screen-login" class="screen">
+  <div class="login-card">
+    <div class="login-glyph" aria-hidden="true">◈</div>
+    <h1 class="login-title">The Answer<br>Protocol</h1>
+    <p class="login-sub">A shared world, spoken one line at a time.</p>
 
-	
-	
-	<form action="Login">
+    <form id="connect-form" class="login-form" autocomplete="off">
+      <label class="field">
+        <span>Server host</span>
+        <input name="host" type="text" value="127.0.0.1" required>
+      </label>
+      <label class="field">
+        <span>Port</span>
+        <input name="port" type="number" value="7534" required>
+      </label>
+      <label class="field">
+        <span>Your name</span>
+        <input name="username" type="text" placeholder="e.g. Alice" maxlength="20" required>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" id="connect-submit">Enter the world</button>
+      <p id="login-error" class="login-error" role="alert" hidden></p>
+    </form>
+    <p class="login-hint">The GUI dials the TAP server for you — it must be running and reachable at the address above.</p>
+  </div>
+</main>
 
-	</form>
-	<script type="text/javascript" src="script.js"></script>
+<!-- ============================================================ -->
+<!-- GAME SCREEN                                                   -->
+<!-- ============================================================ -->
+<div id="screen-game" class="screen" hidden>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-glyph" aria-hidden="true">◈</span>
+      <span class="brand-name">TAP</span>
+    </div>
+
+    <div class="topbar-status">
+      <span class="conn-dot" id="conn-dot" aria-hidden="true"></span>
+      <span id="conn-label">connected</span>
+    </div>
+
+    <div class="topbar-hp">
+      <span class="hp-label">HP</span>
+      <div class="hp-bar hp-bar-sm"><div class="hp-fill" id="hp-fill-top"></div></div>
+      <span id="hp-text-top">—/—</span>
+    </div>
+
+    <div class="topbar-counts" title="Players here / players on the server">
+      <span id="room-count">0</span> here · <span id="server-count">0</span> online
+    </div>
+
+    <div class="topbar-user">
+      <span id="me-name">—</span>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" id="quit-btn" type="button">Quit</button>
+  </header>
+
+  <main class="layout">
+
+    <!-- ROOM / JOURNAL PANEL -->
+    <section class="room-panel" aria-label="Current location">
+      <div class="room-head">
+        <h1 id="room-name">—</h1>
+        <span class="room-id" id="room-id"></span>
+      </div>
+      <p class="room-desc" id="room-desc">…</p>
+
+      <div class="room-block">
+        <h2>Exits</h2>
+        <div class="exit-row" id="exit-row"><span class="empty-note">no visible exits</span></div>
+      </div>
+
+      <div class="room-columns">
+        <div class="room-block">
+          <h2>Here with you</h2>
+          <ul class="chip-list" id="players-list"><li class="empty-note">you're alone</li></ul>
+        </div>
+
+        <div class="room-block">
+          <h2>Things</h2>
+          <ul class="entity-list" id="items-list"><li class="empty-note">nothing lying around</li></ul>
+        </div>
+
+        <div class="room-block">
+          <h2>Faces</h2>
+          <ul class="entity-list" id="npcs-list"><li class="empty-note">no one else here</li></ul>
+        </div>
+      </div>
+
+      <button class="btn btn-ghost btn-sm" id="look-refresh" type="button">↻ Look around</button>
+    </section>
+
+    <!-- LEDGER SIDEBAR -->
+    <aside class="ledger" aria-label="Character sheet">
+
+      <div class="ledger-block">
+        <div class="ledger-row">
+          <span class="ledger-label">Status</span>
+          <span class="status-pill" id="status-pill">alive</span>
+        </div>
+        <div class="hp-bar" id="hp-bar-main"><div class="hp-fill" id="hp-fill-main"></div></div>
+        <div class="hp-numbers"><span id="hp-text-main">—/—</span> HP</div>
+      </div>
+
+      <div class="ledger-block">
+        <div class="ledger-row">
+          <h2>Inventory</h2>
+          <button class="btn btn-ghost btn-xs" id="inventory-refresh" type="button">↻</button>
+        </div>
+        <ul class="inventory-list" id="inventory-list"><li class="empty-note">empty-handed</li></ul>
+      </div>
+
+      <div class="ledger-block">
+        <div class="ledger-row">
+          <h2>Quests</h2>
+          <button class="btn btn-ghost btn-xs" id="quests-refresh" type="button">↻</button>
+        </div>
+        <ul class="quest-list" id="quest-list"><li class="empty-note">no quests yet — talk to someone</li></ul>
+      </div>
+
+      <div class="ledger-block" id="group-block">
+        <div class="ledger-row">
+          <h2>Fellowship</h2>
+          <button class="btn btn-ghost btn-xs" id="group-refresh" type="button">↻</button>
+        </div>
+        <div id="group-none">
+          <p class="empty-note">not in a group</p>
+          <form id="group-create-form" class="inline-form">
+            <input name="name" type="text" placeholder="group name (optional)" maxlength="25">
+            <button type="submit" class="btn btn-secondary btn-xs">Create</button>
+          </form>
+          <form id="group-join-form" class="inline-form">
+            <input name="id" type="text" placeholder="group id to join" maxlength="25" required>
+            <button type="submit" class="btn btn-secondary btn-xs">Join</button>
+          </form>
+        </div>
+        <div id="group-active" hidden>
+          <div class="ledger-row">
+            <span class="ledger-label">Group</span>
+            <span id="group-id-label" class="tag"></span>
+          </div>
+          <div class="ledger-row">
+            <span class="ledger-label">Leader</span>
+            <span id="group-leader-label"></span>
+          </div>
+          <ul class="chip-list" id="group-members-list"></ul>
+          <form id="group-invite-form" class="inline-form">
+            <input name="user" type="text" placeholder="invite by name" maxlength="20" required>
+            <button type="submit" class="btn btn-secondary btn-xs">Invite</button>
+          </form>
+          <div class="group-actions">
+            <button class="btn btn-ghost btn-xs" id="group-leave-btn" type="button">Leave</button>
+            <button class="btn btn-ghost btn-xs" id="group-disband-btn" type="button" hidden>Disband</button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- TERMINAL STRIP -->
+    <section class="terminal" aria-label="Communications">
+      <div class="terminal-tabs" role="tablist">
+        <button class="tab-btn active" data-tab="global" type="button" role="tab">Global</button>
+        <button class="tab-btn" data-tab="room" type="button" role="tab">Room</button>
+        <button class="tab-btn" data-tab="group" type="button" role="tab">Group</button>
+        <button class="tab-btn" data-tab="log" type="button" role="tab">Log</button>
+        <span class="terminal-spacer"></span>
+        <button class="tab-btn tab-console-toggle" id="console-toggle" type="button">console ▾</button>
+      </div>
+
+      <div class="terminal-panes">
+        <div class="terminal-pane active" id="pane-global" role="tabpanel" aria-live="polite"></div>
+        <div class="terminal-pane" id="pane-room" role="tabpanel" aria-live="polite"></div>
+        <div class="terminal-pane" id="pane-group" role="tabpanel" aria-live="polite"></div>
+        <div class="terminal-pane" id="pane-log" role="tabpanel" aria-live="polite"></div>
+      </div>
+
+      <form id="chat-form" class="terminal-input">
+        <span class="prompt" id="chat-scope-label">global&gt;</span>
+        <input name="message" type="text" id="chat-input" placeholder="Say something…" autocomplete="off">
+        <button type="submit" class="btn btn-primary btn-sm">Send</button>
+      </form>
+
+      <form id="console-form" class="terminal-input console-input" hidden>
+        <span class="prompt">tap:~$</span>
+        <input name="raw" type="text" id="console-input" placeholder="RAW COMMAND — e.g. WHO" autocomplete="off">
+        <button type="submit" class="btn btn-secondary btn-sm">Send</button>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast / invite notifications -->
+<div id="toast-stack" class="toast-stack" aria-live="assertive"></div>
+
+<!-- NPC interaction popover (talk / attack / quest) -->
+<div id="npc-popover" class="npc-popover" hidden>
+  <div class="npc-popover-head">
+    <span id="npc-popover-name">—</span>
+    <button class="btn btn-ghost btn-xs" id="npc-popover-close" type="button">✕</button>
+  </div>
+  <div id="npc-popover-dialogue" class="npc-popover-dialogue" hidden></div>
+  <div class="npc-popover-actions">
+    <button class="btn btn-secondary btn-sm" id="npc-talk-btn" type="button">Talk</button>
+    <button class="btn btn-secondary btn-sm" id="npc-quest-btn" type="button">Ask for quest</button>
+    <button class="btn btn-danger btn-sm" id="npc-attack-btn" type="button" hidden>Attack</button>
+  </div>
+</div>
+
+<!-- Item inspection popover -->
+<div id="item-popover" class="npc-popover" hidden>
+  <div class="npc-popover-head">
+    <span id="item-popover-name">—</span>
+    <button class="btn btn-ghost btn-xs" id="item-popover-close" type="button">✕</button>
+  </div>
+  <ul class="item-stat-list" id="item-popover-stats"></ul>
+  <span class="item-popover-id" id="item-popover-id"></span>
+</div>
+
+<script src="script.js"></script>
 </body>
-
 </html>

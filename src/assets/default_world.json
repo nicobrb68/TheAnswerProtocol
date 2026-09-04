@@ -360,7 +360,7 @@
 		"item.fish": {
 			"id": "item.fish",
 			"name": "Fresh Fish",
-			"damage": null,
+			"damage": 1,
 			"armor": null,
 			"heal": 6
 		},

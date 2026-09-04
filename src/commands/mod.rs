@@ -14,3 +14,4 @@ pub mod quest;
 pub mod status;
 pub mod attack;
 pub mod sleep;
+pub mod examine;

@@ -163,6 +163,12 @@ impl World {
         self.npcs.get_mut(id)
     }
 
+    // ITEMS IMPL
+
+    pub fn get_item(&self, id: &str) -> Option<&Item> {
+        self.items.get(id)
+    }
+
 }
 #[derive(Debug)]
 pub enum TapError {
@@ -253,7 +259,7 @@ pub struct Npc {
 }
 
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Item {
     pub id: String,
     pub name: String,
