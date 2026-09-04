@@ -76,6 +76,10 @@ async fn main() {
 
     let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
 
+    let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
+
+    tap::events::boss::start_boss_spawner(Arc::clone(&world), Arc::clone(&registry));
+
     loop {
         let (socket, addr) = match listener.accept().await {
             Ok(val) => val,
