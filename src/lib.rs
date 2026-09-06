@@ -254,6 +254,8 @@ pub struct Npc {
     pub dialogue: Vec<String>,
     pub hostile: bool,
     pub hp: Option<u32>,
+    #[serde(default)]
+    pub max_hp: Option<u32>,
     pub damage: Option<u32>,
     pub quest: Option<String>
 }

@@ -54,7 +54,10 @@ async fn main() {
     let args: Vec<String> = std::env::args().collect();
     let world_path = args.get(1).map(|s| s.as_str()).unwrap_or("src/assets/default_world.json");
     let file = std::fs::read_to_string(world_path).unwrap_or_else(|_| fatal("Failed to load any world file"));
-    let world: World = serde_json::from_str(&file).unwrap_or_else(|_| fatal("Failed to properly read world file."));
+    let mut world: World = serde_json::from_str(&file).unwrap_or_else(|_| fatal("Failed to properly read world file."));
+    for npc in world.npcs.values_mut() {
+        npc.max_hp = npc.hp;
+    }
     if !world.rooms.contains_key(&world.spawn) {
         fatal("Spawn room does not exist in world file");
     }
@@ -76,9 +79,8 @@ async fn main() {
 
     let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
 
-    let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
-
     tap::events::boss::start_boss_spawner(Arc::clone(&world), Arc::clone(&registry));
+    tap::events::regen::start_npc_regen(Arc::clone(&world));
 
     loop {
         let (socket, addr) = match listener.accept().await {

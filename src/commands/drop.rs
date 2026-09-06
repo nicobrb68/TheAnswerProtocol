@@ -23,9 +23,6 @@ pub async fn handle_drop(
         None => return TapError::ItemNotInInventory.message(),
     };
     if let Some(p) = w.get_mut_player(username) {
-        // Remove only ONE matching copy, not every copy — inventories can
-        // legitimately hold duplicate item ids (e.g. a quest reward given
-        // in multiple units), and DROP should shed a single unit at a time.
         if let Some(pos) = p.inventory.iter().position(|i| i == &item_full_id) {
             p.inventory.remove(pos);
         }

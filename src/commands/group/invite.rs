@@ -34,7 +34,11 @@ pub async fn invite_group(
 
     if group.players.contains(&group_args.to_string()) || group.leader == group_args.to_string() {
         return TapError::PlayerAlreadyInGroup.message();
-    };
+    }
+
+    if group.invited.contains(&group_args.to_string()) {
+        return TapError::AlreadyInGroup.message();
+    }
 
     notify_user(&group_args, &format!("EVT GROUP INVITE {} id={}\n", username, group_id), registry).await;
 

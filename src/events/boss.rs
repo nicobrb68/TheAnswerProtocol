@@ -17,7 +17,6 @@ pub fn start_boss_spawner(
     tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(BOSS_INTERVAL_MINS * 60));
 
-        // Consomme le premier tick immédiat pour attendre avant le 1er spawn
         interval.tick().await;
 
         loop {
@@ -47,7 +46,7 @@ pub fn start_boss_spawner(
             }
 
             if spawned {
-                let msg = "EVT GLOBAL [ALERTE] Un rugissement retentit... Le Dragon Ancestral a envahi les Ruines !\n";
+                let msg = "EVT GLOBAL [ALERT] A thunderous roar echoes... The Ancestral Dragon has invaded the Ruins!\n";
                 let reg = registry.lock().await;
                 for tx in reg.values() {
                     let _ = tx.send(msg.to_string());

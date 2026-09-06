@@ -1,14 +1,7 @@
-/* ==========================================================================
-   TAP — The Answer Protocol
-   Design concept: the game is a fantasy world narrated over a text
-   protocol, so the UI is split between two voices —
-     - the "journal": parchment card, old-style serif, for the room/world
-     - the "terminal": dark CRT strip, amber phosphor mono, for the wire
-       protocol (chat, events, raw commands)
-   ========================================================================== */
+
 
 :root {
-  /* -- color tokens -- */
+  
   --bg:            #16110c;
   --bg-raised:     #1e1710;
   --panel-line:    #382c1c;
@@ -24,7 +17,7 @@
   --danger:        #c85c4f;
   --danger-dim:    #7d3b33;
 
-  /* -- type -- */
+  
   --font-display: 'Spectral', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
 
@@ -54,16 +47,10 @@ button, input {
 
 .screen { min-height: 100vh; }
 
-/* Any element hidden via the `hidden` attribute must actually disappear,
-   regardless of other display rules targeting it by id/class (e.g.
-   #screen-game sets display:grid, which — being an ID selector — would
-   otherwise out-specificity a plain `.screen[hidden]` rule and keep the
-   element laid out). !important guarantees this always wins. */
+
 [hidden] { display: none !important; }
 
-/* ==========================================================================
-   Buttons — shared vocabulary
-   ========================================================================== */
+
 
 .btn {
   appearance: none;
@@ -117,9 +104,7 @@ button, input {
 .btn-xs { font-size: 0.7rem; padding: 0.3rem 0.55rem; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ==========================================================================
-   LOGIN SCREEN
-   ========================================================================== */
+
 
 #screen-login {
   display: flex;
@@ -208,9 +193,7 @@ button, input {
   line-height: 1.5;
 }
 
-/* ==========================================================================
-   GAME SCREEN — layout
-   ========================================================================== */
+
 
 #screen-game {
   display: grid;
@@ -265,9 +248,7 @@ button, input {
   overflow: hidden;
 }
 
-/* ==========================================================================
-   ROOM / JOURNAL PANEL
-   ========================================================================== */
+
 
 .room-panel {
   grid-area: room;
@@ -275,8 +256,7 @@ button, input {
   color: var(--ink);
   padding: 1.75rem 2rem;
   overflow-y: auto;
-  min-height: 0; /* grid items default to min-height:auto, which can stop
-                    a scrolling panel from ever shrinking to its track size */
+  min-height: 0; 
 }
 
 .room-head {
@@ -403,9 +383,7 @@ button, input {
   list-style: none;
 }
 
-/* ==========================================================================
-   LEDGER SIDEBAR
-   ========================================================================== */
+
 
 .ledger {
   grid-area: ledger;
@@ -537,9 +515,7 @@ button, input {
 
 .group-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
 
-/* ==========================================================================
-   TERMINAL STRIP
-   ========================================================================== */
+
 
 .terminal {
   grid-area: terminal;
@@ -622,9 +598,7 @@ button, input {
 .console-input { background: rgba(92, 184, 172, 0.05); }
 .console-input .prompt { color: var(--teal); }
 
-/* ==========================================================================
-   TOASTS
-   ========================================================================== */
+
 
 .toast-stack {
   position: fixed;
@@ -651,9 +625,7 @@ button, input {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==========================================================================
-   NPC POPOVER
-   ========================================================================== */
+
 
 .npc-popover {
   position: fixed;
@@ -709,9 +681,7 @@ button, input {
   width: fit-content;
 }
 
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
+
 
 @media (max-width: 900px) {
   .layout {
@@ -728,9 +698,7 @@ button, input {
   .topbar { flex-wrap: wrap; row-gap: 0.5rem; }
 }
 
-/* ==========================================================================
-   ACCESSIBILITY
-   ========================================================================== */
+
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }

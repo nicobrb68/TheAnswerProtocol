@@ -1,26 +1,6 @@
 "use strict";
 
-/* ==========================================================================
- * TAP GUI client
- *
- * Wire protocol reminder (see RFC 42TAP + this server's actual behaviour):
- *   - one command per line, server replies with exactly one "OK ..." or
- *     "ERR <code> <NAME>" line, in the SAME ORDER commands were sent
- *     (this connection's read loop awaits each handler before reading the
- *     next line, so responses never get reordered relative to requests).
- *   - "EVT ..." lines and raw "(GLOBAL)/(ROOM)/(GROUP) user: text" chat
- *     lines are UNSOLICITED and can arrive at any time, interleaved with
- *     command responses. They are never a reply to something we sent.
- *
- * That distinction is the whole trick to building a client without
- * request IDs: filter out anything that looks like an event/chat push
- * first, and treat everything else as "the answer to the oldest command
- * still waiting for one".
- * ========================================================================== */
 
-// ---------------------------------------------------------------------------
-// DOM references
-// ---------------------------------------------------------------------------
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -64,31 +44,23 @@ const toastStack = $("#toast-stack");
 const npcPopover = $("#npc-popover");
 const itemPopover = $("#item-popover");
 
-// ---------------------------------------------------------------------------
-// Client-side state (everything here mirrors what the server told us —
-// nothing is invented except cosmetic humanized labels for raw IDs).
-// ---------------------------------------------------------------------------
 const state = {
   ws: null,
   connected: false,
   me: { username: null, hp: null, maxHp: null, status: "alive" },
-  room: null,           // last LOOK payload
-  inventory: [],         // array of item ids
-  quests: [],            // array of {quest_id, status, progress?}
-  group: null,           // {id, leader, players, invited} or null
+  room: null,
+  inventory: [],
+  quests: [],
+  group: null,
   serverCount: 0,
-  npcCache: {},          // id -> {name, hostile: true|false|null, hp: number|null}
-  itemCache: {},         // id -> {name, damage, armor, heal} — filled in by EXAMINE
+  npcCache: {},
+  itemCache: {},
   activeTab: "global",
-  activeNpc: null,        // id currently shown in the popover
+  activeNpc: null,
 };
 
-// FIFO queue of {type, meta} describing which command we're waiting on.
 const pending = [];
 
-// ---------------------------------------------------------------------------
-// Small utilities
-// ---------------------------------------------------------------------------
 function humanize(id) {
   if (!id) return "";
   const short = id.includes(".") ? id.slice(id.indexOf(".") + 1) : id;
@@ -143,10 +115,6 @@ function friendlyError(line) {
   return ERROR_MESSAGES[code] || name || `Error ${code}`;
 }
 
-// ---------------------------------------------------------------------------
-// Logging into the three terminal panes ("global" / "room" / "group") plus
-// the catch-all protocol "log" pane.
-// ---------------------------------------------------------------------------
 const panes = {
   global: $("#pane-global"),
   room: $("#pane-room"),
@@ -177,9 +145,6 @@ function logSystem(text) { appendLine("log", "system", escapeHtml(text)); }
 function logRaw(text) { appendLine("log", "system", escapeHtml(text)); }
 function logErrorLine(text) { appendLine("log", "error", escapeHtml(friendlyError(text))); }
 
-// ---------------------------------------------------------------------------
-// Toasts
-// ---------------------------------------------------------------------------
 function showToast({ text, type = "info", actions = [], timeout = 4500 }) {
   const el = document.createElement("div");
   el.className = `toast${type === "error" ? " error" : ""}`;
@@ -202,9 +167,6 @@ function showToast({ text, type = "info", actions = [], timeout = 4500 }) {
   if (timeout) setTimeout(() => el.remove(), timeout);
 }
 
-// ---------------------------------------------------------------------------
-// WebSocket / command queue
-// ---------------------------------------------------------------------------
 function sendCommand(type, raw, meta = {}) {
   if (!state.ws || state.ws.readyState !== WebSocket.OPEN) return;
   pending.push({ type, meta });
@@ -236,7 +198,7 @@ function connect(host, port, username) {
     }
   });
 
-  ws.addEventListener("error", () => { /* close handler covers UX */ });
+  ws.addEventListener("error", () => {  });
 }
 
 function returnToLogin() {
@@ -259,18 +221,14 @@ function loginFailed(msg) {
   loginError.textContent = msg;
   connectSubmit.disabled = false;
   connectSubmit.textContent = "Enter the world";
-  if (state.ws) { try { state.ws.close(); } catch { /* noop */ } }
+  if (state.ws) { try { state.ws.close(); } catch {  } }
 }
 
-// ---------------------------------------------------------------------------
-// Incoming line dispatcher
-// ---------------------------------------------------------------------------
 function onLine(line) {
   if (line == null) return;
   line = String(line);
   if (line.length === 0) return;
 
-  // --- unsolicited chat broadcasts ------------------------------------
   const chatMatch = line.match(/^\((GLOBAL|ROOM|GROUP)\)\s+(\S+):\s?(.*)$/);
   if (chatMatch) {
     const [, scope, who, text] = chatMatch;
@@ -278,13 +236,11 @@ function onLine(line) {
     return;
   }
 
-  // --- unsolicited protocol events ------------------------------------
   if (line.startsWith("EVT ")) {
     handleEvent(line.slice(4));
     return;
   }
 
-  // --- bridge-level failures (before any TAP handshake) ---------------
   if (line.startsWith("ERR connection failed")) {
     if (pending.length && pending[0].type === "GREETING") pending.shift();
     if (pending.length && pending[0].type === "CONNECT") pending.shift();
@@ -292,21 +248,16 @@ function onLine(line) {
     return;
   }
 
-  // --- everything else is the answer to the oldest pending command ----
   const ctx = pending.shift();
   if (!ctx) { logRaw(line); return; }
   handleResponse(ctx, line);
 }
 
-// ---------------------------------------------------------------------------
-// Responses (OK / ERR) matched against the command that triggered them
-// ---------------------------------------------------------------------------
 function handleResponse(ctx, line) {
   const isErr = line.startsWith("ERR");
 
   switch (ctx.type) {
     case "GREETING":
-      // "OK hello proto=1" — nothing to do, CONNECT is next in the queue.
       return;
 
     case "CONNECT":
@@ -342,7 +293,6 @@ function handleResponse(ctx, line) {
 
     case "CHAT":
       if (isErr) { showToast({ text: friendlyError(line), type: "error" }); }
-      // success is silent: the message already arrived via the broadcast line
       return;
 
     case "TALK": {
@@ -505,9 +455,6 @@ function handleResponse(ctx, line) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Unsolicited events (EVT ...)
-// ---------------------------------------------------------------------------
 function handleEvent(rest) {
   if (rest.startsWith("ROOM PRESENCE ENTER ")) {
     const who = rest.slice("ROOM PRESENCE ENTER ".length).trim();
@@ -613,13 +560,9 @@ function handleEvent(rest) {
     setTimeout(returnToLogin, 800);
     return;
   }
-  // Unknown event shape — still surface it, never drop silently.
   logRaw(`EVT ${rest}`);
 }
 
-// ---------------------------------------------------------------------------
-// Rendering
-// ---------------------------------------------------------------------------
 function renderHp() {
   const { hp, maxHp, status } = state.me;
   const pct = maxHp ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
@@ -633,6 +576,8 @@ function renderHp() {
   statusPill.textContent = status || "alive";
   statusPill.classList.toggle("dead", status === "dead");
 }
+
+const sleepBtn = $("#sleep-btn");
 
 function applyRoom(room) {
   if (!room) return;
@@ -650,7 +595,6 @@ function renderRoom() {
   roomIdEl.textContent = room.id || "";
   roomDescEl.textContent = room.description || "";
 
-  // exits
   exitRowEl.innerHTML = "";
   const dirs = Object.keys(room.exits || {});
   if (!dirs.length) {
@@ -675,14 +619,12 @@ function renderRoom() {
       });
   }
 
-  // players (excluding self for the list, but counting self for the tally)
   const others = (room.players || []).filter((p) => p !== state.me.username);
   playersListEl.innerHTML = others.length
     ? others.map((p) => `<li class="chip">${escapeHtml(p)}</li>`).join("")
     : '<li class="empty-note">you\'re alone</li>';
   roomCountEl.textContent = (room.players || []).length;
 
-  // items
   const items = room.items || [];
   itemsListEl.innerHTML = items.length
     ? items.map((id) => `
@@ -694,7 +636,6 @@ function renderRoom() {
         </li>`).join("")
     : '<li class="empty-note">nothing lying around</li>';
 
-  // npcs
   const npcs = room.npcs || [];
   npcsListEl.innerHTML = npcs.length
     ? npcs.map((id) => {
@@ -719,6 +660,8 @@ function renderRoom() {
   $$('[data-action="npc"]', npcsListEl).forEach((btn) => {
     btn.onclick = (ev) => openNpcPopover(btn.dataset.id, ev.currentTarget);
   });
+
+  sleepBtn.hidden = !room.can_sleep;
 }
 
 function renderInventory() {
@@ -787,9 +730,6 @@ function renderGroup() {
   });
 }
 
-// ---------------------------------------------------------------------------
-// NPC popover
-// ---------------------------------------------------------------------------
 function openNpcPopover(npcId, anchorEl) {
   state.activeNpc = npcId;
   const cached = state.npcCache[npcId] || {};
@@ -819,10 +759,6 @@ function showNpcDialogue(text) {
   el.textContent = `“${text}”`;
 }
 
-// ---------------------------------------------------------------------------
-// Item popover — "EXAMINE" is a TAP protocol extension (not in RFC 42TAP)
-// added specifically so the GUI can show item stats; see README.
-// ---------------------------------------------------------------------------
 let pendingItemAnchor = null;
 
 function requestItemInfo(itemId, anchorEl) {
@@ -859,9 +795,6 @@ function closeItemPopover() {
   pendingItemAnchor = null;
 }
 
-// ---------------------------------------------------------------------------
-// Helpers to (re)sync everything after connecting or after a raw command
-// ---------------------------------------------------------------------------
 function refreshAll() {
   sendCommand("LOOK", "LOOK");
   sendCommand("STATUS", "STATUS");
@@ -884,9 +817,6 @@ function enterGame() {
   refreshAll();
 }
 
-// ---------------------------------------------------------------------------
-// UI wiring
-// ---------------------------------------------------------------------------
 connectForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const data = new FormData(connectForm);
@@ -905,6 +835,7 @@ connectForm.addEventListener("submit", (e) => {
 
 $("#quit-btn").addEventListener("click", () => sendCommand("QUIT", "QUIT"));
 $("#look-refresh").addEventListener("click", () => sendCommand("LOOK", "LOOK"));
+sleepBtn.addEventListener("click", () => sendCommand("SLEEP", "SLEEP"));
 $("#inventory-refresh").addEventListener("click", () => sendCommand("INVENTORY", "INVENTORY"));
 $("#quests-refresh").addEventListener("click", () => sendCommand("QUESTS", "QUESTS"));
 $("#group-refresh").addEventListener("click", () => {
@@ -934,7 +865,6 @@ $("#group-invite-form").addEventListener("submit", (e) => {
 $("#group-leave-btn").addEventListener("click", () => sendCommand("GROUP_LEAVE", "GROUP LEAVE"));
 groupDisbandBtn.addEventListener("click", () => sendCommand("GROUP_DISBAND", "GROUP DISBAND"));
 
-// terminal tabs
 $$(".tab-btn[data-tab]").forEach((btn) => {
   btn.addEventListener("click", () => {
     state.activeTab = btn.dataset.tab;
@@ -961,7 +891,6 @@ $("#chat-form").addEventListener("submit", (e) => {
   input.value = "";
 });
 
-// raw console (power users / protocol debugging)
 $("#console-toggle").addEventListener("click", () => {
   const form = $("#console-form");
   form.hidden = !form.hidden;
@@ -976,7 +905,6 @@ $("#console-form").addEventListener("submit", (e) => {
   input.value = "";
 });
 
-// npc popover actions
 $("#npc-popover-close").addEventListener("click", closeNpcPopover);
 $("#item-popover-close").addEventListener("click", closeItemPopover);
 $("#npc-talk-btn").addEventListener("click", () => {
@@ -1005,6 +933,6 @@ document.addEventListener("click", (e) => {
 
 window.addEventListener("beforeunload", () => {
   if (state.ws && state.ws.readyState === WebSocket.OPEN) {
-    try { state.ws.send("QUIT"); } catch { /* noop */ }
+    try { state.ws.send("QUIT"); } catch {  }
   }
 });

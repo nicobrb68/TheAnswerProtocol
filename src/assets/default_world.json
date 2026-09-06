@@ -277,6 +277,15 @@
 			"hp": null,
 			"damage": null,
 			"quest": "quest.herbs"
+		},
+		"npc.dragon": {
+			"id": "npc.dragon",
+			"name": "Ancestral Dragon",
+			"dialogue": ["*roars*"],
+			"hostile": true,
+			"hp": 500,
+			"damage": 35,
+			"quest": null
 		}
 	},
 	"items": {

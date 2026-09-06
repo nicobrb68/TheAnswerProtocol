@@ -13,7 +13,6 @@ pub async fn handle_sleep(
 ) -> String {
     let mut w = world.lock().await;
 
-    // 1. Récupération des infos du joueur
     let (room_id, is_dead) = match w.get_player(username) {
         Some(p) => (p.current_room.clone(), matches!(p.status, PlayerState::Dead)),
         None => return TapError::PlayerNotFound.message(),
@@ -23,12 +22,10 @@ pub async fn handle_sleep(
         return TapError::PlayerDead.message();
     }
 
-    // 2. Comparaison directe avec le champ sleep_room du monde
     if room_id != w.sleep_room {
         return TapError::CannotSleepHere.message();
     }
 
-    // 3. Application du soin
     let (new_hp, max_hp) = match w.get_mut_player(username) {
         Some(player) => {
             player.hp = player.max_hp;

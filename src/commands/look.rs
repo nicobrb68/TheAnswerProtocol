@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use serde_json::json;
 use crate::{World, TapError};
 
 pub async fn handle_look(username: &str, world: &Arc<Mutex<World>>) -> String {
@@ -12,9 +13,12 @@ pub async fn handle_look(username: &str, world: &Arc<Mutex<World>>) -> String {
         Some(r) => r,
         None => return TapError::NoExit.message(),
     };
-    let json = match serde_json::to_string(room) {
-        Ok(j) => j,
+    let mut value = match serde_json::to_value(room) {
+        Ok(v) => v,
         Err(_) => return TapError::SendFailed.message(),
     };
-    format!("OK {}\n", json)
+    if player.current_room == w.sleep_room {
+        value.as_object_mut().map(|o| o.insert("can_sleep".to_string(), json!(true)));
+    }
+    format!("OK {}\n", value)
 }

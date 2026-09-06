@@ -3,3 +3,4 @@ pub mod group;
 pub mod user;
 pub mod global;
 pub mod boss;
+pub mod regen;

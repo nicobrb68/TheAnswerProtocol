@@ -84,12 +84,10 @@ pub async fn handle_attack(
                 room.npcs.remove(pos);
             }
         }
-        // Réinitialisation des PV pour le futur respawn (valeur par défaut ex: 30)
         if let Some(npc) = w.get_mut_npc(&npc_full_id) {
-            npc.hp = Some(30);
+            npc.hp = npc.max_hp;
         }
 
-        // Tâche asynchrone pour faire réapparaître le mob
         let world_clone = Arc::clone(world);
         let room_clone = current_room.clone();
         let npc_clone = npc_full_id.clone();

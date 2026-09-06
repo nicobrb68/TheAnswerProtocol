@@ -106,7 +106,6 @@ async fn main() {
     let (reader, writer) = stream.into_split();
     let (input_tx, mut input_rx) = tokio::sync::mpsc::unbounded_channel::<String>();
 
-    // Thread rustyline — lit l'input avec autocompletion
     std::thread::spawn(move || {
         let completer = TapCompleter {
             commands: vec![
@@ -143,7 +142,6 @@ async fn main() {
         }
     });
 
-    // Task recv : serveur → terminal
     let mut server_reader = BufReader::new(reader);
     let task_recv = tokio::spawn(async move {
         let mut line = String::new();
@@ -152,7 +150,6 @@ async fn main() {
             match server_reader.read_line(&mut line).await {
                 Ok(0) => break,
                 Ok(_) => {
-                    // Efface la ligne "> " courante, affiche le message, reaffiche "> "
                     eprint!("\r\x1b[2K");
                     print!("{}", line);
                     eprint!("> ");
@@ -163,7 +160,6 @@ async fn main() {
         eprintln!("\r\x1b[2KServer disconnected.");
     });
 
-    // Task send : channel rustyline → serveur
     let mut writer = writer;
     let task_send = tokio::spawn(async move {
         while let Some(line) = input_rx.recv().await {

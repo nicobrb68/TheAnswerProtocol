@@ -37,8 +37,6 @@ pub async fn handle_take(
     tracing::info!(event = "item_take", player = %username, item = %item_full_id, room = %current_room, "item taken");
     drop(w);
 
-    // Let everyone else still in the room know the item is gone, so their
-    // client-side room state doesn't go stale until their next manual LOOK.
     notify_room(
         &current_room,
         &format!("EVT ROOM ITEM TAKEN {} {}\n", item_full_id, username),
@@ -47,9 +45,6 @@ pub async fn handle_take(
         registry,
     ).await;
 
-    // Item respawns on its own after a while — broadcast that too, so
-    // clients see it reappear instead of it silently coming back only on
-    // their next LOOK.
     let world_clone = Arc::clone(world);
     let registry_clone = Arc::clone(registry);
     let room_clone = current_room.clone();
