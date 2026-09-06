@@ -88,19 +88,21 @@ pub async fn handle_attack(
             npc.hp = npc.max_hp;
         }
 
-        let world_clone = Arc::clone(world);
-        let room_clone = current_room.clone();
-        let npc_clone = npc_full_id.clone();
-        tokio::spawn(async move {
-            tokio::time::sleep(Duration::from_secs(NPC_RESPAWN_SECS)).await;
-            let mut w = world_clone.lock().await;
-            if let Some(room) = w.get_mut_room(&room_clone) {
-                if !room.npcs.contains(&npc_clone) {
-                    room.npcs.push(npc_clone.clone());
-                    tracing::info!(event = "npc_respawn", npc = %npc_clone, room = %room_clone, "npc respawned");
+        if !crate::events::boss::is_boss(&npc_full_id) {
+            let world_clone = Arc::clone(world);
+            let room_clone = current_room.clone();
+            let npc_clone = npc_full_id.clone();
+            tokio::spawn(async move {
+                tokio::time::sleep(Duration::from_secs(NPC_RESPAWN_SECS)).await;
+                let mut w = world_clone.lock().await;
+                if let Some(room) = w.get_mut_room(&room_clone) {
+                    if !room.npcs.contains(&npc_clone) {
+                        room.npcs.push(npc_clone.clone());
+                        tracing::info!(event = "npc_respawn", npc = %npc_clone, room = %room_clone, "npc respawned");
+                    }
                 }
-            }
-        });
+            });
+        }
 
         tracing::info!(event = "combat_victory", player = %username, npc = %npc_name, room = %current_room, "npc defeated");
         status = "victory";

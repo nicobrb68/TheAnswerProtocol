@@ -387,22 +387,40 @@ Combat in TAP is a simple exchange-based system where each `ATTACK` command resu
 
 ### NPC Stats
 
-| NPC | Location | HP | Damage |
+| NPC | Location | HP | Damage | Difficulty |
+|---|---|---|---|---|
+| Giant Crab | Shipwreck Beach | 15 | 5 | Easy |
+| Wild Boar | Sunlit Clearing | 20 | 8 | Easy |
+| Forest Wolf | Whispering Forest | 25 | 10 | Medium |
+| Cave Goblin | Crystal Cavern | 30 | 8 | Medium |
+| Swamp Serpent | Murky Swamp | 30 | 10 | Medium |
+| Cave Spider | Abandoned Mine | 35 | 12 | Medium |
+| Forest Bandit | Deep Forest | 35 | 14 | Hard |
+| Skeleton Warrior | Forgotten Crypt | 40 | 12 | Hard |
+| Ancient Wraith | Ancient Ruins | 55 | 18 | Hard |
+
+### Boss Stats
+
+| Boss | Location | HP | Damage |
 |---|---|---|---|
-| Forest Wolf | Whispering Forest | 25 | 10 |
-| Cave Goblin | Crystal Cavern | 30 | 8 |
-| Skeleton Warrior | Forgotten Crypt | 40 | 12 |
-| Ancestral Dragon (boss) | Ancient Ruins | 500 | 35 |
+| Lich King | Dark Catacombs | 300 | 25 |
+| The Kraken | Shipwreck Beach | 400 | 30 |
+| Ancestral Dragon | Dragon's Lair | 500 | 35 |
 
 ### Weapon Damage Bonuses
 
-| Weapon | Damage bonus |
-|---|---|
-| Iron Sword | +15 |
-| Pickaxe | +8 |
-| Wooden Branch | +3 |
-| Fresh Fish | +1 |
-| No weapon (base) | +0 |
+| Weapon | Location | Damage bonus |
+|---|---|---|
+| Enchanted Staff | Ancient Ruins (or quest reward) | +25 |
+| Battle Axe | Frozen Peak (or quest reward) | +20 |
+| Sea Trident | Quest reward | +18 |
+| Iron Sword | Blacksmith Forge | +15 |
+| Shadow Dagger | Deep Forest | +12 |
+| Pickaxe | Abandoned Mine | +8 |
+| Bone Club | Forgotten Crypt | +6 |
+| Wooden Branch | Whispering Forest | +3 |
+| Fresh Fish | Harbor Docks | +1 |
+| No weapon (base) | — | +0 |
 
 ### NPC Regeneration
 
@@ -410,7 +428,15 @@ Every 60 seconds, a background task restores all hostile NPCs' HP to their maxim
 
 ### Boss System
 
-The **Ancestral Dragon** (`npc.dragon`, 500 HP, 35 damage) is a world boss that spawns in `room.ruins` (Ancient Ruins) every 60 seconds if it is not already present in the room. When the dragon spawns, a global alert is broadcast to all connected players: `EVT GLOBAL [ALERT] A thunderous roar echoes... The Ancestral Dragon has invaded the Ruins!`. Defeating the dragon requires multiple attacks and is designed as a group challenge.
+The server supports **three world bosses** that spawn every 60 seconds if not already present in their designated room. When a boss spawns, a global alert is broadcast to all connected players. Bosses are designed as group challenges due to their high HP and damage.
+
+| Boss | Room | Alert |
+|---|---|---|
+| Ancestral Dragon | Dragon's Lair | `EVT GLOBAL [ALERT] A thunderous roar echoes... The Ancestral Dragon has invaded the Dragon's Lair!` |
+| Lich King | Dark Catacombs | `EVT GLOBAL [ALERT] A chilling darkness spreads... The Lich King has risen in the Dark Catacombs!` |
+| The Kraken | Shipwreck Beach | `EVT GLOBAL [ALERT] The sea churns violently... The Kraken has surfaced at Shipwreck Beach!` |
+
+Like regular hostile NPCs, bosses respawn 30 seconds after being killed (via the combat respawn system) and are also re-spawned by the boss spawner every 60 seconds with full HP if absent from their room.
 
 ## Quest System
 
@@ -420,8 +446,10 @@ Quests are fetch-type: the player must collect specific items and return them to
 
 | Quest | Giver | Location | Objective | Reward |
 |---|---|---|---|---|
-| quest.herbs | Old Hermit | Forest Clearing | Bring 1 Healing Herbs | 1 Blue Crystal |
-| quest.iron | Village Blacksmith | Blacksmith | Bring 1 Iron Sword | 2 Frothy Ale |
+| quest.herbs | Old Hermit | Sacred Grove | Bring 1 Healing Herbs | 2 Health Potions |
+| quest.sword | Village Blacksmith | Blacksmith Forge | Bring 1 Iron Sword | 1 Battle Axe |
+| quest.pearl | Old Fisher | Harbor Docks | Bring 2 Sea Pearls | 1 Sea Trident |
+| quest.mushroom | Swamp Witch | Murky Swamp | Bring 2 Glowing Mushrooms | 1 Enchanted Staff |
 
 ### Quest Flow
 
@@ -441,43 +469,73 @@ Quests are fetch-type: the player must collect specific items and return them to
 
 ## World Design
 
-The default world contains **14 rooms** organized in a connected map with directional exits (north, south, east, west):
+The default world contains **21 rooms** organized across five distinct areas. Difficulty increases as players move further from the village.
 
 ```
-                   Guest Room
-                       |
-     Mine --- Blacksmith --- Village Square --- Marketplace --- Harbor Docks
-       |                          |                                  |
-    Crystal Cavern             South Gate --- Lighthouse ------------|
-       |                          |
-  Forgotten Crypt         Whispering Forest --- Crystal Lake
-       |                     |          |
-   Ancient Ruins --- Forest Clearing ---|
+                        Frozen Peak
+                            |
+                      Crystal Cavern
+                            |
+              Abandoned Mine --- Blacksmith --- Village Square --- Marketplace --- Harbor Docks
+                                                     |                                 |
+                                   Inn --- Tavern    |                           Shipwreck Beach
+                                                     |
+                                                 South Gate --- Old Lighthouse
+                                                     |
+                                              Whispering Forest --- Sacred Grove
+                                               |           |
+                                          Deep Forest  Sunlit Clearing
+                                               |
+                                          Murky Swamp
+                                               |
+                                        Forgotten Crypt
+                                               |
+                                       Dark Catacombs
+                                               |
+                                         Ancient Ruins
+                                               |
+                                         Dragon's Lair
 ```
+
+### Areas
+
+**Village (safe zone)**: Village Square, Tavern, Traveler's Inn, Blacksmith Forge, Marketplace. No hostile NPCs. Shops, quests, and rest.
+
+**Coastal**: Harbor Docks, Shipwreck Beach. Light combat (Giant Crab). Boss: The Kraken (400 HP).
+
+**Mountains**: Abandoned Mine, Crystal Cavern, Frozen Peak. Medium combat (Cave Spider, Cave Goblin). Rare items at the peak.
+
+**Forest**: Whispering Forest, Sacred Grove, Deep Forest, Sunlit Clearing, Murky Swamp. Increasing difficulty (Wolf → Boar → Bandit → Serpent).
+
+**Dark Depths**: Forgotten Crypt, Dark Catacombs, Ancient Ruins, Dragon's Lair. Hardest area (Skeleton → Lich King → Wraith → Dragon). The best weapons are found here.
 
 ### Key Locations
 
-- **South Gate** (`room.gate`): Spawn point for all new players. Connects to the village and the wilderness.
-- **Guest Room** (`room.guest_room`): The only room where SLEEP works. Located upstairs in the tavern. Players come here to restore HP to full.
-- **Village Square** (`room.square`): Central hub connecting the tavern, market, blacksmith, and south gate.
-- **Ancient Ruins** (`room.ruins`): Boss room where the Ancestral Dragon spawns every 60 seconds.
-- **Forest Clearing** (`room.clearing`): Location of the Old Hermit who gives the herbs quest.
+- **South Gate** (`room.gate`): Spawn point for all new players. The boundary between village safety and the dangerous wilderness.
+- **Traveler's Inn** (`room.inn`): The only room where SLEEP works. Located upstairs above the tavern. Players come here to restore HP to full.
+- **Village Square** (`room.square`): Central hub connecting all village areas.
+- **Dragon's Lair** (`room.lair`): Deepest room in the game. The Ancestral Dragon (500 HP) spawns here.
+- **Dark Catacombs** (`room.catacombs`): The Lich King (300 HP) spawns here.
+- **Shipwreck Beach** (`room.beach`): The Kraken (400 HP) spawns here.
+- **Sacred Grove** (`room.grove`): The Old Hermit gives the herbs quest here.
+- **Frozen Peak** (`room.peak`): End of the mountain branch. The Battle Axe (20 dmg) can be found here.
 
 ### NPCs
 
-The world contains 11 NPCs with three roles:
+The world contains 21 NPCs with three roles:
 
-- **Friendly NPCs** (7): Village Guard, Tavern Bartender, Village Blacksmith, Market Merchant, Old Fisher, Lighthouse Keeper, Old Hermit. These NPCs can be talked to (`TALK`) and some give quests (`QUEST`). They cannot be attacked.
-- **Hostile NPCs** (3): Forest Wolf (25 HP, 10 dmg), Cave Goblin (30 HP, 8 dmg), Skeleton Warrior (40 HP, 12 dmg). These can be attacked and will counter-attack. They respawn 30 seconds after being killed.
-- **World Boss** (1): Ancestral Dragon (500 HP, 35 dmg). Spawns periodically in the Ancient Ruins. Requires sustained effort (or a group) to defeat.
+- **Friendly NPCs** (9): Village Guard, Tavern Bartender, Innkeeper, Village Blacksmith, Market Merchant, Old Fisher, Lighthouse Keeper, Old Hermit, Swamp Witch. These NPCs can be talked to (`TALK`) and four of them give quests (`QUEST`). They cannot be attacked.
+- **Hostile NPCs** (9): Giant Crab (15 HP), Wild Boar (20 HP), Forest Wolf (25 HP), Cave Goblin (30 HP), Swamp Serpent (30 HP), Cave Spider (35 HP), Forest Bandit (35 HP), Skeleton Warrior (40 HP), Ancient Wraith (55 HP). They counter-attack and respawn 30 seconds after being killed.
+- **World Bosses** (3): Lich King (300 HP, 25 dmg), The Kraken (400 HP, 30 dmg), Ancestral Dragon (500 HP, 35 dmg). Spawn every 60 seconds in their designated rooms. Designed as group challenges.
 
 ### Items
 
-The world contains 14 items distributed across rooms:
+The world contains 26 items distributed across rooms, with stronger equipment found in more dangerous areas:
 
-- **Weapons**: Iron Sword (15 dmg, Blacksmith), Pickaxe (8 dmg, Old Mine), Wooden Branch (3 dmg, Whispering Forest), Fresh Fish (1 dmg, Crystal Lake)
-- **Healing**: Healing Herbs (20 hp, Forest Clearing), Frothy Ale (10 hp, Tavern), Loaf of Bread (8 hp, Marketplace), Fresh Fish (6 hp, Crystal Lake), Fresh Apple (5 hp, Marketplace)
-- **Miscellaneous**: Old Key (Guest Room), Blue Crystal (Crystal Cavern), Ancient Treasure (Forgotten Crypt), Hemp Rope (Harbor Docks), Oil Lantern (Lighthouse), Ancient Scroll (Ancient Ruins)
+- **Weapons** (9): Enchanted Staff (25 dmg, Ancient Ruins), Battle Axe (20 dmg, Frozen Peak), Sea Trident (18 dmg, quest reward), Iron Sword (15 dmg, Blacksmith), Shadow Dagger (12 dmg, Deep Forest), Pickaxe (8 dmg, Mine), Bone Club (6 dmg, Crypt), Wooden Branch (3 dmg, Forest), Fresh Fish (1 dmg, Docks)
+- **Healing** (7): Health Potion (35 hp, Murky Swamp), Phoenix Feather (30 hp, Frozen Peak), Healing Herbs (20 hp, Sacred Grove), Glowing Mushroom (15 hp, Crystal Cavern), Frothy Ale (10 hp, Tavern), Loaf of Bread (8 hp, Market), Fresh Apple (5 hp, Market)
+- **Quest Items**: Sea Pearl (Shipwreck Beach), Glowing Mushroom (Crystal Cavern), Healing Herbs (Sacred Grove), Iron Sword (Blacksmith)
+- **Miscellaneous**: Old Key, Blue Crystal, Ancient Treasure, Hemp Rope, Oil Lantern, Broken Compass, Ancient Scroll, Dark Gem, Dragon Scale, Phoenix Feather
 
 All items respawn in their original room 30 seconds after being picked up. Multiple players can each pick up the same item once it respawns.
 
@@ -556,7 +614,7 @@ cargo run --bin client_cli -- 127.0.0.1 7534
 
 The CLI client takes two arguments: the host and port to connect to. Once connected, type commands at the `>` prompt. Use Tab for autocompletion and Up/Down arrows for command history.
 
-### Run the Web GUI Client
+### Run the GUI Client
 
 ```bash
 make run-client-gui
@@ -648,10 +706,10 @@ Expected: after ~10 WHO commands, warnings appear in server logs. After ~20, the
 - **Chat**: Two players in the same room: test `CHAT ROOM`. Two players in different rooms: test `CHAT GLOBAL`. Two players in a group: test `CHAT GROUP`.
 - **Item persistence**: Player A takes an item. Player B does `LOOK` and confirms the item is gone. Wait 30 seconds, both players do `LOOK` and confirm the item respawned.
 - **Combat**: Attack a hostile NPC until it dies. Verify the NPC disappears from `LOOK`. Wait 30 seconds, verify it reappears. Attack until the player dies, verify respawn at South Gate with 50 HP.
-- **Quest flow**: `QUEST hermit` to accept, `TAKE herbs` in the clearing, `QUEST hermit` to turn in. Verify herbs are consumed and crystal is rewarded. `QUESTS` shows the quest as completed.
+- **Quest flow**: `QUEST hermit` to accept, `TAKE herbs` in the grove, `QUEST hermit` to turn in. Verify herbs are consumed and potions are rewarded. `QUESTS` shows the quest as completed. Try all four quests (hermit, blacksmith, fisher, witch).
 - **Group flow**: Player A: `GROUP CREATE team`. Player A: `GROUP INVITE playerB`. Player B receives the invite event. Player B: `GROUP JOIN team`. Both do `GROUP INFO` to confirm. Test `CHAT GROUP`. Player A: `GROUP KICK playerB` or `GROUP DISBAND`.
-- **Boss**: Wait 60 seconds after server start. Verify dragon appears in ruins (`LOOK` in `room.ruins`). All players receive the global alert.
-- **Sleep**: Go to the Guest Room (`room.guest_room`). `LOOK` shows `can_sleep: true`. Take some damage from combat first, then `SLEEP`. Verify HP is restored to max.
+- **Boss**: Wait 60 seconds after server start. Verify all three bosses spawn (dragon in lair, lich in catacombs, kraken at beach). All players receive global alerts.
+- **Sleep**: Go to the Traveler's Inn (`room.inn`). `LOOK` shows `can_sleep: true`. Take some damage from combat first, then `SLEEP`. Verify HP is restored to max.
 
 ### Feature Checklist
 
@@ -664,14 +722,14 @@ Expected: after ~10 WHO commands, warnings appear in server logs. After ~20, the
 - [ ] `QUEST` accept and turn-in flow with item consumption and reward
 - [ ] `QUESTS` shows active progress and completed quests
 - [ ] `GROUP CREATE` / `INVITE` / `JOIN` / `LEAVE` / `DISBAND` / `KICK` / `INFO`
-- [ ] `SLEEP` in the guest room, verify HP restoration to max
-- [ ] `SLEEP` outside guest room returns `ERR 410`
+- [ ] `SLEEP` in the Traveler's Inn, verify HP restoration to max
+- [ ] `SLEEP` outside the inn returns `ERR 410`
 - [ ] `EXAMINE` items in room and inventory
 - [ ] `INVENTORY` shows current items as JSON array
 - [ ] `STATUS` shows HP and alive/dead status
 - [ ] `TALK` to friendly and hostile NPCs
 - [ ] Flood detection: rapid commands trigger warning then kick
-- [ ] Boss spawn: wait 60s, verify dragon appears in the ruins with global alert
+- [ ] Boss spawn: wait 60s, verify 3 bosses appear (dragon/lich/kraken) with global alerts
 - [ ] NPC HP regen: damage an NPC without killing it, wait 60s, verify HP is back to max
 - [ ] Disconnect cleanup: player leaves, verify room event and `WHO` count decreases
 - [ ] Username validation: empty, too long, special characters all rejected
