@@ -15,3 +15,4 @@ pub mod status;
 pub mod attack;
 pub mod sleep;
 pub mod examine;
+pub mod use_item;

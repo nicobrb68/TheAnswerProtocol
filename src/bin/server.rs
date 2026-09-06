@@ -26,6 +26,7 @@ use tap::commands::status::handle_status;
 use tap::commands::attack::handle_attack;
 use tap::commands::sleep::handle_sleep;
 use tap::commands::examine::handle_examine;
+use tap::commands::use_item::handle_use;
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -229,8 +230,10 @@ async fn main() {
                     } else if line_upper.starts_with("EXAMINE") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_examine(name, &item_id, &world).await)
-                    }
-                     else if line_upper.starts_with("ATTACK ") {
+                    } else if line_upper.starts_with("USE ") {
+                        let item_id = get_args(&line_trimmed).to_lowercase();
+                        Some(handle_use(name, &item_id, &world).await)
+                    } else if line_upper.starts_with("ATTACK ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_attack(name, &npc_id, &world, &registry).await)
                     } else if line_upper.starts_with("STATUS") {

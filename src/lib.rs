@@ -200,6 +200,7 @@ pub enum TapError {
     NotInvited,
     QuestNotComplete,
     CannotSleepHere,
+    ItemNotUsable,
     PlayerDead,
     // 9xx - System
     ConnectionFailed,
@@ -221,6 +222,7 @@ impl TapError {
             TapError::NoExit               => "ERR 301 NO_EXIT\n".to_string(),
             // 4xx - Game logic
             TapError::CannotSleepHere => "ERR 410 CANNOT_SLEEP_HERE\n".to_string(),
+            TapError::ItemNotUsable   => "ERR 411 ITEM_NOT_USABLE\n".to_string(),
             TapError::CannotKickSelf       => "ERR 407 CANNOT_KICK_SELF\n".to_string(),
             TapError::PlayerNotInGroup    => "ERR 404 PLAYER_NOT_IN_GROUP\n".to_string(),
             TapError::InviteNotFound       => "ERR 404 INVITE_NOT_FOUND\n".to_string(),

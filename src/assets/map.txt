@@ -1,0 +1,265 @@
+
+    ============================================================
+                    THE ANSWER PROTOCOL - WORLD MAP
+                      31 rooms — 3 loops — 5 biomes
+    ============================================================
+
+
+
+    ============================================================================================
+                                     COMPLETE WORLD GRAPH
+    ============================================================================================
+
+                                                    [Lighthouse]
+                                                         |
+                                                         |
+                         [Inn]                       [Docks]·····················LOOP 1
+                          |                          /      \                        ·
+                          |                         /        \                       ·
+                       [Tavern]                [Market]     [Beach]====[KRAKEN]      ·
+                          |                    /               |  \                  ·
+                          |                   /                |   \                 ·
+    [Mine]----[Blacksmith]----[Square]-------+                 |  [Harbor]           ·
+      |                           |                            |                    ·
+      |                           |                            |                    ·
+    [Cavern]·····LOOP 3      [== GATE ==]·····LOOP 2·····[Bridge]····LOOP 1         ·
+      |  \           ·       ** SPAWN **       ·           |                        ·
+      |   \          ·        /       \        ·        [Chapel]                    ·
+      |    \         ·       /         \       ·                                    ·
+    [Peak] [Tunnel]  · [Forest]      [Camp]····+····································+
+      |       |      ·   |   \          |  \
+      |       |      ·   |    \         |   \
+   [Tower] [Catacombs]+  |  [Grove]  [Clearing]
+      |  \     |      ·  |     |        |
+      |   \    |      ·  |     |        |
+  [Library] [Ruins]···+  | [Garden] [Deep Forest]
+               |         |                |
+               |         +--- (same       |
+            [Lair]=====[DRAGON]  Forest)  [Swamp]
+               |                           |
+               |                           |
+           [Throne]                     [Crypt]
+                                           |
+                                           |
+                                       [Catacombs]====[LICH]
+                                       (enters Loop 3)
+
+
+         ===  connection with boss spawn location
+         ---  normal bidirectional connection (vertical or horizontal)
+         |    normal bidirectional connection (vertical)
+         ···  loop path highlight
+
+
+    LOOP 1 — COASTAL (6 rooms):
+    Gate --east--> Bridge --east--> Beach --north--> Docks --west--> Market --west--> Square --south--> Gate
+
+    LOOP 2 — FOREST (5 rooms):
+    Gate --south--> Forest --south--> Deep Forest --east--> Clearing --south--> Camp --east--> Gate
+
+    LOOP 3 — UNDERGROUND (6 rooms):
+    Cavern --east--> Peak --south--> Tower --west--> Ruins --north--> Catacombs --west--> Tunnel --north--> Cavern
+
+
+
+    ============================================================================================
+                               ZOOMED-IN LOOP DIAGRAMS
+    ============================================================================================
+
+
+    LOOP 1 — COASTAL CIRCUIT (Gate -> Bridge -> Beach -> Docks -> Market -> Square -> Gate)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                    [Inn] *SLEEP*
+                      |
+                   [Tavern]
+                      |
+         +------[Square]------+
+         |          |         |
+    [Blacksmith] [  GATE  ] [Market]
+         |       ** SPAWN **  |
+       [Mine]    /    \    [Docks]---[Lighthouse]
+         |    [Camp] [Bridge]  |
+         :      |      |    [Beach]---[BOSS:Kraken]
+         :   [Arena] [Chapel]  |
+         :                  [Harbor]
+         :
+    (continues to mountains below)
+
+
+    LOOP 2 — FOREST CIRCUIT (Gate -> Forest -> Deep Forest -> Clearing -> Camp -> Gate)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+              [GATE] ----------- [Camp] --- [Arena]
+               |                   |
+            [Forest]          [Clearing]
+            /      \               |
+       [Grove]  [Deep Forest] -----+
+         |          |
+      [Garden]   [Swamp]
+                    |
+                 [Crypt]
+                    |
+                (continues to dark zone below)
+
+
+    LOOP 3 — UNDERGROUND CIRCUIT (Cavern -> Peak -> Tower -> Ruins -> Catacombs -> Tunnel -> Cavern)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                     [Mine] (from Blacksmith)
+                       |
+        +----------[Cavern]-----------+
+        |              |              |
+     [Tunnel]       [Peak]            |
+        |              |              |
+     [Catacombs]    [Tower]---[Library]
+     [BOSS:Lich]       |
+        |           [Ruins]
+        +----------/   |
+                    [Lair]
+                  [BOSS:Dragon]
+                       |
+                   [Throne]
+
+
+    CRYPT connects the Forest path to Loop 3:
+        Swamp -> Crypt -> Catacombs (enters Loop 3)
+
+
+    ============================================================
+                        FULL CONNECTION TABLE
+    ============================================================
+
+    Room                 North         South          East           West
+    ----                 -----         -----          ----           ----
+    Inn                  -             Tavern         -              -
+    Tavern               Inn           Square         -              -
+    Square               Tavern        Gate           Market         Blacksmith
+    Blacksmith           -             -              Square         Mine
+    Market               -             -              Docks          Square
+    Docks                -             Beach          Lighthouse     Market
+    Lighthouse           -             -              -              Docks
+    Beach                Docks         Harbor         -              Bridge
+    Bridge               Chapel        -              Beach          Gate
+    Chapel               -             Bridge         -              -
+    Harbor               Beach         -              -              -
+    Gate  **SPAWN**      Square        Forest         Bridge         Camp
+    Forest               Gate          Deep Forest    -              Grove
+    Grove                -             Garden         Forest         -
+    Garden               Grove         -              -              -
+    Deep Forest          Forest        Swamp          Clearing       -
+    Clearing             -             Camp           -              Deep Forest
+    Camp                 Clearing      Arena          Gate           -
+    Arena                Camp          -              -              -
+    Swamp                Deep Forest   Crypt          -              -
+    Crypt                Swamp         Catacombs      -              -
+    Mine                 -             Cavern         Blacksmith     -
+    Cavern               Mine          Tunnel         Peak           -
+    Peak                 -             Tower          -              Cavern
+    Tunnel               Cavern        -              Catacombs      -
+    Tower                Peak          Library        -              Ruins
+    Library              Tower         -              -              -
+    Catacombs            Crypt         Ruins          -              Tunnel
+    Ruins                Catacombs     Lair           Tower          -
+    Lair                 Ruins         Throne         -              -
+    Throne               Lair          -              -              -
+
+    ============================================================
+                      QUESTS (7)
+    ============================================================
+
+    #  Quest          Giver                 Needs                  Reward
+    -  -----          -----                 -----                  ------
+    1  Herbs          Hermit (Grove)        1x Healing Herbs    -> 2x Health Potion
+    2  Sword          Blacksmith (Forge)    1x Iron Sword       -> 1x Battle Axe
+    3  Pearl          Fisher (Docks)        2x Sea Pearl        -> 1x Sea Trident
+    4  Mushroom       Witch (Swamp)         2x Glowing Mushroom -> 1x Enchanted Staff
+    5  Bones          Priest (Chapel)       1x Bone Club        -> 2x Holy Water
+    6  Crystal        Wizard (Tower)        1x Blue Crystal     -> 1x Enchanted Ring
+    7  Treasure       Smuggler (Harbor)     1x Ancient Treasure -> 1x Pirate Cutlass
+
+    Pearl locations  : Beach + Harbor (2 in world, quest needs 2)
+    Mushroom locations: Cavern + Garden (2 in world, quest needs 2)
+
+    ============================================================
+                 HOSTILE NPCs (15, sorted by difficulty)
+    ============================================================
+
+    NPC                 HP    DMG   Location
+    ---                 --    ---   --------
+    Giant Rat           10     3    Smuggler's Cove
+    Giant Crab          15     5    Shipwreck Beach
+    Wild Boar           20     8    Sunlit Clearing
+    Forest Wolf         25    10    Whispering Forest
+    Cave Goblin         30     8    Crystal Cavern
+    Swamp Serpent       30    10    Murky Swamp
+    Cave Spider         35    12    Abandoned Mine
+    Forest Bandit       35    14    Deep Forest
+    Skeleton Warrior    40    12    Forgotten Crypt
+    Stone Gargoyle      45    14    Ancient Library
+    Bridge Troll        45    15    Old Stone Bridge
+    Cave Bear           50    16    Underground Tunnel
+    Ancient Wraith      55    18    Ancient Ruins
+    Bandit Chief        60    20    Bandit Camp
+    Arena Champion      70    22    Fighting Arena
+
+    ============================================================
+                 BOSSES (one at a time, rotating every 60s)
+    ============================================================
+
+    BOSS                HP    DMG   Location
+    ----                --    ---   --------
+    Lich King          300    25    Dark Catacombs
+    The Kraken         400    30    Shipwreck Beach
+    Ancestral Dragon   500    35    Dragon's Lair
+
+    ============================================================
+                 WEAPONS (13, sorted by damage)
+    ============================================================
+
+    Weapon              DMG   Location
+    ------              ---   --------
+    Fresh Fish           1    Harbor Docks
+    Old Torch            2    Underground Tunnel
+    Wooden Branch        3    Whispering Forest
+    Bone Club            6    Forgotten Crypt (quest item)
+    Pickaxe              8    Abandoned Mine
+    Shadow Dagger       12    Deep Forest
+    Iron Spear          14    Fighting Arena
+    Iron Sword          15    Blacksmith Forge (quest item)
+    Pirate Cutlass      16    Quest reward (Smuggler)
+    War Hammer          17    Old Stone Bridge
+    Sea Trident         18    Quest reward (Fisher)
+    Battle Axe          20    Frozen Peak / Quest reward (Blacksmith)
+    Enchanted Staff     25    Ancient Ruins / Quest reward (Witch)
+
+    ============================================================
+                 HEALING ITEMS (12, sorted by heal)
+    ============================================================
+
+    Item                HEAL  Location
+    ----                ----  --------
+    Fresh Apple          5    Marketplace
+    Fresh Fish           6    Harbor Docks
+    Loaf of Bread        8    Marketplace
+    Frothy Ale          10    The Prancing Pony
+    Elven Wine          12    Smuggler's Cove
+    Glowing Mushroom    15    Crystal Cavern / Enchanted Garden
+    Moonflower          18    Enchanted Garden
+    Healing Herbs       20    Sacred Grove
+    Enchanted Ring      25    Quest reward (Wizard)
+    Phoenix Feather     30    Frozen Peak
+    Health Potion       35    Murky Swamp / Quest reward (Hermit)
+    Holy Water          40    Quest reward (Priest)
+
+    ============================================================
+                 ARMOR ITEMS (4, sorted)
+    ============================================================
+
+    Item                ARM   Location
+    ----                ---   --------
+    Shadow Cloak         8    Bandit Camp
+    Wooden Shield       10    Abandoned Chapel
+    Ancient Crown       20    Throne of Ashes
+    Dragon Scale        50    Dragon's Lair
+

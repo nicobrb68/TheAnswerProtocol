@@ -24,7 +24,8 @@ impl Highlighter for TapCompleter {
         let first = parts[0].to_uppercase();
 
         let single = ["CONNECT", "LOOK", "MOVE", "WHO", "TAKE", "DROP",
-            "INVENTORY", "TALK", "ATTACK", "STATUS", "QUEST", "QUESTS", "QUIT", "SLEEP"];
+            "INVENTORY", "TALK", "ATTACK", "STATUS", "QUEST", "QUESTS", "QUIT", "SLEEP",
+            "USE", "EXAMINE"];
         let chat_subs = ["GLOBAL", "ROOM", "GROUP"];
         let group_subs = ["CREATE", "INVITE", "JOIN", "LEAVE", "DISBAND", "INFO", "KICK"];
 
@@ -116,7 +117,7 @@ async fn main() {
                 "QUEST".into(), "QUESTS".into(),
                 "GROUP CREATE".into(), "GROUP INVITE".into(), "GROUP KICK".into(),
                 "GROUP JOIN".into(), "GROUP LEAVE".into(), "GROUP DISBAND".into(),
-                "GROUP INFO".into(), "SLEEP".into(),
+                "GROUP INFO".into(), "SLEEP".into(), "USE".into(), "EXAMINE".into(),
                 "QUIT".into()
             ],
         };
