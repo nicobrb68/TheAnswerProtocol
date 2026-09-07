@@ -16,3 +16,5 @@ pub mod attack;
 pub mod sleep;
 pub mod examine;
 pub mod use_item;
+pub mod shop;
+pub mod market;

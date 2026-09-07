@@ -121,6 +121,10 @@
         </div>
         <div class="hp-bar" id="hp-bar-main"><div class="hp-fill" id="hp-fill-main"></div></div>
         <div class="hp-numbers"><span id="hp-text-main">—/—</span> HP</div>
+        <div class="ledger-row">
+          <span class="ledger-label">Gold</span>
+          <span id="gold-text">—</span>
+        </div>
       </div>
 
       <div class="ledger-block">
@@ -129,6 +133,22 @@
           <button class="btn btn-ghost btn-xs" id="inventory-refresh" type="button">↻</button>
         </div>
         <ul class="inventory-list" id="inventory-list"><li class="empty-note">empty-handed</li></ul>
+      </div>
+
+      <div class="ledger-block" id="shop-block">
+        <div class="ledger-row">
+          <h2>Shop</h2>
+          <button class="btn btn-ghost btn-xs" id="shop-refresh" type="button">↻</button>
+        </div>
+        <ul class="inventory-list" id="shop-list"><li class="empty-note">loading...</li></ul>
+      </div>
+
+      <div class="ledger-block" id="market-block">
+        <div class="ledger-row">
+          <h2>Market</h2>
+          <button class="btn btn-ghost btn-xs" id="market-refresh" type="button">↻</button>
+        </div>
+        <ul class="inventory-list" id="market-list"><li class="empty-note">nothing for sale</li></ul>
       </div>
 
       <div class="ledger-block">

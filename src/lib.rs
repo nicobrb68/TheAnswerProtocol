@@ -44,6 +44,7 @@ pub struct Player {
     pub quests_done: Vec<String>,
     pub hp: u32,
     pub max_hp: u32,
+    pub gold: u32,
     pub status: PlayerState,
     pub current_room: String,
     pub group_id: Option<String>
@@ -58,6 +59,7 @@ impl Player {
             quests_done: Vec::new(),
             hp: 100,
             max_hp: 100,
+            gold: 50,
             status: PlayerState::Alive,
             current_room,
             group_id: None,
@@ -101,7 +103,11 @@ pub struct World {
     pub npcs: HashMap<String, Npc>,
     #[serde(default)]
     pub items: HashMap<String, Item>,
-    pub quests: HashMap<String, Quest>
+    pub quests: HashMap<String, Quest>,
+    #[serde(default)]
+    pub shop: Vec<String>,
+    #[serde(skip)]
+    pub market: Vec<MarketListing>,
 }
 
 impl World {
@@ -261,8 +267,16 @@ pub struct Npc {
     pub max_hp: Option<u32>,
     pub damage: Option<u32>,
     pub quest: Option<String>,
+    #[serde(default)]
+    pub gold_drop: u32,
+    #[serde(default)]
+    pub boss: bool,
+    pub boss_room: Option<String>,
+    pub boss_alert: Option<String>,
     #[serde(skip)]
     pub last_hit: Option<Instant>,
+    #[serde(skip)]
+    pub attackers: Vec<String>,
 }
 
 
@@ -273,4 +287,13 @@ pub struct Item {
     pub damage: Option<u32>,
     pub armor: Option<u32>,
     pub heal: Option<u32>,
+    #[serde(default)]
+    pub value: u32,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct MarketListing {
+    pub item_id: String,
+    pub seller: String,
+    pub price: u32,
 }

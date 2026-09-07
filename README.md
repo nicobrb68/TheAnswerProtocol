@@ -60,6 +60,8 @@ project/
 │   │   ├── status.rs           # STATUS — player HP and state
 │   │   ├── quest.rs            # QUEST/QUESTS — quest system
 │   │   ├── sleep.rs            # SLEEP — HP recovery
+│   │   ├── shop.rs             # SHOP/SHOP BUY — game shop
+│   │   ├── market.rs           # MARKET/MARKET BUY/SELL — player market
 │   │   ├── group_dispatcher.rs # GROUP subcommand router
 │   │   └── group/
 │   │       ├── mod.rs
@@ -76,7 +78,7 @@ project/
 │   │   ├── global.rs           # Global event broadcasting
 │   │   ├── group.rs            # Group event broadcasting
 │   │   ├── user.rs             # User-targeted events
-│   │   ├── boss.rs             # Boss spawner (Ancestral Dragon, every 60s)
+│   │   ├── boss.rs             # Data-driven boss spawner (reads from world JSON)
 │   │   └── regen.rs            # NPC HP regeneration (60s after last hit)
 │   └── assets/
 │       └── default_world.json  # World data (rooms, NPCs, items, quests)
@@ -215,7 +217,7 @@ All attacks broadcast `EVT ROOM COMBAT <username> attacks <npc_name> for <damage
 
 Returns the player's current HP, maximum HP, and alive/dead status as JSON.
 
-- **Success**: `OK {"hp": 85, "max_hp": 100, "status": "alive"}`
+- **Success**: `OK {"hp": 85, "max_hp": 100, "gold": 50, "status": "alive"}`
 
 #### `QUEST <npc>`
 
@@ -243,6 +245,40 @@ Restores the player's HP to maximum. This command only works in the designated s
 
 - **Success**: `OK hp=100/100 You feel really good now !`
 - **Errors**: `ERR 410 CANNOT_SLEEP_HERE` (not in the sleep room), `ERR 409 PLAYER_DEAD`
+
+#### `SHOP`
+
+Lists the game shop catalog. The shop has an infinite stock — items are always available for purchase. Each entry includes the item's id, name, price, and combat stats.
+
+- **Success**: `OK [{"id":"item.sword","name":"Iron Sword","price":50,"damage":15,"armor":null,"heal":null}, ...]`
+
+#### `SHOP BUY <item_id>`
+
+Purchases an item from the game shop. The item is matched by partial ID. The item's `value` field determines the price. The player must have enough gold.
+
+- **Success**: `OK bought=<item_id> price=<amount> gold=<remaining_gold>`
+- **Errors**: `ERR 404 ITEM_NOT_FOUND`, `ERR 412 NOT_ENOUGH_GOLD`
+
+#### `SELL <item_id>`
+
+Puts an item from the player's inventory up for sale on the player market. The item is removed from the inventory and listed at its base value. Other players (and the seller) can then buy it with `MARKET BUY`.
+
+- **Success**: `OK listed=<item_id> price=<amount>`
+- **Errors**: `ERR 404 ITEM_NOT_IN_INVENTORY`
+
+#### `MARKET`
+
+Lists all items currently for sale on the player market. Each entry includes the item details, seller name, price, and a numeric index used for purchasing.
+
+- **Success**: `OK [{"index":0,"item_id":"item.sword","name":"Iron Sword","seller":"bob","price":50,"damage":15,"armor":null,"heal":null}, ...]`
+- **Success (empty)**: `OK []`
+
+#### `MARKET BUY <index>`
+
+Purchases an item from the player market by its listing index (from the `MARKET` response). The buyer's gold is deducted and the seller's gold is credited. The item is added to the buyer's inventory and removed from the market.
+
+- **Success**: `OK bought=<item_id> price=<amount> seller=<name> gold=<remaining_gold>`
+- **Errors**: `ERR 404 ITEM_NOT_FOUND` (invalid index), `ERR 412 NOT_ENOUGH_GOLD`
 
 #### `GROUP CREATE <name>`
 
@@ -428,15 +464,27 @@ A background task checks every 15 seconds whether any NPC needs HP restoration. 
 
 ### Boss System
 
-The server supports **three world bosses** that spawn every 60 seconds if not already present in their designated room. When a boss spawns, a global alert is broadcast to all connected players. Bosses are designed as group challenges due to their high HP and damage.
+The server supports **world bosses** defined in the world data (NPCs with `"boss": true`, `"boss_room"`, and `"boss_alert"` fields). Every 60 seconds, the boss spawner checks if any boss is active — if none is present, it spawns the next one in rotation. When a boss spawns, a global alert (`EVT GLOBAL [ALERT] ...`) is broadcast to all connected players. Bosses are designed as group challenges due to their high HP and damage.
 
-| Boss | Room | Alert |
-|---|---|---|
-| Ancestral Dragon | Dragon's Lair | `EVT GLOBAL [ALERT] A thunderous roar echoes... The Ancestral Dragon has invaded the Dragon's Lair!` |
-| Lich King | Dark Catacombs | `EVT GLOBAL [ALERT] A chilling darkness spreads... The Lich King has risen in the Dark Catacombs!` |
-| The Kraken | Shipwreck Beach | `EVT GLOBAL [ALERT] The sea churns violently... The Kraken has surfaced at Shipwreck Beach!` |
+| Boss | Room | HP | Dmg | Gold | Alert |
+|---|---|---|---|---|---|
+| Ancestral Dragon | Dragon's Lair | 500 | 35 | 100 | A thunderous roar echoes... |
+| Lich King | Dark Catacombs | 300 | 25 | 75 | A chilling darkness spreads... |
+| The Kraken | Shipwreck Beach | 400 | 30 | 80 | The sea churns violently... |
 
-Like regular hostile NPCs, bosses respawn 30 seconds after being killed (via the combat respawn system) and are also re-spawned by the boss spawner every 60 seconds with full HP if absent from their room.
+Boss configuration is data-driven: adding a new boss only requires adding an NPC entry with `boss`, `boss_room`, and `boss_alert` fields in the world JSON file. Unlike regular hostile NPCs, bosses do **not** respawn automatically after being killed — they only reappear via the boss spawner cycle when no boss is active.
+
+## Economy System
+
+Players start with **50 gold**. Gold is earned by defeating hostile NPCs (each NPC has a `gold_drop` value based on its HP). **All players who contributed damage** to an NPC receive the full gold reward when it dies — not just the player who lands the killing blow. Gold can be spent in two ways:
+
+### Game Shop (`SHOP` / `SHOP BUY`)
+
+A fixed catalog of items available at any time with infinite stock. Items are priced at their base `value`. The shop sells consumables (food, herbs), tools, and weapons.
+
+### Player Market (`MARKET` / `SELL` / `MARKET BUY`)
+
+A player-to-player marketplace. Any player can list an item from their inventory with `SELL` — the item is removed from their inventory and listed at its base value. Other players (and the seller) can purchase listed items with `MARKET BUY <index>`. When purchased, the buyer pays and the seller receives the gold. Listings are global and persist until bought (or until server restart).
 
 ## Quest System
 

@@ -27,6 +27,8 @@ use tap::commands::attack::handle_attack;
 use tap::commands::sleep::handle_sleep;
 use tap::commands::examine::handle_examine;
 use tap::commands::use_item::handle_use;
+use tap::commands::shop::{handle_shop, handle_shop_buy};
+use tap::commands::market::{handle_market, handle_sell, handle_market_buy};
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -238,6 +240,19 @@ async fn main() {
                         Some(handle_attack(name, &npc_id, &world, &registry).await)
                     } else if line_upper.starts_with("STATUS") {
                         Some(handle_status(name, &world).await)
+                    } else if line_upper.starts_with("SHOP BUY ") {
+                        let item_id = get_args(get_args(&line_trimmed)).to_lowercase();
+                        Some(handle_shop_buy(name, &item_id, &world).await)
+                    } else if line_upper.starts_with("SHOP") {
+                        Some(handle_shop(&world).await)
+                    } else if line_upper.starts_with("MARKET BUY ") {
+                        let index = get_args(get_args(&line_trimmed));
+                        Some(handle_market_buy(name, index, &world).await)
+                    } else if line_upper.starts_with("MARKET") {
+                        Some(handle_market(&world).await)
+                    } else if line_upper.starts_with("SELL ") {
+                        let item_id = get_args(&line_trimmed).to_lowercase();
+                        Some(handle_sell(name, &item_id, &world).await)
                     } else if line_upper.starts_with("SLEEP") {
                         Some(handle_sleep(name, &world, &registry).await)
                     } else if line_upper.starts_with("QUESTS") {

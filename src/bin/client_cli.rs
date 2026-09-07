@@ -25,15 +25,17 @@ impl Highlighter for TapCompleter {
 
         let single = ["CONNECT", "LOOK", "MOVE", "WHO", "TAKE", "DROP",
             "INVENTORY", "TALK", "ATTACK", "STATUS", "QUEST", "QUESTS", "QUIT", "SLEEP",
-            "USE", "EXAMINE"];
+            "USE", "EXAMINE", "SELL", "MARKET"];
         let chat_subs = ["GLOBAL", "ROOM", "GROUP"];
         let group_subs = ["CREATE", "INVITE", "JOIN", "LEAVE", "DISBAND", "INFO", "KICK"];
+        let shop_subs = ["BUY"];
+        let market_subs = ["BUY"];
 
         let (valid, cmd_end) = 
-        if first == "CHAT" || first == "GROUP" {
+        if first == "CHAT" || first == "GROUP" || first == "SHOP" || first == "MARKET" {
             if let Some(sub) = parts.get(1) {
                 let sub_upper = sub.to_uppercase();
-                let subs = if first == "CHAT" { &chat_subs[..] } else { &group_subs[..] };
+                let subs = if first == "CHAT" { &chat_subs[..] } else if first == "SHOP" { &shop_subs[..] } else if first == "MARKET" { &market_subs[..] } else { &group_subs[..] };
                 if subs.contains(&sub_upper.as_str()) {
                     (true, parts[0].len() + 1 + sub.len())
                 } else {
@@ -118,6 +120,8 @@ async fn main() {
                 "GROUP CREATE".into(), "GROUP INVITE".into(), "GROUP KICK".into(),
                 "GROUP JOIN".into(), "GROUP LEAVE".into(), "GROUP DISBAND".into(),
                 "GROUP INFO".into(), "SLEEP".into(), "USE".into(), "EXAMINE".into(),
+                "SHOP".into(), "SHOP BUY".into(), "SELL".into(),
+                "MARKET".into(), "MARKET BUY".into(),
                 "QUIT".into()
             ],
         };

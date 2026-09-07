@@ -25,6 +25,7 @@ pub fn start_npc_regen(world: Arc<Mutex<World>>) {
                         if can_regen {
                             npc.hp = Some(max_hp);
                             npc.last_hit = None;
+                            npc.attackers.clear();
                             tracing::info!(event = "npc_regen", npc = %npc.id, hp = max_hp, "npc hp regenerated");
                         }
                     }

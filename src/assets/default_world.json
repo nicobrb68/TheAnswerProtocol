@@ -4,25 +4,43 @@
 			"id": "room.inn",
 			"name": "Traveler's Inn",
 			"description": "A quiet upstairs room with a wooden bed and a warm fireplace. The perfect place to rest.",
-			"exits": {"south": "room.tavern"},
+			"exits": {
+				"south": "room.tavern"
+			},
 			"players": [],
-			"items": ["item.key"],
-			"npcs": ["npc.innkeeper"]
+			"items": [
+				"item.key"
+			],
+			"npcs": [
+				"npc.innkeeper"
+			]
 		},
 		"room.tavern": {
 			"id": "room.tavern",
 			"name": "The Prancing Pony",
 			"description": "A warm tavern filled with laughter and the smell of roasted meat. Adventurers share stories by the fire.",
-			"exits": {"north": "room.inn", "south": "room.square"},
+			"exits": {
+				"north": "room.inn",
+				"south": "room.square"
+			},
 			"players": [],
-			"items": ["item.ale"],
-			"npcs": ["npc.bartender"]
+			"items": [
+				"item.ale"
+			],
+			"npcs": [
+				"npc.bartender"
+			]
 		},
 		"room.square": {
 			"id": "room.square",
 			"name": "Village Square",
 			"description": "The heart of the village. A stone fountain bubbles in the center, surrounded by cobblestone paths leading in every direction.",
-			"exits": {"north": "room.tavern", "east": "room.market", "west": "room.blacksmith", "south": "room.gate"},
+			"exits": {
+				"north": "room.tavern",
+				"east": "room.market",
+				"west": "room.blacksmith",
+				"south": "room.gate"
+			},
 			"players": [],
 			"items": [],
 			"npcs": []
@@ -31,252 +49,451 @@
 			"id": "room.blacksmith",
 			"name": "Blacksmith Forge",
 			"description": "The forge burns bright as steel is hammered on the anvil. Sparks fly with every strike. Weapons of all kinds line the walls.",
-			"exits": {"east": "room.square", "west": "room.mine"},
+			"exits": {
+				"east": "room.square",
+				"west": "room.mine"
+			},
 			"players": [],
-			"items": ["item.sword"],
-			"npcs": ["npc.blacksmith"]
+			"items": [
+				"item.sword"
+			],
+			"npcs": [
+				"npc.blacksmith"
+			]
 		},
 		"room.market": {
 			"id": "room.market",
 			"name": "Marketplace",
 			"description": "Busy merchants shout prices from colorful stalls. The smell of fresh bread and ripe fruit fills the air.",
-			"exits": {"west": "room.square", "east": "room.docks"},
+			"exits": {
+				"west": "room.square",
+				"east": "room.docks"
+			},
 			"players": [],
-			"items": ["item.apple", "item.bread"],
-			"npcs": ["npc.merchant"]
+			"items": [
+				"item.apple",
+				"item.bread"
+			],
+			"npcs": [
+				"npc.merchant"
+			]
 		},
 		"room.docks": {
 			"id": "room.docks",
 			"name": "Harbor Docks",
 			"description": "Fishing boats gently rock on the water. Seagulls circle overhead as fishermen haul in their nets.",
-			"exits": {"west": "room.market", "south": "room.beach", "east": "room.lighthouse"},
+			"exits": {
+				"west": "room.market",
+				"south": "room.beach",
+				"east": "room.lighthouse"
+			},
 			"players": [],
-			"items": ["item.fish", "item.rope"],
-			"npcs": ["npc.fisher"]
+			"items": [
+				"item.fish",
+				"item.rope"
+			],
+			"npcs": [
+				"npc.fisher"
+			]
 		},
 		"room.lighthouse": {
 			"id": "room.lighthouse",
 			"name": "Old Lighthouse",
 			"description": "A tall lighthouse overlooks the rocky coastline. Its beacon still turns slowly, guiding ships through the fog.",
-			"exits": {"west": "room.docks"},
+			"exits": {
+				"west": "room.docks"
+			},
 			"players": [],
-			"items": ["item.compass"],
-			"npcs": ["npc.keeper"]
+			"items": [
+				"item.compass"
+			],
+			"npcs": [
+				"npc.keeper"
+			]
 		},
 		"room.beach": {
 			"id": "room.beach",
 			"name": "Shipwreck Beach",
 			"description": "The shattered hull of a merchant vessel lies half-buried in the sand. Strange marks scar the wood, as if something massive dragged it from the depths.",
-			"exits": {"north": "room.docks", "west": "room.bridge", "south": "room.harbor"},
+			"exits": {
+				"north": "room.docks",
+				"west": "room.bridge",
+				"south": "room.harbor"
+			},
 			"players": [],
-			"items": ["item.pearl"],
-			"npcs": ["npc.crab"]
+			"items": [
+				"item.pearl"
+			],
+			"npcs": [
+				"npc.crab"
+			]
 		},
 		"room.bridge": {
 			"id": "room.bridge",
 			"name": "Old Stone Bridge",
 			"description": "A crumbling stone bridge spans a deep ravine. Moss and vines cling to its ancient pillars. Something large lurks underneath.",
-			"exits": {"east": "room.beach", "west": "room.gate", "north": "room.chapel"},
+			"exits": {
+				"east": "room.beach",
+				"west": "room.gate",
+				"north": "room.chapel"
+			},
 			"players": [],
-			"items": ["item.hammer"],
-			"npcs": ["npc.troll"]
+			"items": [
+				"item.hammer"
+			],
+			"npcs": [
+				"npc.troll"
+			]
 		},
 		"room.chapel": {
 			"id": "room.chapel",
 			"name": "Abandoned Chapel",
 			"description": "A small stone chapel stands alone on the cliffside. Stained glass windows cast colored light on the dusty pews. A faint hum of prayer lingers in the air.",
-			"exits": {"south": "room.bridge"},
+			"exits": {
+				"south": "room.bridge"
+			},
 			"players": [],
-			"items": ["item.shield"],
-			"npcs": ["npc.priest"]
+			"items": [
+				"item.shield"
+			],
+			"npcs": [
+				"npc.priest"
+			]
 		},
 		"room.harbor": {
 			"id": "room.harbor",
 			"name": "Smuggler's Cove",
 			"description": "A hidden inlet shielded by jagged rocks. Crates of dubious origin are stacked against the cave walls. A rickety boat bobs at the makeshift dock.",
-			"exits": {"north": "room.beach"},
+			"exits": {
+				"north": "room.beach"
+			},
 			"players": [],
-			"items": ["item.wine", "item.pearl"],
-			"npcs": ["npc.smuggler", "npc.rat"]
+			"items": [
+				"item.wine",
+				"item.pearl"
+			],
+			"npcs": [
+				"npc.smuggler",
+				"npc.rat"
+			]
 		},
 		"room.gate": {
 			"id": "room.gate",
 			"name": "South Gate",
 			"description": "The heavy wooden gate marks the boundary between the safety of the village and the dangers beyond. A guard stands watch.",
-			"exits": {"north": "room.square", "south": "room.forest", "east": "room.bridge", "west": "room.camp"},
+			"exits": {
+				"north": "room.square",
+				"south": "room.forest",
+				"east": "room.bridge",
+				"west": "room.camp"
+			},
 			"players": [],
 			"items": [],
-			"npcs": ["npc.guard"]
+			"npcs": [
+				"npc.guard"
+			]
 		},
 		"room.forest": {
 			"id": "room.forest",
 			"name": "Whispering Forest",
 			"description": "Towering oaks sway in the breeze, their leaves rustling with whispered secrets. A narrow path leads deeper into the wilderness.",
-			"exits": {"north": "room.gate", "south": "room.deep_forest", "west": "room.grove"},
+			"exits": {
+				"north": "room.gate",
+				"south": "room.deep_forest",
+				"west": "room.grove"
+			},
 			"players": [],
-			"items": ["item.branch"],
-			"npcs": ["npc.wolf"]
+			"items": [
+				"item.branch"
+			],
+			"npcs": [
+				"npc.wolf"
+			]
 		},
 		"room.grove": {
 			"id": "room.grove",
 			"name": "Sacred Grove",
 			"description": "An ancient circle of standing stones surrounds a patch of vibrant green. Healing herbs grow wild between the mossy rocks. The air feels pure.",
-			"exits": {"east": "room.forest", "south": "room.garden"},
+			"exits": {
+				"east": "room.forest",
+				"south": "room.garden"
+			},
 			"players": [],
-			"items": ["item.herbs"],
-			"npcs": ["npc.hermit"]
+			"items": [
+				"item.herbs"
+			],
+			"npcs": [
+				"npc.hermit"
+			]
 		},
 		"room.garden": {
 			"id": "room.garden",
 			"name": "Enchanted Garden",
 			"description": "A hidden garden glowing with soft magical light. Strange flowers bloom in impossible colors and tiny lights dance between the leaves like living stars.",
-			"exits": {"north": "room.grove"},
+			"exits": {
+				"north": "room.grove"
+			},
 			"players": [],
-			"items": ["item.flower", "item.emerald", "item.mushroom"],
-			"npcs": ["npc.fairy"]
+			"items": [
+				"item.flower",
+				"item.emerald",
+				"item.mushroom"
+			],
+			"npcs": [
+				"npc.fairy"
+			]
 		},
 		"room.deep_forest": {
 			"id": "room.deep_forest",
 			"name": "Deep Forest",
 			"description": "The canopy blocks out most of the sunlight. Strange sounds echo between the trees. Footprints of various creatures mark the muddy ground.",
-			"exits": {"north": "room.forest", "east": "room.clearing", "south": "room.swamp"},
+			"exits": {
+				"north": "room.forest",
+				"east": "room.clearing",
+				"south": "room.swamp"
+			},
 			"players": [],
-			"items": ["item.dagger"],
-			"npcs": ["npc.bandit"]
+			"items": [
+				"item.dagger"
+			],
+			"npcs": [
+				"npc.bandit"
+			]
 		},
 		"room.clearing": {
 			"id": "room.clearing",
 			"name": "Sunlit Clearing",
 			"description": "A peaceful clearing bathed in golden sunlight. Wildflowers carpet the ground and butterflies dance in the warm air.",
-			"exits": {"west": "room.deep_forest", "south": "room.camp"},
+			"exits": {
+				"west": "room.deep_forest",
+				"south": "room.camp"
+			},
 			"players": [],
 			"items": [],
-			"npcs": ["npc.boar"]
+			"npcs": [
+				"npc.boar"
+			]
 		},
 		"room.camp": {
 			"id": "room.camp",
 			"name": "Bandit Camp",
 			"description": "A rough encampment hidden in the trees. Torn tents surround a smoldering campfire. Stolen goods are piled carelessly around the clearing.",
-			"exits": {"north": "room.clearing", "east": "room.gate", "south": "room.arena"},
+			"exits": {
+				"north": "room.clearing",
+				"east": "room.gate",
+				"south": "room.arena"
+			},
 			"players": [],
-			"items": ["item.cloak"],
-			"npcs": ["npc.bandit_chief"]
+			"items": [
+				"item.cloak"
+			],
+			"npcs": [
+				"npc.bandit_chief"
+			]
 		},
 		"room.arena": {
 			"id": "room.arena",
 			"name": "Fighting Arena",
 			"description": "A crude pit dug into the earth, ringed by wooden stakes and torches. The sand is stained dark. The crowd's roar still echoes in the empty seats.",
-			"exits": {"north": "room.camp"},
+			"exits": {
+				"north": "room.camp"
+			},
 			"players": [],
-			"items": ["item.spear"],
-			"npcs": ["npc.gladiator"]
+			"items": [
+				"item.spear"
+			],
+			"npcs": [
+				"npc.gladiator"
+			]
 		},
 		"room.swamp": {
 			"id": "room.swamp",
 			"name": "Murky Swamp",
 			"description": "Thick fog hangs over dark, bubbling waters. Gnarled trees rise from the muck like twisted fingers. A foul stench fills the air.",
-			"exits": {"north": "room.deep_forest", "south": "room.crypt"},
+			"exits": {
+				"north": "room.deep_forest",
+				"south": "room.crypt"
+			},
 			"players": [],
-			"items": ["item.potion"],
-			"npcs": ["npc.serpent", "npc.witch"]
+			"items": [
+				"item.potion"
+			],
+			"npcs": [
+				"npc.serpent",
+				"npc.witch"
+			]
 		},
 		"room.crypt": {
 			"id": "room.crypt",
 			"name": "Forgotten Crypt",
 			"description": "Ancient tombs line the walls beneath thick layers of dust. Faded inscriptions tell of warriors long dead. Bones crunch underfoot.",
-			"exits": {"north": "room.swamp", "south": "room.catacombs"},
+			"exits": {
+				"north": "room.swamp",
+				"south": "room.catacombs"
+			},
 			"players": [],
-			"items": ["item.bone", "item.treasure"],
-			"npcs": ["npc.skeleton"]
+			"items": [
+				"item.bone",
+				"item.treasure"
+			],
+			"npcs": [
+				"npc.skeleton"
+			]
 		},
 		"room.mine": {
 			"id": "room.mine",
 			"name": "Abandoned Mine",
 			"description": "Wooden supports creak overhead in this dark, narrow tunnel. Cobwebs cover the old minecart tracks. Something skitters in the shadows.",
-			"exits": {"east": "room.blacksmith", "south": "room.cavern"},
+			"exits": {
+				"east": "room.blacksmith",
+				"south": "room.cavern"
+			},
 			"players": [],
-			"items": ["item.pickaxe", "item.lantern"],
-			"npcs": ["npc.spider"]
+			"items": [
+				"item.pickaxe",
+				"item.lantern"
+			],
+			"npcs": [
+				"npc.spider"
+			]
 		},
 		"room.cavern": {
 			"id": "room.cavern",
 			"name": "Crystal Cavern",
 			"description": "Blue and purple crystals glow faintly from the cave walls, casting an eerie light. Mushrooms grow in clusters between the rocks.",
-			"exits": {"north": "room.mine", "east": "room.peak", "south": "room.tunnel"},
+			"exits": {
+				"north": "room.mine",
+				"east": "room.peak",
+				"south": "room.tunnel"
+			},
 			"players": [],
-			"items": ["item.crystal", "item.mushroom"],
-			"npcs": ["npc.goblin"]
+			"items": [
+				"item.crystal",
+				"item.mushroom"
+			],
+			"npcs": [
+				"npc.goblin"
+			]
 		},
 		"room.peak": {
 			"id": "room.peak",
 			"name": "Frozen Peak",
 			"description": "The wind howls across this exposed mountain summit. Snow clings to the jagged rocks. The entire world stretches out below in every direction.",
-			"exits": {"west": "room.cavern", "south": "room.tower"},
+			"exits": {
+				"west": "room.cavern",
+				"south": "room.tower"
+			},
 			"players": [],
-			"items": ["item.axe", "item.feather"],
+			"items": [
+				"item.axe",
+				"item.feather"
+			],
 			"npcs": []
 		},
 		"room.tunnel": {
 			"id": "room.tunnel",
 			"name": "Underground Tunnel",
 			"description": "A narrow passage carved through solid rock connects the mountain depths to the catacombs below. Water drips from the ceiling and the air is cold and stale.",
-			"exits": {"north": "room.cavern", "east": "room.catacombs"},
+			"exits": {
+				"north": "room.cavern",
+				"east": "room.catacombs"
+			},
 			"players": [],
-			"items": ["item.torch"],
-			"npcs": ["npc.bear"]
+			"items": [
+				"item.torch"
+			],
+			"npcs": [
+				"npc.bear"
+			]
 		},
 		"room.tower": {
 			"id": "room.tower",
 			"name": "Wizard's Tower",
 			"description": "A tall spiraling tower filled with floating books and glowing runes. Arcane symbols cover every surface. The air crackles with magical energy.",
-			"exits": {"north": "room.peak", "west": "room.ruins", "south": "room.library"},
+			"exits": {
+				"north": "room.peak",
+				"west": "room.ruins",
+				"south": "room.library"
+			},
 			"players": [],
 			"items": [],
-			"npcs": ["npc.wizard"]
+			"npcs": [
+				"npc.wizard"
+			]
 		},
 		"room.library": {
 			"id": "room.library",
 			"name": "Ancient Library",
 			"description": "Endless shelves of crumbling books stretch into the shadows. Dust motes float in the dim light. A stone guardian watches the entrance with hollow eyes.",
-			"exits": {"north": "room.tower"},
+			"exits": {
+				"north": "room.tower"
+			},
 			"players": [],
-			"items": ["item.tome"],
-			"npcs": ["npc.gargoyle"]
+			"items": [
+				"item.tome"
+			],
+			"npcs": [
+				"npc.gargoyle"
+			]
 		},
 		"room.catacombs": {
 			"id": "room.catacombs",
 			"name": "Dark Catacombs",
 			"description": "An endless labyrinth of tunnels stretches into the darkness. The walls are carved with dark runes that pulse with a faint, sickly glow.",
-			"exits": {"south": "room.ruins", "north": "room.crypt", "west": "room.tunnel"},
+			"exits": {
+				"south": "room.ruins",
+				"north": "room.crypt",
+				"west": "room.tunnel"
+			},
 			"players": [],
-			"items": ["item.gem"],
+			"items": [
+				"item.gem"
+			],
 			"npcs": []
 		},
 		"room.ruins": {
 			"id": "room.ruins",
 			"name": "Ancient Ruins",
 			"description": "Broken pillars and moss-covered stones remain from a civilization lost to time. Strange energy radiates from the crumbling altar at the center.",
-			"exits": {"east": "room.tower", "north": "room.catacombs", "south": "room.lair"},
+			"exits": {
+				"east": "room.tower",
+				"north": "room.catacombs",
+				"south": "room.lair"
+			},
 			"players": [],
-			"items": ["item.scroll", "item.staff"],
-			"npcs": ["npc.wraith"]
+			"items": [
+				"item.scroll",
+				"item.staff"
+			],
+			"npcs": [
+				"npc.wraith"
+			]
 		},
 		"room.lair": {
 			"id": "room.lair",
 			"name": "Dragon's Lair",
 			"description": "A massive cavern filled with the stench of sulfur. Scorch marks cover the stone walls. Piles of bones and melted armor litter the ground.",
-			"exits": {"north": "room.ruins", "south": "room.throne"},
+			"exits": {
+				"north": "room.ruins",
+				"south": "room.throne"
+			},
 			"players": [],
-			"items": ["item.scale"],
+			"items": [
+				"item.scale"
+			],
 			"npcs": []
 		},
 		"room.throne": {
 			"id": "room.throne",
 			"name": "Throne of Ashes",
 			"description": "A crumbling obsidian throne sits atop a mound of scorched bones. The walls are lined with ancient dragon skulls. An oppressive heat radiates from the blackened stone floor.",
-			"exits": {"north": "room.lair"},
+			"exits": {
+				"north": "room.lair"
+			},
 			"players": [],
-			"items": ["item.crown"],
+			"items": [
+				"item.crown"
+			],
 			"npcs": []
 		}
 	},
@@ -286,7 +503,11 @@
 		"npc.guard": {
 			"id": "npc.guard",
 			"name": "Village Guard",
-			"dialogue": ["Stay safe, traveler.", "The roads south are dangerous at night.", "Move along, citizen."],
+			"dialogue": [
+				"Stay safe, traveler.",
+				"The roads south are dangerous at night.",
+				"Move along, citizen."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -295,7 +516,11 @@
 		"npc.bartender": {
 			"id": "npc.bartender",
 			"name": "Tavern Bartender",
-			"dialogue": ["Welcome to The Prancing Pony!", "The ale is fresh today.", "I hear strange noises coming from the south lately..."],
+			"dialogue": [
+				"Welcome to The Prancing Pony!",
+				"The ale is fresh today.",
+				"I hear strange noises coming from the south lately..."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -304,7 +529,11 @@
 		"npc.innkeeper": {
 			"id": "npc.innkeeper",
 			"name": "Innkeeper",
-			"dialogue": ["Rest well, adventurer.", "You look like you could use some sleep.", "The bed is all yours, free of charge."],
+			"dialogue": [
+				"Rest well, adventurer.",
+				"You look like you could use some sleep.",
+				"The bed is all yours, free of charge."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -313,7 +542,11 @@
 		"npc.blacksmith": {
 			"id": "npc.blacksmith",
 			"name": "Village Blacksmith",
-			"dialogue": ["Fine steel is my craft.", "Bring me a sword and I will forge something greater.", "The mountains hold rare metals worth seeking."],
+			"dialogue": [
+				"Fine steel is my craft.",
+				"Bring me a sword and I will forge something greater.",
+				"The mountains hold rare metals worth seeking."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -322,7 +555,11 @@
 		"npc.merchant": {
 			"id": "npc.merchant",
 			"name": "Market Merchant",
-			"dialogue": ["Fresh goods today!", "Best prices in town, I swear.", "The fisher down at the docks has been looking for help."],
+			"dialogue": [
+				"Fresh goods today!",
+				"Best prices in town, I swear.",
+				"The fisher down at the docks has been looking for help."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -331,7 +568,11 @@
 		"npc.fisher": {
 			"id": "npc.fisher",
 			"name": "Old Fisher",
-			"dialogue": ["The sea has been rough lately.", "Pearls from the shipwreck beach are incredibly valuable.", "Bring me pearls and I will reward you handsomely."],
+			"dialogue": [
+				"The sea has been rough lately.",
+				"Pearls from the shipwreck beach are incredibly valuable.",
+				"Bring me pearls and I will reward you handsomely."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -340,7 +581,11 @@
 		"npc.keeper": {
 			"id": "npc.keeper",
 			"name": "Lighthouse Keeper",
-			"dialogue": ["The light must never go out.", "I have seen strange shadows on the beach at night.", "Be careful near the shipwreck, something lurks beneath."],
+			"dialogue": [
+				"The light must never go out.",
+				"I have seen strange shadows on the beach at night.",
+				"Be careful near the shipwreck, something lurks beneath."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -349,7 +594,11 @@
 		"npc.hermit": {
 			"id": "npc.hermit",
 			"name": "Old Hermit",
-			"dialogue": ["The forest provides all we need.", "Healing herbs grow in this sacred place.", "Bring me herbs and I shall share my knowledge of alchemy."],
+			"dialogue": [
+				"The forest provides all we need.",
+				"Healing herbs grow in this sacred place.",
+				"Bring me herbs and I shall share my knowledge of alchemy."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -358,7 +607,11 @@
 		"npc.witch": {
 			"id": "npc.witch",
 			"name": "Swamp Witch",
-			"dialogue": ["Hehehe... lost, are we?", "The cavern mushrooms have powerful magical properties.", "Bring me mushrooms and I will craft something truly special."],
+			"dialogue": [
+				"Hehehe... lost, are we?",
+				"The cavern mushrooms have powerful magical properties.",
+				"Bring me mushrooms and I will craft something truly special."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -367,7 +620,11 @@
 		"npc.priest": {
 			"id": "npc.priest",
 			"name": "Father Thomas",
-			"dialogue": ["Blessings upon you, child.", "The undead stir in the crypt to the south... bring me their cursed bones.", "I can purify dark relics and reward those who cleanse the land."],
+			"dialogue": [
+				"Blessings upon you, child.",
+				"The undead stir in the crypt to the south... bring me their cursed bones.",
+				"I can purify dark relics and reward those who cleanse the land."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -376,7 +633,11 @@
 		"npc.wizard": {
 			"id": "npc.wizard",
 			"name": "Archmage Aldric",
-			"dialogue": ["Knowledge is the truest power.", "The blue crystals in the mountain caverns hold immense magical energy.", "Bring me a crystal and I will enchant something wondrous for you."],
+			"dialogue": [
+				"Knowledge is the truest power.",
+				"The blue crystals in the mountain caverns hold immense magical energy.",
+				"Bring me a crystal and I will enchant something wondrous for you."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -385,7 +646,11 @@
 		"npc.smuggler": {
 			"id": "npc.smuggler",
 			"name": "Shady Smuggler",
-			"dialogue": ["Psst... you look like someone who appreciates fine goods.", "There is treasure buried in the old crypt, guarded by the dead.", "Bring me that treasure and I will make it worth your while."],
+			"dialogue": [
+				"Psst... you look like someone who appreciates fine goods.",
+				"There is treasure buried in the old crypt, guarded by the dead.",
+				"Bring me that treasure and I will make it worth your while."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -394,7 +659,11 @@
 		"npc.fairy": {
 			"id": "npc.fairy",
 			"name": "Forest Fairy",
-			"dialogue": ["Welcome to my garden, traveler!", "The moonflowers here can mend even the deepest wounds.", "Take what you need, but respect the balance of nature."],
+			"dialogue": [
+				"Welcome to my garden, traveler!",
+				"The moonflowers here can mend even the deepest wounds.",
+				"Take what you need, but respect the balance of nature."
+			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
@@ -403,164 +672,242 @@
 		"npc.rat": {
 			"id": "npc.rat",
 			"name": "Giant Rat",
-			"dialogue": ["*squeaks aggressively*", "*bares yellow fangs*"],
+			"dialogue": [
+				"*squeaks aggressively*",
+				"*bares yellow fangs*"
+			],
 			"hostile": true,
 			"hp": 10,
 			"damage": 3,
-			"quest": null
+			"quest": null,
+			"gold_drop": 5
 		},
 		"npc.crab": {
 			"id": "npc.crab",
 			"name": "Giant Crab",
-			"dialogue": ["*clicks claws menacingly*"],
+			"dialogue": [
+				"*clicks claws menacingly*"
+			],
 			"hostile": true,
 			"hp": 15,
 			"damage": 5,
-			"quest": null
+			"quest": null,
+			"gold_drop": 5
 		},
 		"npc.boar": {
 			"id": "npc.boar",
 			"name": "Wild Boar",
-			"dialogue": ["*snorts angrily*"],
+			"dialogue": [
+				"*snorts angrily*"
+			],
 			"hostile": true,
 			"hp": 20,
 			"damage": 8,
-			"quest": null
+			"quest": null,
+			"gold_drop": 5
 		},
 		"npc.wolf": {
 			"id": "npc.wolf",
 			"name": "Forest Wolf",
-			"dialogue": ["*growls menacingly*", "*howls*"],
+			"dialogue": [
+				"*growls menacingly*",
+				"*howls*"
+			],
 			"hostile": true,
 			"hp": 25,
 			"damage": 10,
-			"quest": null
+			"quest": null,
+			"gold_drop": 5
 		},
 		"npc.goblin": {
 			"id": "npc.goblin",
 			"name": "Cave Goblin",
-			"dialogue": ["*cackles*", "*growls and brandishes a crude knife*"],
+			"dialogue": [
+				"*cackles*",
+				"*growls and brandishes a crude knife*"
+			],
 			"hostile": true,
 			"hp": 30,
 			"damage": 8,
-			"quest": null
+			"quest": null,
+			"gold_drop": 6
 		},
 		"npc.serpent": {
 			"id": "npc.serpent",
 			"name": "Swamp Serpent",
-			"dialogue": ["*slithers through the murky water*", "*hisses venomously*"],
+			"dialogue": [
+				"*slithers through the murky water*",
+				"*hisses venomously*"
+			],
 			"hostile": true,
 			"hp": 30,
 			"damage": 10,
-			"quest": null
+			"quest": null,
+			"gold_drop": 6
 		},
 		"npc.spider": {
 			"id": "npc.spider",
 			"name": "Cave Spider",
-			"dialogue": ["*hisses from the shadows*", "*skitters across the ceiling*"],
+			"dialogue": [
+				"*hisses from the shadows*",
+				"*skitters across the ceiling*"
+			],
 			"hostile": true,
 			"hp": 35,
 			"damage": 12,
-			"quest": null
+			"quest": null,
+			"gold_drop": 7
 		},
 		"npc.bandit": {
 			"id": "npc.bandit",
 			"name": "Forest Bandit",
-			"dialogue": ["Your gold or your life!", "*draws a rusted blade*"],
+			"dialogue": [
+				"Your gold or your life!",
+				"*draws a rusted blade*"
+			],
 			"hostile": true,
 			"hp": 35,
 			"damage": 14,
-			"quest": null
+			"quest": null,
+			"gold_drop": 7
 		},
 		"npc.skeleton": {
 			"id": "npc.skeleton",
 			"name": "Skeleton Warrior",
-			"dialogue": ["*rattles bones*", "*raises a rusty sword*"],
+			"dialogue": [
+				"*rattles bones*",
+				"*raises a rusty sword*"
+			],
 			"hostile": true,
 			"hp": 40,
 			"damage": 12,
-			"quest": null
+			"quest": null,
+			"gold_drop": 8
 		},
 		"npc.troll": {
 			"id": "npc.troll",
 			"name": "Bridge Troll",
-			"dialogue": ["*roars and slams the ground*", "NONE SHALL PASS!"],
+			"dialogue": [
+				"*roars and slams the ground*",
+				"NONE SHALL PASS!"
+			],
 			"hostile": true,
 			"hp": 45,
 			"damage": 15,
-			"quest": null
+			"quest": null,
+			"gold_drop": 9
 		},
 		"npc.gargoyle": {
 			"id": "npc.gargoyle",
 			"name": "Stone Gargoyle",
-			"dialogue": ["*stone eyes glow red*", "*spreads granite wings with a grinding screech*"],
+			"dialogue": [
+				"*stone eyes glow red*",
+				"*spreads granite wings with a grinding screech*"
+			],
 			"hostile": true,
 			"hp": 45,
 			"damage": 14,
-			"quest": null
+			"quest": null,
+			"gold_drop": 9
 		},
 		"npc.bear": {
 			"id": "npc.bear",
 			"name": "Cave Bear",
-			"dialogue": ["*a deep growl echoes through the tunnel*", "*massive claws scrape the stone floor*"],
+			"dialogue": [
+				"*a deep growl echoes through the tunnel*",
+				"*massive claws scrape the stone floor*"
+			],
 			"hostile": true,
 			"hp": 50,
 			"damage": 16,
-			"quest": null
+			"quest": null,
+			"gold_drop": 10
 		},
 		"npc.wraith": {
 			"id": "npc.wraith",
 			"name": "Ancient Wraith",
-			"dialogue": ["*an ethereal wail fills the air*", "*ghostly eyes burn with hatred*"],
+			"dialogue": [
+				"*an ethereal wail fills the air*",
+				"*ghostly eyes burn with hatred*"
+			],
 			"hostile": true,
 			"hp": 55,
 			"damage": 18,
-			"quest": null
+			"quest": null,
+			"gold_drop": 11
 		},
 		"npc.bandit_chief": {
 			"id": "npc.bandit_chief",
 			"name": "Bandit Chief",
-			"dialogue": ["You dare enter my camp?!", "*unsheathes a jagged scimitar*", "Boys! We have a visitor..."],
+			"dialogue": [
+				"You dare enter my camp?!",
+				"*unsheathes a jagged scimitar*",
+				"Boys! We have a visitor..."
+			],
 			"hostile": true,
 			"hp": 60,
 			"damage": 20,
-			"quest": null
+			"quest": null,
+			"gold_drop": 12
 		},
 		"npc.gladiator": {
 			"id": "npc.gladiator",
 			"name": "Arena Champion",
-			"dialogue": ["*cracks knuckles*", "You want to fight? Step into the ring.", "I have never been defeated."],
+			"dialogue": [
+				"*cracks knuckles*",
+				"You want to fight? Step into the ring.",
+				"I have never been defeated."
+			],
 			"hostile": true,
 			"hp": 70,
 			"damage": 22,
-			"quest": null
+			"quest": null,
+			"gold_drop": 14
 		},
 		"npc.dragon": {
 			"id": "npc.dragon",
 			"name": "Ancestral Dragon",
-			"dialogue": ["*roars with ancient fury*", "*breathes scorching fire*"],
+			"dialogue": [
+				"*The dragon roars with ancient fury*"
+			],
 			"hostile": true,
 			"hp": 500,
 			"damage": 35,
-			"quest": null
+			"quest": null,
+			"gold_drop": 100,
+			"boss": true,
+			"boss_room": "room.lair",
+			"boss_alert": "A thunderous roar echoes... The Ancestral Dragon has invaded the Dragon's Lair!"
 		},
 		"npc.lich": {
 			"id": "npc.lich",
 			"name": "Lich King",
-			"dialogue": ["*dark magic crackles around skeletal hands*", "*a hollow laugh echoes endlessly*"],
+			"dialogue": [
+				"*An icy whisper fills the air*"
+			],
 			"hostile": true,
 			"hp": 300,
 			"damage": 25,
-			"quest": null
+			"quest": null,
+			"gold_drop": 75,
+			"boss": true,
+			"boss_room": "room.catacombs",
+			"boss_alert": "A chilling darkness spreads... The Lich King has risen in the Dark Catacombs!"
 		},
 		"npc.kraken": {
 			"id": "npc.kraken",
 			"name": "The Kraken",
-			"dialogue": ["*massive tentacles rise from the depths*", "*the sea itself seems to tremble*"],
+			"dialogue": [
+				"*Massive tentacles thrash the waves*"
+			],
 			"hostile": true,
 			"hp": 400,
 			"damage": 30,
-			"quest": null
+			"quest": null,
+			"gold_drop": 80,
+			"boss": true,
+			"boss_room": "room.beach",
+			"boss_alert": "The sea churns violently... The Kraken has surfaced at Shipwreck Beach!"
 		}
 	},
 	"items": {
@@ -569,273 +916,312 @@
 			"name": "Old Key",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.ale": {
 			"id": "item.ale",
 			"name": "Frothy Ale",
 			"damage": null,
 			"armor": null,
-			"heal": 10
+			"heal": 10,
+			"value": 5
 		},
 		"item.sword": {
 			"id": "item.sword",
 			"name": "Iron Sword",
 			"damage": 15,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 50
 		},
 		"item.apple": {
 			"id": "item.apple",
 			"name": "Fresh Apple",
 			"damage": null,
 			"armor": null,
-			"heal": 5
+			"heal": 5,
+			"value": 3
 		},
 		"item.bread": {
 			"id": "item.bread",
 			"name": "Loaf of Bread",
 			"damage": null,
 			"armor": null,
-			"heal": 8
+			"heal": 8,
+			"value": 5
 		},
 		"item.fish": {
 			"id": "item.fish",
 			"name": "Fresh Fish",
 			"damage": 1,
 			"armor": null,
-			"heal": 6
+			"heal": 6,
+			"value": 4
 		},
 		"item.rope": {
 			"id": "item.rope",
 			"name": "Hemp Rope",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 8
 		},
 		"item.pearl": {
 			"id": "item.pearl",
 			"name": "Sea Pearl",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.pickaxe": {
 			"id": "item.pickaxe",
 			"name": "Pickaxe",
 			"damage": 8,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 30
 		},
 		"item.lantern": {
 			"id": "item.lantern",
 			"name": "Oil Lantern",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 15
 		},
 		"item.crystal": {
 			"id": "item.crystal",
 			"name": "Blue Crystal",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 40
 		},
 		"item.mushroom": {
 			"id": "item.mushroom",
 			"name": "Glowing Mushroom",
 			"damage": null,
 			"armor": null,
-			"heal": 15
+			"heal": 15,
+			"value": 10
 		},
 		"item.axe": {
 			"id": "item.axe",
 			"name": "Battle Axe",
 			"damage": 20,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.feather": {
 			"id": "item.feather",
 			"name": "Phoenix Feather",
 			"damage": null,
 			"armor": null,
-			"heal": 30
+			"heal": 30,
+			"value": 10
 		},
 		"item.compass": {
 			"id": "item.compass",
 			"name": "Broken Compass",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.branch": {
 			"id": "item.branch",
 			"name": "Wooden Branch",
 			"damage": 3,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 2
 		},
 		"item.herbs": {
 			"id": "item.herbs",
 			"name": "Healing Herbs",
 			"damage": null,
 			"armor": null,
-			"heal": 20
+			"heal": 20,
+			"value": 12
 		},
 		"item.dagger": {
 			"id": "item.dagger",
 			"name": "Shadow Dagger",
 			"damage": 12,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.potion": {
 			"id": "item.potion",
 			"name": "Health Potion",
 			"damage": null,
 			"armor": null,
-			"heal": 35
+			"heal": 35,
+			"value": 10
 		},
 		"item.bone": {
 			"id": "item.bone",
 			"name": "Bone Club",
 			"damage": 6,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.treasure": {
 			"id": "item.treasure",
 			"name": "Ancient Treasure",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 100
 		},
 		"item.gem": {
 			"id": "item.gem",
 			"name": "Dark Gem",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.scroll": {
 			"id": "item.scroll",
 			"name": "Ancient Scroll",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 25
 		},
 		"item.staff": {
 			"id": "item.staff",
 			"name": "Enchanted Staff",
 			"damage": 25,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.scale": {
 			"id": "item.scale",
 			"name": "Dragon Scale",
 			"damage": null,
 			"armor": 50,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.trident": {
 			"id": "item.trident",
 			"name": "Sea Trident",
 			"damage": 18,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.hammer": {
 			"id": "item.hammer",
 			"name": "War Hammer",
 			"damage": 17,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.shield": {
 			"id": "item.shield",
 			"name": "Wooden Shield",
 			"damage": null,
 			"armor": 10,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.wine": {
 			"id": "item.wine",
 			"name": "Elven Wine",
 			"damage": null,
 			"armor": null,
-			"heal": 12
+			"heal": 12,
+			"value": 10
 		},
 		"item.torch": {
 			"id": "item.torch",
 			"name": "Old Torch",
 			"damage": 2,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.tome": {
 			"id": "item.tome",
 			"name": "Book of Shadows",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.flower": {
 			"id": "item.flower",
 			"name": "Moonflower",
 			"damage": null,
 			"armor": null,
-			"heal": 18
+			"heal": 18,
+			"value": 10
 		},
 		"item.emerald": {
 			"id": "item.emerald",
 			"name": "Enchanted Emerald",
 			"damage": null,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.cloak": {
 			"id": "item.cloak",
 			"name": "Shadow Cloak",
 			"damage": null,
 			"armor": 8,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.spear": {
 			"id": "item.spear",
 			"name": "Iron Spear",
 			"damage": 14,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.crown": {
 			"id": "item.crown",
 			"name": "Ancient Crown",
 			"damage": null,
 			"armor": 20,
-			"heal": null
+			"heal": null,
+			"value": 10
 		},
 		"item.ring": {
 			"id": "item.ring",
 			"name": "Enchanted Ring",
 			"damage": null,
 			"armor": null,
-			"heal": 25
+			"heal": 25,
+			"value": 10
 		},
 		"item.holy_water": {
 			"id": "item.holy_water",
 			"name": "Holy Water",
 			"damage": null,
 			"armor": null,
-			"heal": 40
+			"heal": 40,
+			"value": 10
 		},
 		"item.cutlass": {
 			"id": "item.cutlass",
 			"name": "Pirate Cutlass",
 			"damage": 16,
 			"armor": null,
-			"heal": null
+			"heal": null,
+			"value": 10
 		}
 	},
 	"quests": {
@@ -909,5 +1295,15 @@
 			"reward": "item.cutlass",
 			"reward_count": 1
 		}
-	}
+	},
+	"shop": [
+		"item.sword",
+		"item.pickaxe",
+		"item.herbs",
+		"item.apple",
+		"item.bread",
+		"item.rope",
+		"item.lantern",
+		"item.ale"
+	]
 }

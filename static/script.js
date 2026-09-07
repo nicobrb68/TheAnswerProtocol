@@ -44,13 +44,19 @@ const toastStack = $("#toast-stack");
 const npcPopover = $("#npc-popover");
 const itemPopover = $("#item-popover");
 
+const goldTextEl = $("#gold-text");
+const shopListEl = $("#shop-list");
+const marketListEl = $("#market-list");
+
 const state = {
   ws: null,
   connected: false,
-  me: { username: null, hp: null, maxHp: null, status: "alive" },
+  me: { username: null, hp: null, maxHp: null, gold: null, status: "alive" },
   room: null,
   inventory: [],
   quests: [],
+  shop: [],
+  market: [],
   group: null,
   serverCount: 0,
   npcCache: {},
@@ -203,10 +209,12 @@ function connect(host, port, username) {
 
 function returnToLogin() {
   state.ws = null;
-  state.me = { username: null, hp: null, maxHp: null, status: "alive" };
+  state.me = { username: null, hp: null, maxHp: null, gold: null, status: "alive" };
   state.room = null;
   state.inventory = [];
   state.quests = [];
+  state.shop = [];
+  state.market = [];
   state.group = null;
   state.npcCache = {};
   pending.length = 0;
@@ -359,7 +367,10 @@ function handleResponse(ctx, line) {
         }
       }
       const npcLabel = state.npcCache[ctx.meta.npcId]?.name || humanize(ctx.meta.npcId);
-      if (data.status === "victory") logCombat(`You defeated ${npcLabel}! (-${data.damage} HP dealt)`);
+      if (data.status === "victory") {
+        const goldMsg = data.gold_earned ? ` +${data.gold_earned} gold` : "";
+        logCombat(`You defeated ${npcLabel}! (-${data.damage} HP dealt)${goldMsg}`);
+      }
       else if (data.status === "death") logCombat(`${npcLabel} struck you down. You wake up back at a safe place.`);
       else logCombat(`You hit ${npcLabel} for ${data.damage}. Their HP: ${data.target_hp}. Yours: ${data.attacker_hp}.`);
       sendCommand("STATUS", "STATUS");
@@ -374,6 +385,7 @@ function handleResponse(ctx, line) {
       if (!data) return;
       state.me.hp = data.hp;
       state.me.maxHp = data.max_hp;
+      state.me.gold = data.gold;
       state.me.status = data.status;
       renderHp();
       return;
@@ -406,6 +418,71 @@ function handleResponse(ctx, line) {
       const m = line.match(/hp=(\d+)\/(\d+)/);
       if (m) { state.me.hp = Number(m[1]); state.me.maxHp = Number(m[2]); renderHp(); }
       showToast({ text: "You feel rested." });
+      return;
+    }
+
+    case "SHOP": {
+      if (isErr) return;
+      const arr = safeJson(line.slice(3));
+      state.shop = Array.isArray(arr) ? arr : [];
+      renderShop();
+      return;
+    }
+
+    case "SHOP_BUY": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const m = line.match(/bought=(\S+) price=(\d+) gold=(\d+)/);
+      if (m) {
+        state.me.gold = Number(m[3]);
+        renderHp();
+        showToast({ text: `Bought ${humanize(m[1])} for ${m[2]} gold.` });
+      }
+      sendCommand("INVENTORY", "INVENTORY");
+      return;
+    }
+
+    case "MARKET": {
+      if (isErr) return;
+      const arr = safeJson(line.slice(3));
+      state.market = Array.isArray(arr) ? arr : [];
+      renderMarket();
+      return;
+    }
+
+    case "MARKET_BUY": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const m = line.match(/bought=(\S+) price=(\d+) seller=(\S+) gold=(\d+)/);
+      if (m) {
+        state.me.gold = Number(m[4]);
+        renderHp();
+        showToast({ text: `Bought ${humanize(m[1])} from ${m[3]} for ${m[2]} gold.` });
+      }
+      sendCommand("INVENTORY", "INVENTORY");
+      sendCommand("MARKET", "MARKET");
+      return;
+    }
+
+    case "USE": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const data = safeJson(line.slice(3));
+      if (data) {
+        state.me.hp = data.hp;
+        state.me.maxHp = data.max_hp;
+        renderHp();
+        showToast({ text: `Used ${humanize(data.used)}: +${data.heal} HP` });
+      }
+      sendCommand("INVENTORY", "INVENTORY");
+      return;
+    }
+
+    case "SELL": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const m = line.match(/listed=(\S+) price=(\d+)/);
+      if (m) {
+        showToast({ text: `Listed ${humanize(m[1])} for ${m[2]} gold on the market.` });
+      }
+      sendCommand("INVENTORY", "INVENTORY");
+      sendCommand("MARKET", "MARKET");
       return;
     }
 
@@ -589,7 +666,7 @@ function handleEvent(rest) {
 }
 
 function renderHp() {
-  const { hp, maxHp, status } = state.me;
+  const { hp, maxHp, gold, status } = state.me;
   const pct = maxHp ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
   [hpFillTop, hpFillMain].forEach((el) => {
     el.style.width = `${pct}%`;
@@ -598,6 +675,7 @@ function renderHp() {
   const text = hp != null ? `${hp}/${maxHp}` : "—/—";
   hpTextTop.textContent = text;
   hpTextMain.textContent = text;
+  goldTextEl.textContent = gold != null ? gold : "—";
   statusPill.textContent = status || "alive";
   statusPill.classList.toggle("dead", status === "dead");
 }
@@ -696,6 +774,8 @@ function renderInventory() {
           <span>${escapeHtml(state.itemCache[id]?.name || humanize(id))}</span>
           <span class="inventory-item-actions">
             <button class="btn btn-ghost btn-xs" data-info="${escapeHtml(id)}" type="button" title="Item info" aria-label="Item info">ⓘ</button>
+            <button class="btn btn-ghost btn-xs" data-use="${escapeHtml(id)}" type="button">use</button>
+            <button class="btn btn-ghost btn-xs" data-sell="${escapeHtml(id)}" type="button">sell</button>
             <button class="btn btn-ghost btn-xs" data-drop="${escapeHtml(id)}" type="button">drop</button>
           </span>
         </li>`).join("")
@@ -703,8 +783,48 @@ function renderInventory() {
   $$('[data-drop]', inventoryListEl).forEach((btn) => {
     btn.onclick = () => sendCommand("DROP", `DROP ${btn.dataset.drop}`);
   });
+  $$('[data-use]', inventoryListEl).forEach((btn) => {
+    btn.onclick = () => sendCommand("USE", `USE ${btn.dataset.use}`);
+  });
+  $$('[data-sell]', inventoryListEl).forEach((btn) => {
+    btn.onclick = () => sendCommand("SELL", `SELL ${btn.dataset.sell}`);
+  });
   $$('[data-info]', inventoryListEl).forEach((btn) => {
     btn.onclick = (ev) => requestItemInfo(btn.dataset.info, ev.currentTarget);
+  });
+}
+
+function renderShop() {
+  shopListEl.innerHTML = state.shop.length
+    ? state.shop.map((item) => {
+        const stats = [
+          item.damage ? `${item.damage} dmg` : "",
+          item.armor ? `${item.armor} def` : "",
+          item.heal ? `+${item.heal} hp` : "",
+        ].filter(Boolean).join(", ");
+        return `<li class="inventory-item">
+          <span>${escapeHtml(item.name)} <span class="entity-mark">${item.price}g${stats ? " · " + stats : ""}</span></span>
+          <button class="btn btn-secondary btn-xs" data-shopbuy="${escapeHtml(item.id)}" type="button">Buy</button>
+        </li>`;
+      }).join("")
+    : '<li class="empty-note">shop is empty</li>';
+  $$('[data-shopbuy]', shopListEl).forEach((btn) => {
+    btn.onclick = () => sendCommand("SHOP_BUY", `SHOP BUY ${btn.dataset.shopbuy}`);
+  });
+}
+
+function renderMarket() {
+  marketListEl.innerHTML = state.market.length
+    ? state.market.map((listing) => {
+        const isMine = listing.seller === state.me.username;
+        return `<li class="inventory-item">
+          <span>${escapeHtml(listing.name)} <span class="entity-mark">${listing.price}g · by ${escapeHtml(listing.seller)}</span></span>
+          ${!isMine ? `<button class="btn btn-secondary btn-xs" data-marketbuy="${listing.index}" type="button">Buy</button>` : '<span class="tag">yours</span>'}
+        </li>`;
+      }).join("")
+    : '<li class="empty-note">nothing for sale</li>';
+  $$('[data-marketbuy]', marketListEl).forEach((btn) => {
+    btn.onclick = () => sendCommand("MARKET_BUY", `MARKET BUY ${btn.dataset.marketbuy}`);
   });
 }
 
@@ -826,6 +946,8 @@ function refreshAll() {
   sendCommand("INVENTORY", "INVENTORY");
   sendCommand("QUESTS", "QUESTS");
   sendCommand("WHO", "WHO");
+  sendCommand("SHOP", "SHOP");
+  sendCommand("MARKET", "MARKET");
   if (state.group) sendCommand("GROUP_INFO", "GROUP INFO");
 }
 
@@ -862,6 +984,8 @@ $("#quit-btn").addEventListener("click", () => sendCommand("QUIT", "QUIT"));
 $("#look-refresh").addEventListener("click", () => sendCommand("LOOK", "LOOK"));
 sleepBtn.addEventListener("click", () => sendCommand("SLEEP", "SLEEP"));
 $("#inventory-refresh").addEventListener("click", () => sendCommand("INVENTORY", "INVENTORY"));
+$("#shop-refresh").addEventListener("click", () => sendCommand("SHOP", "SHOP"));
+$("#market-refresh").addEventListener("click", () => sendCommand("MARKET", "MARKET"));
 $("#quests-refresh").addEventListener("click", () => sendCommand("QUESTS", "QUESTS"));
 $("#group-refresh").addEventListener("click", () => {
   if (state.group) sendCommand("GROUP_INFO", "GROUP INFO");

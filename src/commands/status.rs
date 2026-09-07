@@ -12,5 +12,5 @@ pub async fn handle_status(username: &str, world: &Arc<Mutex<World>>) -> String 
 		PlayerState::Alive => "alive",
 		PlayerState::Dead => "dead",
 	};
-	format!("OK {{\"hp\": {}, \"max_hp\": {}, \"status\": \"{}\"}}\n", player.hp, player.max_hp, status_str)
+	format!("OK {{\"hp\": {}, \"max_hp\": {}, \"gold\": {}, \"status\": \"{}\"}}\n", player.hp, player.max_hp, player.gold, status_str)
 }
