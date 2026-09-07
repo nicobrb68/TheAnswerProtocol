@@ -231,8 +231,9 @@ button, input {
 .topbar-hp { display: flex; align-items: center; gap: 0.5rem; }
 .hp-label { color: var(--ink-soft); font-size: 0.7rem; }
 
-.topbar-counts { color: var(--ink-soft); }
+.topbar-counts { color: var(--ink-soft); display: flex; align-items: center; gap: 0.5rem; }
 .topbar-counts span { color: var(--paper); font-weight: 600; }
+.topbar-refresh { flex-shrink: 0; }
 
 .topbar-user { margin-left: auto; color: var(--amber-bright); font-weight: 600; }
 
@@ -622,8 +623,6 @@ button, input {
   font-size: 0.85rem;
 }
 .terminal-input input:focus { outline: none; }
-.console-input { background: rgba(92, 184, 172, 0.05); }
-.console-input .prompt { color: var(--teal); }
 
 
 

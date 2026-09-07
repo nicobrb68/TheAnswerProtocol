@@ -245,12 +245,12 @@
 			"dialogue": [
 				"Stay safe, traveler.",
 				"The roads can be dangerous.",
-				"Move along, citizen."
+				"Bring me an ancient treasure and I shall reward you with dragon scale armor."
 			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
-			"quest": null
+			"quest": "quest.treasure"
 		},
 		"npc.bartender": {
 			"id": "npc.bartender",
@@ -310,12 +310,12 @@
 			"dialogue": [
 				"The light must never go out.",
 				"Many ships have I guided to safety.",
-				"Stay clear of the rocks."
+				"Bring me a crystal and I shall forge you a mighty armor."
 			],
 			"hostile": false,
 			"hp": null,
 			"damage": null,
-			"quest": null
+			"quest": "quest.crystal"
 		},
 		"npc.goblin": {
 			"id": "npc.goblin",
@@ -525,6 +525,46 @@
 			"armor": null,
 			"heal": null,
 			"value": 25
+		},
+		"item.leather_cap": {
+			"id": "item.leather_cap",
+			"name": "Leather Cap",
+			"damage": null,
+			"armor": 3,
+			"heal": null,
+			"value": 25
+		},
+		"item.chainmail": {
+			"id": "item.chainmail",
+			"name": "Chainmail Vest",
+			"damage": null,
+			"armor": 6,
+			"heal": null,
+			"value": 120
+		},
+		"item.iron_shield": {
+			"id": "item.iron_shield",
+			"name": "Iron Shield",
+			"damage": null,
+			"armor": 10,
+			"heal": null,
+			"value": 300
+		},
+		"item.plate_armor": {
+			"id": "item.plate_armor",
+			"name": "Plate Armor",
+			"damage": null,
+			"armor": 15,
+			"heal": null,
+			"value": 500
+		},
+		"item.dragon_scale": {
+			"id": "item.dragon_scale",
+			"name": "Dragon Scale Armor",
+			"damage": null,
+			"armor": 20,
+			"heal": null,
+			"value": 1000
 		}
 	},
 	"quests": {
@@ -547,6 +587,26 @@
 			"target_count": 1,
 			"reward": "item.ale",
 			"reward_count": 2
+		},
+		"quest.crystal": {
+			"id": "quest.crystal",
+			"description": "Bring 1 blue crystal to the Lighthouse Keeper.",
+			"giver": "npc.keeper",
+			"type": "fetch",
+			"target_item": "item.crystal",
+			"target_count": 1,
+			"reward": "item.plate_armor",
+			"reward_count": 1
+		},
+		"quest.treasure": {
+			"id": "quest.treasure",
+			"description": "Bring 1 ancient treasure to the Village Guard.",
+			"giver": "npc.guard",
+			"type": "fetch",
+			"target_item": "item.treasure",
+			"target_count": 1,
+			"reward": "item.dragon_scale",
+			"reward_count": 1
 		}
 	},
 	"shop": [
@@ -557,6 +617,9 @@
 		"item.bread",
 		"item.rope",
 		"item.lantern",
-		"item.ale"
+		"item.ale",
+		"item.leather_cap",
+		"item.chainmail",
+		"item.iron_shield"
 	]
 }

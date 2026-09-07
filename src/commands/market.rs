@@ -1,5 +1,7 @@
 use std::sync::Arc;
+use std::collections::HashMap;
 use tokio::sync::Mutex;
+use tokio::sync::mpsc::UnboundedSender;
 use serde_json::json;
 use crate::{World, MarketListing, TapError};
 
@@ -61,7 +63,41 @@ pub async fn handle_sell(username: &str, item_id: &str, world: &Arc<Mutex<World>
     format!("OK listed={} price={}\n", item_full_id, price)
 }
 
-pub async fn handle_market_buy(username: &str, index_str: &str, world: &Arc<Mutex<World>>) -> String {
+pub async fn handle_market_cancel(username: &str, index_str: &str, world: &Arc<Mutex<World>>) -> String {
+    let mut w = world.lock().await;
+
+    let index: usize = match index_str.parse() {
+        Ok(i) => i,
+        Err(_) => return TapError::ItemNotFound.message(),
+    };
+
+    if index >= w.market.len() {
+        return TapError::ItemNotFound.message();
+    }
+
+    let listing = &w.market[index];
+    if listing.seller != username {
+        return "ERR 403 NOT_YOUR_LISTING\n".to_string();
+    }
+
+    let item_id = listing.item_id.clone();
+    w.market.remove(index);
+
+    if let Some(p) = w.get_mut_player(username) {
+        p.inventory.push(item_id.clone());
+    }
+
+    tracing::info!(event = "market_cancel", player = %username, item = %item_id, "listing cancelled");
+
+    format!("OK cancelled={}\n", item_id)
+}
+
+pub async fn handle_market_buy(
+    username: &str,
+    index_str: &str,
+    world: &Arc<Mutex<World>>,
+    registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>,
+) -> String {
     let mut w = world.lock().await;
 
     let index: usize = match index_str.parse() {
@@ -100,6 +136,19 @@ pub async fn handle_market_buy(username: &str, index_str: &str, world: &Arc<Mute
 
     tracing::info!(event = "market_buy", buyer = %username, seller = %seller, item = %item_id, price = price, "item purchased from market");
 
-    let buyer_gold = w.get_player(username).map(|p| p.gold).unwrap_or(0);
+    let item_name = w.items.get(&item_id).map(|i| i.name.clone()).unwrap_or_default();
+
+    drop(w);
+
+    let evt = format!("EVT MARKET SOLD {} bought your {} for {} gold\n", username, item_name, price);
+    let reg = registry.lock().await;
+    if let Some(tx) = reg.get(&seller) {
+        let _ = tx.send(evt);
+    }
+
+    let buyer_gold = {
+        let w = world.lock().await;
+        w.get_player(username).map(|p| p.gold).unwrap_or(0)
+    };
     format!("OK bought={} price={} seller={} gold={}\n", item_id, price, seller, buyer_gold)
 }

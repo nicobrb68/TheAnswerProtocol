@@ -367,12 +367,13 @@ function handleResponse(ctx, line) {
         }
       }
       const npcLabel = state.npcCache[ctx.meta.npcId]?.name || humanize(ctx.meta.npcId);
+      const armorMsg = data.absorbed > 0 ? ` (${data.absorbed} absorbed)` : "";
       if (data.status === "victory") {
         const goldMsg = data.gold_earned ? ` +${data.gold_earned} gold` : "";
         logCombat(`You defeated ${npcLabel}! (-${data.damage} HP dealt)${goldMsg}`);
       }
-      else if (data.status === "death") logCombat(`${npcLabel} struck you down. You wake up back at a safe place.`);
-      else logCombat(`You hit ${npcLabel} for ${data.damage}. Their HP: ${data.target_hp}. Yours: ${data.attacker_hp}.`);
+      else if (data.status === "death") logCombat(`${npcLabel} struck you down.${armorMsg} You wake up back at a safe place.`);
+      else logCombat(`You hit ${npcLabel} for ${data.damage}. They hit you for ${data.npc_damage}${armorMsg}. HP: ${data.target_hp}/${data.attacker_hp}.`);
       sendCommand("STATUS", "STATUS");
       if (data.status === "victory" || data.status === "death") sendCommand("LOOK", "LOOK");
       else renderRoom();
@@ -462,6 +463,17 @@ function handleResponse(ctx, line) {
       return;
     }
 
+    case "MARKET_CANCEL": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const m = line.match(/cancelled=(\S+)/);
+      if (m) {
+        showToast({ text: `Cancelled listing for ${humanize(m[1])}.` });
+      }
+      sendCommand("INVENTORY", "INVENTORY");
+      sendCommand("MARKET", "MARKET");
+      return;
+    }
+
     case "USE": {
       if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
       const data = safeJson(line.slice(3));
@@ -523,12 +535,6 @@ function handleResponse(ctx, line) {
     case "GROUP_KICK":
       if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
       sendCommand("GROUP_INFO", "GROUP INFO");
-      return;
-
-    case "RAW":
-      logRaw(`tap:~$ ${ctx.meta.raw}`);
-      logRaw(line);
-      refreshAll();
       return;
 
     default:
@@ -648,6 +654,14 @@ function handleEvent(rest) {
   if (rest.startsWith("GROUP LEAVE ")) {
     logEvent(`${rest.slice("GROUP LEAVE ".length).trim()} left the group.`);
     if (state.group) sendCommand("GROUP_INFO", "GROUP INFO");
+    return;
+  }
+  if (rest.startsWith("MARKET SOLD ")) {
+    const msg = rest.slice("MARKET SOLD ".length).trim();
+    logEvent(msg);
+    showToast({ text: msg });
+    sendCommand("STATUS", "STATUS");
+    sendCommand("MARKET", "MARKET");
     return;
   }
   if (rest.startsWith("GLOBAL ")) {
@@ -819,12 +833,17 @@ function renderMarket() {
         const isMine = listing.seller === state.me.username;
         return `<li class="inventory-item">
           <span>${escapeHtml(listing.name)} <span class="entity-mark">${listing.price}g · by ${escapeHtml(listing.seller)}</span></span>
-          ${!isMine ? `<button class="btn btn-secondary btn-xs" data-marketbuy="${listing.index}" type="button">Buy</button>` : '<span class="tag">yours</span>'}
+          ${!isMine
+            ? `<button class="btn btn-secondary btn-xs" data-marketbuy="${listing.index}" type="button">Buy</button>`
+            : `<button class="btn btn-danger btn-xs" data-marketcancel="${listing.index}" type="button">Cancel</button>`}
         </li>`;
       }).join("")
     : '<li class="empty-note">nothing for sale</li>';
   $$('[data-marketbuy]', marketListEl).forEach((btn) => {
     btn.onclick = () => sendCommand("MARKET_BUY", `MARKET BUY ${btn.dataset.marketbuy}`);
+  });
+  $$('[data-marketcancel]', marketListEl).forEach((btn) => {
+    btn.onclick = () => sendCommand("MARKET_CANCEL", `MARKET CANCEL ${btn.dataset.marketcancel}`);
   });
 }
 
@@ -981,7 +1000,7 @@ connectForm.addEventListener("submit", (e) => {
 });
 
 $("#quit-btn").addEventListener("click", () => sendCommand("QUIT", "QUIT"));
-$("#look-refresh").addEventListener("click", () => sendCommand("LOOK", "LOOK"));
+$("#look-refresh").addEventListener("click", () => refreshAll());
 sleepBtn.addEventListener("click", () => sendCommand("SLEEP", "SLEEP"));
 $("#inventory-refresh").addEventListener("click", () => sendCommand("INVENTORY", "INVENTORY"));
 $("#shop-refresh").addEventListener("click", () => sendCommand("SHOP", "SHOP"));
@@ -1035,19 +1054,6 @@ $("#chat-form").addEventListener("submit", (e) => {
   input.value = "";
 });
 
-$("#console-toggle").addEventListener("click", () => {
-  const form = $("#console-form");
-  form.hidden = !form.hidden;
-  if (!form.hidden) $("#console-input").focus();
-});
-$("#console-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const input = $("#console-input");
-  const raw = input.value.trim();
-  if (!raw) return;
-  sendCommand("RAW", raw, { raw });
-  input.value = "";
-});
 
 $("#npc-popover-close").addEventListener("click", closeNpcPopover);
 $("#item-popover-close").addEventListener("click", closeItemPopover);

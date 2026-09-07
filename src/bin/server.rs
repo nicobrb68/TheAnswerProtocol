@@ -28,7 +28,7 @@ use tap::commands::sleep::handle_sleep;
 use tap::commands::examine::handle_examine;
 use tap::commands::use_item::handle_use;
 use tap::commands::shop::{handle_shop, handle_shop_buy};
-use tap::commands::market::{handle_market, handle_sell, handle_market_buy};
+use tap::commands::market::{handle_market, handle_sell, handle_market_buy, handle_market_cancel};
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -132,18 +132,17 @@ async fn main() {
                 let line_upper = line_trimmed.to_uppercase();
 
                 if !line_trimmed.is_empty() {
-                    if flood_window.elapsed().as_secs() >= 3 {
+                    if flood_window.elapsed().as_secs() >= 2 {
                         flood_window = tokio::time::Instant::now();
                         flood_count = 0;
                     }
                     flood_count += 1;
-                    if flood_count > 15 {
+                    if flood_count > 40 {
                         tracing::error!(event = "abuse_kick", ip = %addr, player = ?authenticated, rate = flood_count, "client kicked for flooding");
                         let _ = tx.send(tap::TapError::Flooding.message());
                         break;
-                    } else if flood_count > 11 {
+                    } else if flood_count > 25 {
                         tracing::warn!(event = "abuse_flood", ip = %addr, player = ?authenticated, rate = flood_count, "command flooding detected");
-                        let _ = tx.send("ERR 902 FLOODING_WARNING\n".to_string());
                     }
                     tracing::info!(event = "command", ip = %addr, player = ?authenticated, command = %line_trimmed, "command received");
                 }
@@ -246,9 +245,12 @@ async fn main() {
                         Some(handle_shop_buy(name, &item_id, &world).await)
                     } else if line_upper.starts_with("SHOP") {
                         Some(handle_shop(&world).await)
+                    } else if line_upper.starts_with("MARKET CANCEL ") {
+                        let index = get_args(get_args(&line_trimmed));
+                        Some(handle_market_cancel(name, index, &world).await)
                     } else if line_upper.starts_with("MARKET BUY ") {
                         let index = get_args(get_args(&line_trimmed));
-                        Some(handle_market_buy(name, index, &world).await)
+                        Some(handle_market_buy(name, index, &world, &registry).await)
                     } else if line_upper.starts_with("MARKET") {
                         Some(handle_market(&world).await)
                     } else if line_upper.starts_with("SELL ") {

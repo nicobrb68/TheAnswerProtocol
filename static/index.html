@@ -64,6 +64,7 @@
 
     <div class="topbar-counts" title="Players here / players on the server">
       <span id="room-count">0</span> here · <span id="server-count">0</span> online
+      <button class="btn btn-secondary btn-xs topbar-refresh" id="look-refresh" type="button">↻ refresh</button>
     </div>
 
     <div class="topbar-user">
@@ -106,7 +107,6 @@
       </div>
 
       <div class="room-actions">
-        <button class="btn btn-ghost btn-sm" id="look-refresh" type="button">↻ Look around</button>
         <button class="btn btn-secondary btn-sm" id="sleep-btn" type="button" hidden>💤 Rest</button>
       </div>
     </section>
@@ -203,8 +203,6 @@
 
       <div class="terminal-log-header">
         <span class="log-header-title">log</span>
-        <span class="terminal-spacer"></span>
-        <button class="tab-btn tab-console-toggle" id="console-toggle" type="button">console ▾</button>
       </div>
       <div class="terminal-log-pane" id="pane-log" aria-live="polite"></div>
 
@@ -226,11 +224,6 @@
         <button type="submit" class="btn btn-primary btn-sm">Send</button>
       </form>
 
-      <form id="console-form" class="terminal-input console-input" hidden>
-        <span class="prompt">tap:~$</span>
-        <input name="raw" type="text" id="console-input" placeholder="RAW COMMAND — e.g. WHO" autocomplete="off">
-        <button type="submit" class="btn btn-secondary btn-sm">Send</button>
-      </form>
     </section>
 
   </main>

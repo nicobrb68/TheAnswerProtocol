@@ -29,7 +29,7 @@ impl Highlighter for TapCompleter {
         let chat_subs = ["GLOBAL", "ROOM", "GROUP"];
         let group_subs = ["CREATE", "INVITE", "JOIN", "LEAVE", "DISBAND", "INFO", "KICK"];
         let shop_subs = ["BUY"];
-        let market_subs = ["BUY"];
+        let market_subs = ["BUY", "CANCEL"];
 
         let (valid, cmd_end) = 
         if first == "CHAT" || first == "GROUP" || first == "SHOP" || first == "MARKET" {
@@ -121,7 +121,7 @@ async fn main() {
                 "GROUP JOIN".into(), "GROUP LEAVE".into(), "GROUP DISBAND".into(),
                 "GROUP INFO".into(), "SLEEP".into(), "USE".into(), "EXAMINE".into(),
                 "SHOP".into(), "SHOP BUY".into(), "SELL".into(),
-                "MARKET".into(), "MARKET BUY".into(),
+                "MARKET".into(), "MARKET BUY".into(), "MARKET CANCEL".into(),
                 "QUIT".into()
             ],
         };

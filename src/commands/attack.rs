@@ -48,6 +48,7 @@ pub async fn handle_attack(
     let npc_gold_drop = npc.gold_drop;
 
     let mut weapon_bonus: u32 = 0;
+    let mut armor_bonus: u32 = 0;
     for item_id in &player_inventory {
         if let Some(item) = w.items.get(item_id) {
             if let Some(dmg) = item.damage {
@@ -55,9 +56,16 @@ pub async fn handle_attack(
                     weapon_bonus = dmg;
                 }
             }
+            if let Some(arm) = item.armor {
+                if arm > armor_bonus {
+                    armor_bonus = arm;
+                }
+            }
         }
     }
     let player_damage = 10 + weapon_bonus;
+    let absorbed = armor_bonus.min(npc_damage.saturating_sub(1));
+    let effective_npc_damage = npc_damage - absorbed;
 
     let npc = match w.get_mut_npc(&npc_full_id) {
         Some(n) => n,
@@ -72,7 +80,7 @@ pub async fn handle_attack(
 
     let player_hp = match w.get_mut_player(username) {
         Some(p) => {
-            p.hp = p.hp.saturating_sub(npc_damage);
+            p.hp = p.hp.saturating_sub(effective_npc_damage);
             p.hp
         },
         None => return TapError::PlayerNotFound.message(),
@@ -187,13 +195,13 @@ pub async fn handle_attack(
     }
 
     if status == "death" {
-        format!("OK {{\"attacker_hp\": 0, \"target_hp\": {}, \"damage\": {}, \"status\": \"death\", \"respawn_room\": \"{}\", \"respawn_hp\": 50}}\n",
-            npc_hp, player_damage, spawn_room)
+        format!("OK {{\"attacker_hp\": 0, \"target_hp\": {}, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"status\": \"death\", \"respawn_room\": \"{}\", \"respawn_hp\": 50}}\n",
+            npc_hp, player_damage, absorbed, effective_npc_damage, spawn_room)
     } else if status == "victory" {
-        format!("OK {{\"attacker_hp\": {}, \"target_hp\": 0, \"damage\": {}, \"status\": \"victory\", \"gold_earned\": {}}}\n",
-            player_hp, player_damage, npc_gold_drop)
+        format!("OK {{\"attacker_hp\": {}, \"target_hp\": 0, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"status\": \"victory\", \"gold_earned\": {}}}\n",
+            player_hp, player_damage, absorbed, effective_npc_damage, npc_gold_drop)
     } else {
-        format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"damage\": {}, \"status\": \"combat\"}}\n",
-            player_hp, npc_hp, player_damage)
+        format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"status\": \"combat\"}}\n",
+            player_hp, npc_hp, player_damage, absorbed, effective_npc_damage)
     }
 }
