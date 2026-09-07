@@ -235,6 +235,29 @@ button, input {
 .topbar-counts span { color: var(--paper); font-weight: 600; }
 .topbar-refresh { flex-shrink: 0; }
 
+.topbar-boss {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(200, 92, 79, 0.15);
+  border: 1px solid var(--danger-dim);
+  border-radius: var(--radius);
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  color: var(--danger);
+  font-weight: 600;
+}
+.boss-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--danger);
+  box-shadow: 0 0 6px var(--danger);
+  animation: boss-pulse 1.5s ease-in-out infinite;
+}
+@keyframes boss-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 .topbar-user { margin-left: auto; color: var(--amber-bright); font-weight: 600; }
 
 .layout {

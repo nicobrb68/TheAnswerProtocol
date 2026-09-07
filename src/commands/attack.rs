@@ -90,6 +90,7 @@ pub async fn handle_attack(
 
     let status;
     let mut spawn_room = String::new();
+    let mut is_boss_kill = false;
 
     if npc_hp == 0 {
         if let Some(room) = w.get_mut_room(&current_room) {
@@ -133,6 +134,7 @@ pub async fn handle_attack(
 
         tracing::info!(event = "combat_victory", player = %username, npc = %npc_name, room = %current_room, gold = npc_gold_drop, "npc defeated");
         status = "victory";
+        is_boss_kill = crate::events::boss::is_boss(&npc_full_id, &w.npcs);
     } else if player_hp == 0 {
         spawn_room = w.spawn.clone();
         if let Some(old_room) = w.get_mut_room(&current_room) {
@@ -170,6 +172,13 @@ pub async fn handle_attack(
             world,
             registry
         ).await;
+        if is_boss_kill {
+            let msg = format!("EVT GLOBAL [DEFEAT] {} has been slain by {}! boss={}\n", npc_name, username, npc_full_id);
+            let reg = registry.lock().await;
+            for tx in reg.values() {
+                let _ = tx.send(msg.clone());
+            }
+        }
     } else if status == "death" {
         notify_room(
             &current_room,

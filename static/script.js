@@ -45,6 +45,8 @@ const npcPopover = $("#npc-popover");
 const itemPopover = $("#item-popover");
 
 const goldTextEl = $("#gold-text");
+const bossIndicatorEl = $("#boss-indicator");
+const bossLabelEl = $("#boss-label");
 const shopListEl = $("#shop-list");
 const marketListEl = $("#market-list");
 
@@ -63,6 +65,7 @@ const state = {
   itemCache: {},
   activeTab: "global",
   activeNpc: null,
+  activeBoss: null,
 };
 
 const pending = [];
@@ -217,7 +220,9 @@ function returnToLogin() {
   state.market = [];
   state.group = null;
   state.npcCache = {};
+  state.activeBoss = null;
   pending.length = 0;
+  bossIndicatorEl.hidden = true;
   screenGame.hidden = true;
   screenLogin.hidden = false;
   connectSubmit.disabled = false;
@@ -665,9 +670,25 @@ function handleEvent(rest) {
     return;
   }
   if (rest.startsWith("GLOBAL ")) {
-    const msg = rest.slice("GLOBAL ".length).replace(/^\[ALERT\]\s*/, "");
-    logCombat(msg);
-    showToast({ text: msg, type: "error", timeout: 8000 });
+    const body = rest.slice("GLOBAL ".length);
+    if (body.startsWith("[ALERT] ")) {
+      const bossMatch = body.match(/boss=(\S+)\s+room=(\S+)$/);
+      const text = body.replace(/^\[ALERT\]\s*/, "").replace(/\s*boss=\S+\s+room=\S+$/, "");
+      logCombat(text);
+      showToast({ text, type: "error", timeout: 8000 });
+      if (bossMatch) {
+        state.activeBoss = { id: bossMatch[1], room: bossMatch[2], name: text.split("...")[0].trim() };
+        renderBossIndicator();
+      }
+    } else if (body.startsWith("[DEFEAT] ")) {
+      const text = body.replace(/^\[DEFEAT\]\s*/, "").replace(/\s*boss=\S+$/, "");
+      logCombat(text);
+      showToast({ text, timeout: 6000 });
+      state.activeBoss = null;
+      renderBossIndicator();
+    } else {
+      logCombat(body);
+    }
     return;
   }
   if (rest.startsWith("DISCONNECTED")) {
@@ -692,6 +713,15 @@ function renderHp() {
   goldTextEl.textContent = gold != null ? gold : "—";
   statusPill.textContent = status || "alive";
   statusPill.classList.toggle("dead", status === "dead");
+}
+
+function renderBossIndicator() {
+  if (state.activeBoss) {
+    bossLabelEl.textContent = `${humanize(state.activeBoss.id)} @ ${humanize(state.activeBoss.room)}`;
+    bossIndicatorEl.hidden = false;
+  } else {
+    bossIndicatorEl.hidden = true;
+  }
 }
 
 const sleepBtn = $("#sleep-btn");

@@ -81,7 +81,8 @@
 			"description": "Blue crystals glow faintly from the cave walls.",
 			"exits": {
 				"north": "room.mine",
-				"south": "room.crypt"
+				"south": "room.crypt",
+				"east": "room.lair"
 			},
 			"players": [],
 			"items": [
@@ -97,7 +98,8 @@
 			"description": "Ancient tombs line the walls beneath thick layers of dust.",
 			"exits": {
 				"north": "room.cavern",
-				"east": "room.ruins"
+				"east": "room.ruins",
+				"west": "room.catacombs"
 			},
 			"players": [],
 			"items": [
@@ -130,7 +132,8 @@
 			"description": "Fishing boats gently rock on the water.",
 			"exits": {
 				"west": "room.market",
-				"south": "room.lighthouse"
+				"south": "room.lighthouse",
+				"east": "room.beach"
 			},
 			"players": [],
 			"items": [
@@ -233,6 +236,39 @@
 			"items": [
 				"item.scroll"
 			],
+			"npcs": []
+		},
+		"room.lair": {
+			"id": "room.lair",
+			"name": "Dragon's Lair",
+			"description": "A massive cavern scorched by dragonfire. Charred bones litter the floor.",
+			"exits": {
+				"north": "room.cavern"
+			},
+			"players": [],
+			"items": [],
+			"npcs": []
+		},
+		"room.catacombs": {
+			"id": "room.catacombs",
+			"name": "Dark Catacombs",
+			"description": "An ancient burial chamber deep beneath the earth. The air is ice cold.",
+			"exits": {
+				"east": "room.crypt"
+			},
+			"players": [],
+			"items": [],
+			"npcs": []
+		},
+		"room.beach": {
+			"id": "room.beach",
+			"name": "Shipwreck Beach",
+			"description": "A desolate shore strewn with broken hulls and tangled rigging.",
+			"exits": {
+				"north": "room.docks"
+			},
+			"players": [],
+			"items": [],
 			"npcs": []
 		}
 	},

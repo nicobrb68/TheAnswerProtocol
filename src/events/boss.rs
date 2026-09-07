@@ -64,7 +64,7 @@ pub fn start_boss_spawner(
                     }
 
                     if let Some(msg) = alert_msg {
-                        alert = Some(format!("EVT GLOBAL [ALERT] {}\n", msg));
+                        alert = Some(format!("EVT GLOBAL [ALERT] {} boss={} room={}\n", msg, boss_id, room_id));
                     }
 
                     tracing::info!(
