@@ -28,7 +28,9 @@ pub async fn handle_take(
         None => return TapError::ItemNotFound.message(),
     };
     if let Some(r) = w.get_mut_room(&current_room) {
-        r.items.retain(|i| i != &item_full_id);
+        if let Some(pos) = r.items.iter().position(|i| i == &item_full_id) {
+            r.items.remove(pos);
+        }
     }
     if let Some(p) = w.get_mut_player(username) {
         p.inventory.push(item_full_id.clone());

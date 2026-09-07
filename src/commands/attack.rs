@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use std::collections::HashMap;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 use tokio::sync::mpsc::UnboundedSender;
 use crate::{World, PlayerState, TapError};
@@ -63,6 +63,7 @@ pub async fn handle_attack(
         None => return TapError::NpcNotFound.message(),
     };
     npc.hp = Some(npc.hp.unwrap_or(0).saturating_sub(player_damage));
+    npc.last_hit = Some(Instant::now());
     let npc_hp = npc.hp.unwrap_or(0);
 
     let player_hp = match w.get_mut_player(username) {
@@ -86,6 +87,7 @@ pub async fn handle_attack(
         }
         if let Some(npc) = w.get_mut_npc(&npc_full_id) {
             npc.hp = npc.max_hp;
+            npc.last_hit = None;
         }
 
         if !crate::events::boss::is_boss(&npc_full_id) {
@@ -129,7 +131,7 @@ pub async fn handle_attack(
 
     notify_room(
         &current_room,
-        &format!("EVT ROOM COMBAT {} attacks {} for {} damage\n", username, npc_name, player_damage),
+        &format!("EVT ROOM COMBAT {} attacks {} for {} damage npc={} hp={}\n", username, npc_name, player_damage, npc_full_id, npc_hp),
         Some(username),
         world,
         registry
@@ -138,7 +140,7 @@ pub async fn handle_attack(
     if status == "victory" {
         notify_room(
             &current_room,
-            &format!("EVT ROOM COMBAT {} defeated by {}\n", npc_name, username),
+            &format!("EVT ROOM COMBAT {} defeated by {} npc={}\n", npc_name, username, npc_full_id),
             Some(username),
             world,
             registry

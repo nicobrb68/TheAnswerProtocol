@@ -10,55 +10,68 @@
                                      COMPLETE WORLD GRAPH
     ============================================================================================
 
-                                                    [Lighthouse]
-                                                         |
-                                                         |
-                         [Inn]                       [Docks]·····················LOOP 1
-                          |                          /      \                        ·
-                          |                         /        \                       ·
-                       [Tavern]                [Market]     [Beach]====[KRAKEN]      ·
-                          |                    /               |  \                  ·
-                          |                   /                |   \                 ·
-    [Mine]----[Blacksmith]----[Square]-------+                 |  [Harbor]           ·
-      |                           |                            |                    ·
-      |                           |                            |                    ·
-    [Cavern]·····LOOP 3      [== GATE ==]·····LOOP 2·····[Bridge]····LOOP 1         ·
-      |  \           ·       ** SPAWN **       ·           |                        ·
-      |   \          ·        /       \        ·        [Chapel]                    ·
-      |    \         ·       /         \       ·                                    ·
-    [Peak] [Tunnel]  · [Forest]      [Camp]····+····································+
-      |       |      ·   |   \          |  \
-      |       |      ·   |    \         |   \
-   [Tower] [Catacombs]+  |  [Grove]  [Clearing]
-      |  \     |      ·  |     |        |
-      |   \    |      ·  |     |        |
-  [Library] [Ruins]···+  | [Garden] [Deep Forest]
-               |         |                |
-               |         +--- (same       |
-            [Lair]=====[DRAGON]  Forest)  [Swamp]
-               |                           |
-               |                           |
-           [Throne]                     [Crypt]
-                                           |
-                                           |
-                                       [Catacombs]====[LICH]
-                                       (enters Loop 3)
+    N=up  S=down  E=right  W=left — every room placed by its exits.
+    (· · ·) = underground passages closing Loop 3.
 
 
-         ===  connection with boss spawn location
-         ---  normal bidirectional connection (vertical or horizontal)
-         |    normal bidirectional connection (vertical)
-         ···  loop path highlight
+                                                                   [Inn]
+                                                                     |
+                                                                  [Tavern]
+                                                                     |
+           [Mine]----------[Blacksmith]----------[Square]----------[Market]----------[Docks]----------[Lighthouse]
+             |                                      |                                   |
+             |                                      |                                   |
+          [Cavern]----------[Peak]                [GATE]----------[Bridge]----------[Beach]====KRAKEN
+             |                 |                  /    \             |                   |
+             |                 |                 /      \            |                   |
+          [Tunnel]          [Tower]          [Forest]    \        [Chapel]           [Harbor]
+             ·               /   \           /   \       |
+             ·          [Ruins] [Library] [Grove]  \     |
+             ·             |               |    [Deep_F] |
+             ·          [Lair]          [Garden]    |    [Camp]
+             ·             |                     [Swamp]  |  \
+             ·          [Throne]                    |   [Clearing]  [Arena]
+             ·                                  [Crypt]
+             ·                                     |
+             · · · · · · · · · · · · · · · ·[Catacombs]====LICH
+                                                   |
+                  [Tower]· · · · · · · · · · · ·[Ruins]
+                  (same as above)                  |
+                                                [Lair]====DRAGON
+                                                   |
+                                               [Throne]
 
+
+    Why [Ruins/Lair/Throne] appear twice:
+      Loop 3 wraps around — Ruins connects EAST to Tower (mountains, upper-left)
+      and SOUTH to Lair (dark zone, lower-right). Both positions are shown.
+
+    Why Camp is not directly below Gate:
+      Gate W (left) -> Camp.  Gate S (down) -> Forest.
+      Camp is placed LEFT of Gate, Forest is placed BELOW Gate.
+      Camp also connects N->Clearing and S->Arena (below it).
+      Clearing W->Deep_F closes Loop 2.
+
+    Underground passages (Loop 3):
+      Tunnel (mountains) --E/W-- Catacombs (dark zone)
+      Tower  (mountains) --W/E-- Ruins     (dark zone)
+      Circuit: Cavern->Peak->Tower···>Ruins->Catacombs···>Tunnel->Cavern
+
+
+    ============================================================================================
+                                    LOOPS SUMMARY
+    ============================================================================================
 
     LOOP 1 — COASTAL (6 rooms):
-    Gate --east--> Bridge --east--> Beach --north--> Docks --west--> Market --west--> Square --south--> Gate
+    Gate --E--> Bridge --E--> Beach --N--> Docks --W--> Market --W--> Square --S--> Gate
 
     LOOP 2 — FOREST (5 rooms):
-    Gate --south--> Forest --south--> Deep Forest --east--> Clearing --south--> Camp --east--> Gate
+    Gate --S--> Forest --S--> Deep Forest --E--> Clearing --S--> Camp --E--> Gate
 
     LOOP 3 — UNDERGROUND (6 rooms):
-    Cavern --east--> Peak --south--> Tower --west--> Ruins --north--> Catacombs --west--> Tunnel --north--> Cavern
+    Cavern --E--> Peak --S--> Tower --W··> Ruins --N--> Catacombs --W··> Tunnel --N--> Cavern
+                                      ^^^                           ^^^
+                               (underground passages that cross the map)
 
 
 

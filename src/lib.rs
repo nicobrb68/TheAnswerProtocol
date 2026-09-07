@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::time::Instant;
 use serde::{Deserialize, Serialize};
 
 pub mod commands;
@@ -259,7 +260,9 @@ pub struct Npc {
     #[serde(default)]
     pub max_hp: Option<u32>,
     pub damage: Option<u32>,
-    pub quest: Option<String>
+    pub quest: Option<String>,
+    #[serde(skip)]
+    pub last_hit: Option<Instant>,
 }
 
 

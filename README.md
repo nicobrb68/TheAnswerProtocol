@@ -77,7 +77,7 @@ project/
 │   │   ├── group.rs            # Group event broadcasting
 │   │   ├── user.rs             # User-targeted events
 │   │   ├── boss.rs             # Boss spawner (Ancestral Dragon, every 60s)
-│   │   └── regen.rs            # NPC HP regeneration (every 60s)
+│   │   └── regen.rs            # NPC HP regeneration (60s after last hit)
 │   └── assets/
 │       └── default_world.json  # World data (rooms, NPCs, items, quests)
 ├── static/
@@ -96,7 +96,7 @@ The server follows a **single-process, multi-task async** architecture using tok
 - **Client connection handling**: Each TCP connection spawns a dedicated tokio task. The task reads lines from the socket in a loop and dispatches each command to the appropriate handler function. A command dispatcher in `server.rs` pattern-matches the first word of each line (case-insensitive) to route to the correct handler.
 - **Message delivery**: Each client has its own `mpsc::unbounded_channel`. The sender half is stored in a global `registry` (`HashMap<String, UnboundedSender<String>>`), keyed by username. A separate tokio task per client reads from the receiver half and writes messages to the TCP socket. This allows any handler or event to send messages to any connected player by looking up their sender in the registry.
 - **Event broadcasting**: Events (room presence, chat, combat, item changes) are broadcast by iterating over relevant players in the world state, looking up each player's sender in the registry, and sending the event string. Room events go to all players in the same room (optionally excluding the triggering player). Global events go to all registered players. Group events go to all group members.
-- **Background tasks**: The server spawns long-running tokio tasks for the boss spawner (every 60 seconds) and NPC HP regeneration (every 60 seconds). Short-lived tasks are spawned for item respawn (30-second delay) and NPC respawn (30-second delay after being killed).
+- **Background tasks**: The server spawns long-running tokio tasks for the boss spawner (every 60 seconds) and NPC HP regeneration (checks every 15 seconds, heals NPCs that haven't been hit for 60 seconds). Short-lived tasks are spawned for item respawn (30-second delay) and NPC respawn (30-second delay after being killed).
 - **Startup validation**: At startup, the server verifies that the spawn room and sleep room exist in the world data, and that all quests reference valid NPCs and items. If any validation fails, the server exits immediately with an error message.
 
 ## Protocol Implementation
@@ -201,10 +201,10 @@ Inspects an item to see its properties. The server first looks for the item in t
 Attacks a hostile NPC in the current room. The NPC is matched by partial ID. The player deals base 10 damage plus the highest weapon damage bonus from their inventory (the best weapon is automatically selected). The NPC counter-attacks immediately, dealing its own damage to the player. Both HP values are updated simultaneously. The result depends on whether either combatant reaches 0 HP:
 
 - **Normal hit**: Both player and NPC survive. Returns damage dealt and remaining HP.
-- **NPC defeated** (`target_hp` reaches 0): The NPC is removed from the room. It respawns in the same room after 30 seconds with full HP restored. The room receives `EVT ROOM COMBAT <npc_name> defeated by <username>`.
+- **NPC defeated** (`target_hp` reaches 0): The NPC is removed from the room. It respawns in the same room after 30 seconds with full HP restored. The room receives `EVT ROOM COMBAT <npc_name> defeated by <username> npc=<npc_id>`.
 - **Player killed** (`attacker_hp` reaches 0): The player is moved to the spawn room (`room.gate`) and revived with 50 HP. Their status resets to Alive. The old room receives `EVT ROOM COMBAT <username> was killed by <npc_name>` and `EVT ROOM PRESENCE LEAVE <username>`. The spawn room receives `EVT ROOM PRESENCE ENTER <username>`.
 
-All attacks broadcast `EVT ROOM COMBAT <username> attacks <npc_name> for <damage> damage` to other players in the room.
+All attacks broadcast `EVT ROOM COMBAT <username> attacks <npc_name> for <damage> damage npc=<npc_id> hp=<remaining_hp>` to other players in the room, allowing their clients to display real-time NPC health updates.
 
 - **Success (combat continues)**: `OK {"attacker_hp": <player_hp>, "target_hp": <npc_hp>, "damage": <player_damage>, "status": "combat"}`
 - **Success (NPC dies)**: `OK {"attacker_hp": <player_hp>, "target_hp": 0, "damage": <player_damage>, "status": "victory"}`
@@ -317,8 +317,8 @@ Disconnects from the server. The player is removed from the world, removed from 
 |---|---|
 | `EVT ROOM PRESENCE ENTER <player>` | A player enters the room (sent to all other players in the room) |
 | `EVT ROOM PRESENCE LEAVE <player>` | A player leaves the room (sent to all other players in the room) |
-| `EVT ROOM COMBAT <player> attacks <npc> for <dmg> damage` | A player attacks an NPC (sent to other players in the room) |
-| `EVT ROOM COMBAT <npc> defeated by <player>` | An NPC is killed (sent to other players in the room) |
+| `EVT ROOM COMBAT <player> attacks <npc> for <dmg> damage npc=<id> hp=<remaining>` | A player attacks an NPC; includes NPC id and remaining HP for real-time updates |
+| `EVT ROOM COMBAT <npc> defeated by <player> npc=<id>` | An NPC is killed; includes NPC id so clients can remove it |
 | `EVT ROOM COMBAT <player> was killed by <npc>` | A player is killed by an NPC (sent to other players in the room) |
 | `EVT ROOM ITEM TAKEN <item> <player>` | A player picks up an item (sent to other players in the room) |
 | `EVT ROOM ITEM DROPPED <item> <player>` | A player drops an item (sent to other players in the room) |
@@ -424,7 +424,7 @@ Combat in TAP is a simple exchange-based system where each `ATTACK` command resu
 
 ### NPC Regeneration
 
-Every 60 seconds, a background task restores all hostile NPCs' HP to their maximum value. This means an NPC that was damaged but not killed will eventually return to full health, even if the player walks away.
+A background task checks every 15 seconds whether any NPC needs HP restoration. An NPC's HP is restored to maximum only if **60 seconds have elapsed since the last hit** it received. This cooldown-based approach means bosses and other NPCs remain killable during active combat, but will fully heal if left alone for a minute.
 
 ### Boss System
 
@@ -730,6 +730,6 @@ Expected: after ~10 WHO commands, warnings appear in server logs. After ~20, the
 - [ ] `TALK` to friendly and hostile NPCs
 - [ ] Flood detection: rapid commands trigger warning then kick
 - [ ] Boss spawn: wait 60s, verify 3 bosses appear (dragon/lich/kraken) with global alerts
-- [ ] NPC HP regen: damage an NPC without killing it, wait 60s, verify HP is back to max
+- [ ] NPC HP regen: damage an NPC without killing it, wait 60s after last hit, verify HP is back to max
 - [ ] Disconnect cleanup: player leaves, verify room event and `WHO` count decreases
 - [ ] Username validation: empty, too long, special characters all rejected

@@ -348,11 +348,15 @@ function handleResponse(ctx, line) {
       const data = safeJson(line.slice(3));
       if (!data) return;
       if (ctx.meta.npcId) {
-        state.npcCache[ctx.meta.npcId] = {
-          ...(state.npcCache[ctx.meta.npcId] || {}),
-          hostile: true,
-          hp: data.status === "victory" ? 0 : data.target_hp,
-        };
+        if (data.status === "victory") {
+          delete state.npcCache[ctx.meta.npcId];
+        } else {
+          state.npcCache[ctx.meta.npcId] = {
+            ...(state.npcCache[ctx.meta.npcId] || {}),
+            hostile: true,
+            hp: data.target_hp,
+          };
+        }
       }
       const npcLabel = state.npcCache[ctx.meta.npcId]?.name || humanize(ctx.meta.npcId);
       if (data.status === "victory") logCombat(`You defeated ${npcLabel}! (-${data.damage} HP dealt)`);
@@ -471,7 +475,22 @@ function handleEvent(rest) {
     return;
   }
   if (rest.startsWith("ROOM COMBAT ")) {
-    logCombat(rest.slice("ROOM COMBAT ".length));
+    const combatText = rest.slice("ROOM COMBAT ".length);
+    const defeatedMatch = combatText.match(/^(.+) defeated by (\S+) npc=(\S+)$/);
+    if (defeatedMatch) {
+      const [, , , npcId] = defeatedMatch;
+      delete state.npcCache[npcId];
+      if (state.room) state.room.npcs = (state.room.npcs || []).filter((n) => n !== npcId);
+      renderRoom();
+    } else {
+      const hpMatch = combatText.match(/npc=(\S+) hp=(\d+)$/);
+      if (hpMatch) {
+        const [, npcId, hp] = hpMatch;
+        state.npcCache[npcId] = { ...(state.npcCache[npcId] || {}), hostile: true, hp: Number(hp) };
+        renderRoom();
+      }
+    }
+    logCombat(combatText.replace(/ npc=\S+( hp=\d+)?$/, ""));
     return;
   }
   if (rest.startsWith("ROOM ITEM TAKEN ")) {
@@ -552,6 +571,12 @@ function handleEvent(rest) {
   if (rest.startsWith("GROUP LEAVE ")) {
     logEvent(`${rest.slice("GROUP LEAVE ".length).trim()} left the group.`);
     if (state.group) sendCommand("GROUP_INFO", "GROUP INFO");
+    return;
+  }
+  if (rest.startsWith("GLOBAL ")) {
+    const msg = rest.slice("GLOBAL ".length).replace(/^\[ALERT\]\s*/, "");
+    logCombat(msg);
+    showToast({ text: msg, type: "error", timeout: 8000 });
     return;
   }
   if (rest.startsWith("DISCONNECTED")) {
