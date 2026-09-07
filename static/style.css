@@ -239,7 +239,7 @@ button, input {
 .layout {
   display: grid;
   grid-template-columns: 1fr 320px;
-  grid-template-rows: 1fr 260px;
+  grid-template-rows: 1fr 400px;
   grid-template-areas:
     "room   ledger"
     "terminal terminal";
@@ -525,6 +525,33 @@ button, input {
   min-height: 0;
 }
 
+.terminal-log-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--panel-line);
+  padding: 0 0.5rem;
+}
+
+.log-header-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+  color: var(--amber-bright);
+  border-bottom: 2px solid var(--amber);
+  padding: 0.6rem 0.8rem;
+}
+
+.terminal-log-pane {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  border-bottom: 1px solid var(--panel-line);
+}
+
 .terminal-tabs {
   display: flex;
   align-items: center;
@@ -686,7 +713,7 @@ button, input {
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 260px;
+    grid-template-rows: auto auto 400px;
     grid-template-areas:
       "room"
       "ledger"

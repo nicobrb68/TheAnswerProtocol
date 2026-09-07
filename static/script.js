@@ -1018,15 +1018,10 @@ $$(".tab-btn[data-tab]").forEach((btn) => {
   btn.addEventListener("click", () => {
     state.activeTab = btn.dataset.tab;
     $$(".tab-btn[data-tab]").forEach((b) => b.classList.toggle("active", b === btn));
-    Object.entries(panes).forEach(([name, el]) => el.classList.toggle("active", name === state.activeTab));
-    const scopeLabel = $("#chat-scope-label");
-    const chatForm = $("#chat-form");
-    if (state.activeTab === "log") {
-      chatForm.hidden = true;
-    } else {
-      chatForm.hidden = false;
-      scopeLabel.textContent = `${state.activeTab}>`;
-    }
+    ["global", "room", "group"].forEach(name => {
+      panes[name].classList.toggle("active", name === state.activeTab);
+    });
+    $("#chat-scope-label").textContent = `${state.activeTab}>`;
   });
 });
 
@@ -1035,7 +1030,7 @@ $("#chat-form").addEventListener("submit", (e) => {
   const input = $("#chat-input");
   const text = input.value.trim();
   if (!text) return;
-  const scope = state.activeTab === "log" ? "global" : state.activeTab;
+  const scope = state.activeTab;
   sendCommand("CHAT", `CHAT ${scope.toUpperCase()} ${text}`);
   input.value = "";
 });

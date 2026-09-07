@@ -200,20 +200,24 @@
 
     <!-- TERMINAL STRIP -->
     <section class="terminal" aria-label="Communications">
+
+      <div class="terminal-log-header">
+        <span class="log-header-title">log</span>
+        <span class="terminal-spacer"></span>
+        <button class="tab-btn tab-console-toggle" id="console-toggle" type="button">console ▾</button>
+      </div>
+      <div class="terminal-log-pane" id="pane-log" aria-live="polite"></div>
+
       <div class="terminal-tabs" role="tablist">
         <button class="tab-btn active" data-tab="global" type="button" role="tab">Global</button>
         <button class="tab-btn" data-tab="room" type="button" role="tab">Room</button>
         <button class="tab-btn" data-tab="group" type="button" role="tab">Group</button>
-        <button class="tab-btn" data-tab="log" type="button" role="tab">Log</button>
-        <span class="terminal-spacer"></span>
-        <button class="tab-btn tab-console-toggle" id="console-toggle" type="button">console ▾</button>
       </div>
 
       <div class="terminal-panes">
         <div class="terminal-pane active" id="pane-global" role="tabpanel" aria-live="polite"></div>
         <div class="terminal-pane" id="pane-room" role="tabpanel" aria-live="polite"></div>
         <div class="terminal-pane" id="pane-group" role="tabpanel" aria-live="polite"></div>
-        <div class="terminal-pane" id="pane-log" role="tabpanel" aria-live="polite"></div>
       </div>
 
       <form id="chat-form" class="terminal-input">
