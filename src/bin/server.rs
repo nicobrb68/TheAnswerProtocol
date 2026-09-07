@@ -78,6 +78,35 @@ async fn main() {
             fatal(&format!("Quest {} references unknown giver: {}", qid, quest.giver));
         }
     }
+    for shop_item in &world.shop {
+        if !world.items.contains_key(shop_item) {
+            fatal(&format!("Shop references unknown item: {}", shop_item));
+        }
+    }
+    for (rid, room) in &world.rooms {
+        for item_id in &room.items {
+            if !world.items.contains_key(item_id) {
+                fatal(&format!("Room {} references unknown item: {}", rid, item_id));
+            }
+        }
+        for npc_id in &room.npcs {
+            if !world.npcs.contains_key(npc_id) {
+                fatal(&format!("Room {} references unknown npc: {}", rid, npc_id));
+            }
+        }
+    }
+    for (nid, npc) in &world.npcs {
+        if let Some(ref quest_id) = npc.quest {
+            if !world.quests.contains_key(quest_id) {
+                fatal(&format!("NPC {} references unknown quest: {}", nid, quest_id));
+            }
+        }
+        if let Some(ref room_id) = npc.boss_room {
+            if !world.rooms.contains_key(room_id) {
+                fatal(&format!("Boss NPC {} references unknown boss_room: {}", nid, room_id));
+            }
+        }
+    }
     let world: Arc<Mutex<World>> = Arc::new(Mutex::new(world));
 
     let registry: Arc<Mutex<HashMap<String, UnboundedSender<String>>>> = Arc::new(Mutex::new(HashMap::new()));
