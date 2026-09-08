@@ -1,7 +1,9 @@
 
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
-    response::IntoResponse,
+    http::header::{HeaderValue, CACHE_CONTROL, PRAGMA},
+    middleware,
+    response::{IntoResponse, Response},
     routing::get,
     Router,
 };
@@ -24,7 +26,8 @@ struct ConnectParams {
 async fn main() {
     let app = Router::new()
         .route("/ws", get(ws_handler))
-        .fallback_service(ServeDir::new("static"));
+        .fallback_service(ServeDir::new("static"))
+        .layer(middleware::map_response(no_cache));
 
     let bind_port: u16 = std::env::var("TAP_GUI_PORT")
         .ok()
@@ -38,6 +41,15 @@ async fn main() {
         .unwrap_or_else(|e| panic!("Failed to bind port {bind_port}: {e}"));
 
     axum::serve(listener, app).await.unwrap();
+}
+
+// Assets are served from disk on every request; without this a browser keeps
+// running an old script.js after the GUI is updated.
+async fn no_cache(mut res: Response) -> Response {
+    let headers = res.headers_mut();
+    headers.insert(CACHE_CONTROL, HeaderValue::from_static("no-store, no-cache, must-revalidate"));
+    headers.insert(PRAGMA, HeaderValue::from_static("no-cache"));
+    res
 }
 
 async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {

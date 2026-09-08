@@ -222,10 +222,17 @@ function returnToLogin() {
   state.market = [];
   state.group = null;
   state.npcCache = {};
+  state.itemCache = {};
   state.activeBoss = null;
+  state.activeNpc = null;
   state.mapData = null;
   state.mapLayout = null;
+  state.serverCount = 0;
   pending.length = 0;
+  npcPopover.hidden = true;
+  itemPopover.hidden = true;
+  document.getElementById("minimap-inline").hidden = true;
+  Object.values(panes).forEach((p) => { if (p) p.innerHTML = ""; });
   bossIndicatorEl.hidden = true;
   screenGame.hidden = true;
   screenLogin.hidden = false;
