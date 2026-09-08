@@ -384,7 +384,7 @@ function handleResponse(ctx, line) {
         logCombat(`You defeated ${npcLabel}! (-${data.damage} HP dealt)${goldMsg}`);
       }
       else if (data.status === "death") logCombat(`${npcLabel} struck you down.${armorMsg} You wake up back at a safe place.`);
-      else logCombat(`You hit ${npcLabel} for ${data.damage}. They hit you for ${data.npc_damage}${armorMsg}. HP: ${data.target_hp}/${data.attacker_hp}.`);
+      else logCombat(`You hit ${npcLabel} for ${data.damage}. They hit you for ${data.npc_damage}${armorMsg}. [${npcLabel}: ${data.target_hp} HP | You: ${data.attacker_hp} HP]`);
       sendCommand("STATUS", "STATUS");
       if (data.status === "victory" || data.status === "death") sendCommand("LOOK", "LOOK");
       else renderRoom();
