@@ -1147,28 +1147,6 @@ $("#npc-attack-btn").addEventListener("click", () => {
   closeNpcPopover();
 });
 
-const ARROW_KEYS = {
-  ArrowUp: "north",
-  ArrowDown: "south",
-  ArrowLeft: "west",
-  ArrowRight: "east",
-};
-
-document.addEventListener("keydown", (e) => {
-  const dir = ARROW_KEYS[e.key];
-  if (!dir || e.ctrlKey || e.metaKey || e.altKey) return;
-  if (screenGame.hidden || !state.room) return;
-  const el = document.activeElement;
-  if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-
-  e.preventDefault();
-  if (!state.room.exits?.[dir]) {
-    showToast({ text: "You can't go that way.", type: "error", timeout: 1800 });
-    return;
-  }
-  sendCommand("MOVE", `MOVE ${dir}`);
-});
-
 document.addEventListener("click", (e) => {
   if (!npcPopover.hidden && !npcPopover.contains(e.target) && !e.target.closest('[data-action="npc"]')) {
     closeNpcPopover();
