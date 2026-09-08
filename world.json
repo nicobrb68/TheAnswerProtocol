@@ -232,7 +232,6 @@
 			"description": "The lake's surface is perfectly calm.",
 			"exits": {
 				"west": "room.forest",
-				"south": "room.clearing",
 				"north": "room.waterfall",
 				"east": "room.bridge"
 			},
@@ -250,8 +249,6 @@
 			"description": "A peaceful clearing bathed in sunlight.",
 			"exits": {
 				"north": "room.forest",
-				"east": "room.lake",
-				"west": "room.ruins",
 				"south": "room.swamp"
 			},
 			"players": [],
@@ -270,7 +267,6 @@
 			"description": "Broken pillars and moss-covered stones remain from an ancient civilization.",
 			"exits": {
 				"east": "room.forest",
-				"south": "room.clearing",
 				"west": "room.crypt",
 				"north": "room.well"
 			},
@@ -287,14 +283,14 @@
 			"name": "Dragon's Lair",
 			"description": "A massive cavern scorched by dragonfire. Charred bones litter the floor.",
 			"exits": {
-				"north": "room.cavern",
-				"south": "room.throne"
+				"south": "room.throne",
+				"west": "room.cavern"
 			},
 			"players": [],
 			"items": [],
 			"npcs": [],
 			"map_x": 2,
-			"map_y": 4
+			"map_y": 3
 		},
 		"room.catacombs": {
 			"id": "room.catacombs",
@@ -315,14 +311,14 @@
 			"name": "Shipwreck Beach",
 			"description": "A desolate shore strewn with broken hulls and tangled rigging.",
 			"exits": {
-				"north": "room.docks",
-				"south": "room.reef"
+				"south": "room.reef",
+				"west": "room.docks"
 			},
 			"players": [],
 			"items": [],
 			"npcs": [],
 			"map_x": 11,
-			"map_y": 3
+			"map_y": 2
 		},
 		"room.temple": {
 			"id": "room.temple",

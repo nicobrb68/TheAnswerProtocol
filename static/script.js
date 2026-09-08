@@ -1278,7 +1278,7 @@ function renderMinimap() {
       ? `<path d="M${pa.x} ${pa.y} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${pb.x} ${pb.y}" class="minimap-edge" fill="none"/>`
       : `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" class="minimap-edge"/>`;
 
-    const la = at(0.16), lb = at(0.84);
+    const la = at(0.2), lb = at(0.8);
     html += `<text x="${la.x.toFixed(1)}" y="${(la.y + 2.5).toFixed(1)}" class="minimap-dir">${dirA}</text>`;
     html += `<text x="${lb.x.toFixed(1)}" y="${(lb.y + 2.5).toFixed(1)}" class="minimap-dir">${dirB}</text>`;
   }
