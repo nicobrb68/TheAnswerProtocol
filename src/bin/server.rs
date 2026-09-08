@@ -84,6 +84,11 @@ async fn main() {
         }
     }
     for (rid, room) in &world.rooms {
+        for (dir, target) in &room.exits {
+            if !world.rooms.contains_key(target) {
+                fatal(&format!("Room {} exit {} points to unknown room: {}", rid, dir, target));
+            }
+        }
         for item_id in &room.items {
             if !world.items.contains_key(item_id) {
                 fatal(&format!("Room {} references unknown item: {}", rid, item_id));
@@ -194,10 +199,10 @@ async fn main() {
                     if res.starts_with("OK") {
                         authenticated = Some(username.to_string());
                         registry.lock().await.insert(username.to_string(), tx.clone());
-                        let player_room = {
+                        let (player_room, count) = {
                             let w = world.lock().await;
                             match w.get_player(username) {
-                                Some(p) => p.current_room.clone(),
+                                Some(p) => (p.current_room.clone(), w.players.len()),
                                 None => { line.clear(); continue; }
                             }
                         };
@@ -208,6 +213,15 @@ async fn main() {
                             &world,
                             &registry
                         ).await;
+                        {
+                            let evt = format!("EVT STATS players={}\n", count);
+                            let reg = registry.lock().await;
+                            for (name, sender) in reg.iter() {
+                                if name != username {
+                                    let _ = sender.send(evt.clone());
+                                }
+                            }
+                        }
                     }
 
                     match tx.send(res) {

@@ -691,6 +691,14 @@ function handleEvent(rest) {
     }
     return;
   }
+  if (rest.startsWith("STATS ")) {
+    const m = rest.match(/players=(\d+)/);
+    if (m) {
+      state.serverCount = Number(m[1]);
+      serverCountEl.textContent = state.serverCount;
+    }
+    return;
+  }
   if (rest.startsWith("DISCONNECTED")) {
     logSystem(rest);
     showToast({ text: "The server closed the connection.", type: "error", timeout: 6000 });
@@ -743,28 +751,21 @@ function renderRoom() {
   roomDescEl.textContent = room.description || "";
 
   exitRowEl.innerHTML = "";
-  const dirs = Object.keys(room.exits || {});
-  if (!dirs.length) {
-    exitRowEl.innerHTML = '<span class="empty-note">no visible exits</span>';
-  } else {
-    dirs
-      .sort((a, b) => {
-        const ia = DIRECTION_ORDER.indexOf(a), ib = DIRECTION_ORDER.indexOf(b);
-        if (ia === -1 && ib === -1) return a.localeCompare(b);
-        if (ia === -1) return 1;
-        if (ib === -1) return -1;
-        return ia - ib;
-      })
-      .forEach((dir) => {
-        const btn = document.createElement("button");
-        btn.className = "exit-btn";
-        btn.type = "button";
-        btn.textContent = humanize(dir);
-        btn.title = `Move ${dir}`;
-        btn.onclick = () => sendCommand("MOVE", `MOVE ${dir}`);
-        exitRowEl.appendChild(btn);
-      });
-  }
+  const exits = room.exits || {};
+  ["north", "east", "south", "west"].forEach((dir) => {
+    const btn = document.createElement("button");
+    btn.className = "exit-btn";
+    btn.type = "button";
+    btn.textContent = humanize(dir);
+    if (exits[dir]) {
+      btn.title = `Move ${dir}`;
+      btn.onclick = () => sendCommand("MOVE", `MOVE ${dir}`);
+    } else {
+      btn.disabled = true;
+      btn.title = "No exit";
+    }
+    exitRowEl.appendChild(btn);
+  });
 
   const others = (room.players || []).filter((p) => p !== state.me.username);
   playersListEl.innerHTML = others.length

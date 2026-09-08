@@ -347,8 +347,9 @@ button, input {
   cursor: pointer;
   transition: background-color 120ms, border-color 120ms;
 }
-.exit-btn:hover { background: rgba(169, 117, 43, 0.14); border-color: var(--amber-dim); }
-.exit-btn:active { transform: translateY(1px); }
+.exit-btn:disabled { opacity: 0.25; cursor: not-allowed; border-style: dashed; }
+.exit-btn:not(:disabled):hover { background: rgba(169, 117, 43, 0.14); border-color: var(--amber-dim); }
+.exit-btn:not(:disabled):active { transform: translateY(1px); }
 
 .chip-list, .entity-list {
   list-style: none;
