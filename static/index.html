@@ -65,6 +65,7 @@
     <div class="topbar-counts" title="Players here / players on the server">
       <span id="room-count">0</span> here · <span id="server-count">0</span> online
       <button class="btn btn-secondary btn-xs topbar-refresh" id="look-refresh" type="button">↻ refresh</button>
+      <button class="btn btn-ghost btn-xs topbar-refresh" id="minimap-btn" type="button">🗺 map</button>
     </div>
 
     <div class="topbar-boss" id="boss-indicator" hidden>
@@ -83,16 +84,19 @@
 
     <!-- ROOM / JOURNAL PANEL -->
     <section class="room-panel" aria-label="Current location">
-      <div class="room-head">
-        <h1 id="room-name">—</h1>
-        <span class="room-id" id="room-id"></span>
-        <button class="btn btn-ghost btn-xs minimap-toggle" id="minimap-btn" type="button">Map</button>
-      </div>
-      <p class="room-desc" id="room-desc">…</p>
+      <div class="room-body">
+        <div class="room-main">
+          <div class="room-head">
+            <h1 id="room-name">—</h1>
+            <span class="room-id" id="room-id"></span>
+          </div>
+          <p class="room-desc" id="room-desc">…</p>
+        </div>
 
-      <div class="room-block">
-        <h2>Exits</h2>
-        <div class="exit-row" id="exit-row"><span class="empty-note">no visible exits</span></div>
+        <div class="room-block room-compass">
+          <h2>Exits</h2>
+          <div class="compass" id="exit-row"></div>
+        </div>
       </div>
 
       <div class="room-columns">
@@ -114,6 +118,14 @@
 
       <div class="room-actions">
         <button class="btn btn-secondary btn-sm" id="sleep-btn" type="button" hidden>💤 Rest</button>
+      </div>
+
+      <div class="minimap-inline" id="minimap-inline" hidden>
+        <div class="minimap-head">
+          <span class="minimap-title">World Map</span>
+          <button class="btn btn-ghost btn-xs" id="minimap-close" type="button">✕</button>
+        </div>
+        <svg id="minimap-svg" class="minimap-svg" viewBox="0 0 490 355" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
     </section>
 
@@ -260,17 +272,6 @@
   </div>
   <ul class="item-stat-list" id="item-popover-stats"></ul>
   <span class="item-popover-id" id="item-popover-id"></span>
-</div>
-
-<!-- Minimap overlay -->
-<div id="minimap-overlay" class="minimap-overlay" hidden>
-  <div class="minimap-card">
-    <div class="minimap-head">
-      <span class="minimap-title">World Map</span>
-      <button class="btn btn-ghost btn-xs" id="minimap-close" type="button">✕</button>
-    </div>
-    <svg id="minimap-svg" class="minimap-svg" viewBox="0 0 490 355" xmlns="http://www.w3.org/2000/svg"></svg>
-  </div>
 </div>
 
 <script src="script.js"></script>

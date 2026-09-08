@@ -334,7 +334,34 @@ button, input {
   gap: 1.5rem;
 }
 
-.exit-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.room-body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.room-main { flex: 1; min-width: 0; }
+.room-compass { flex-shrink: 0; margin-bottom: 1.5rem; }
+
+.compass {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 40px);
+  gap: 0.35rem;
+}
+.compass-n { grid-area: 1 / 2; }
+.compass-w { grid-area: 2 / 1; }
+.compass-c { grid-area: 2 / 2; }
+.compass-e { grid-area: 2 / 3; }
+.compass-s { grid-area: 3 / 2; }
+.compass .exit-btn { padding: 0; font-size: 0.68rem; }
+.compass .compass-c {
+  border-style: none;
+  color: var(--amber-dim);
+  opacity: 1;
+  font-size: 0.9rem;
+}
+
 .exit-btn {
   font-family: var(--font-mono);
   font-size: 0.78rem;
@@ -768,28 +795,11 @@ button, input {
 :focus-visible { outline: 2px solid var(--amber-bright); outline-offset: 2px; }
 
 
-.minimap-toggle { margin-left: auto; }
-
-.minimap-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-
-.minimap-card {
-  background: var(--paper);
-  color: var(--ink);
-  border-radius: 4px;
-  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
-  padding: 1rem 1.25rem 1.25rem;
-  width: min(95vw, 1100px);
-  max-height: 90vh;
-  overflow: auto;
+.minimap-inline {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--paper-shadow);
+  padding-top: 1rem;
+  overflow-x: auto;
 }
 
 .minimap-head {
@@ -807,6 +817,7 @@ button, input {
 
 .minimap-svg {
   width: 100%;
+  min-width: 900px;
   height: auto;
 }
 

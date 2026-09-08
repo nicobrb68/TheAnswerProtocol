@@ -764,7 +764,7 @@ function applyRoom(room) {
   if (!room) return;
   state.room = room;
   renderRoom();
-  if (!document.getElementById("minimap-overlay").hidden) renderMinimap();
+  if (!document.getElementById("minimap-inline").hidden) renderMinimap();
 }
 
 const DIRECTION_ORDER = ["north", "east", "south", "west", "up", "down", "in", "out"];
@@ -779,13 +779,13 @@ function renderRoom() {
 
   exitRowEl.innerHTML = "";
   const exits = room.exits || {};
-  ["north", "east", "south", "west"].forEach((dir) => {
+  [["north", "n"], ["west", "w"], ["east", "e"], ["south", "s"]].forEach(([dir, slot]) => {
     const btn = document.createElement("button");
-    btn.className = "exit-btn";
+    btn.className = `exit-btn compass-${slot}`;
     btn.type = "button";
     btn.textContent = humanize(dir);
     if (exits[dir]) {
-      btn.title = `Move ${dir}`;
+      btn.title = `Move ${dir} → ${humanize(exits[dir])}`;
       btn.onclick = () => sendCommand("MOVE", `MOVE ${dir}`);
     } else {
       btn.disabled = true;
@@ -793,6 +793,12 @@ function renderRoom() {
     }
     exitRowEl.appendChild(btn);
   });
+  const center = document.createElement("button");
+  center.className = "exit-btn compass-c";
+  center.type = "button";
+  center.disabled = true;
+  center.textContent = "◈";
+  exitRowEl.appendChild(center);
 
   const others = (room.players || []).filter((p) => p !== state.me.username);
   playersListEl.innerHTML = others.length
@@ -1288,21 +1294,19 @@ function renderMinimap() {
 }
 
 function toggleMinimap() {
-  const overlay = document.getElementById("minimap-overlay");
-  if (overlay.hidden) {
+  const panel = document.getElementById("minimap-inline");
+  if (panel.hidden) {
     renderMinimap();
-    overlay.hidden = false;
+    panel.hidden = false;
+    panel.scrollIntoView({ block: "nearest", behavior: "smooth" });
   } else {
-    overlay.hidden = true;
+    panel.hidden = true;
   }
 }
 
 $("#minimap-btn").addEventListener("click", toggleMinimap);
 $("#minimap-close").addEventListener("click", () => {
-  document.getElementById("minimap-overlay").hidden = true;
-});
-document.getElementById("minimap-overlay").addEventListener("click", (e) => {
-  if (e.target === e.currentTarget) e.currentTarget.hidden = true;
+  document.getElementById("minimap-inline").hidden = true;
 });
 
 window.addEventListener("beforeunload", () => {
