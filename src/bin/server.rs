@@ -29,6 +29,7 @@ use tap::commands::examine::handle_examine;
 use tap::commands::use_item::handle_use;
 use tap::commands::shop::{handle_shop, handle_shop_buy};
 use tap::commands::market::{handle_market, handle_sell, handle_market_buy, handle_market_cancel};
+use tap::commands::map::handle_map;
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -214,11 +215,13 @@ async fn main() {
                             &registry
                         ).await;
                         {
-                            let evt = format!("EVT STATS players={}\n", count);
+                            let evt_join = format!("EVT GLOBAL JOIN {}\n", username);
+                            let evt_stats = format!("EVT STATS players={}\n", count);
                             let reg = registry.lock().await;
                             for (name, sender) in reg.iter() {
                                 if name != username {
-                                    let _ = sender.send(evt.clone());
+                                    let _ = sender.send(evt_join.clone());
+                                    let _ = sender.send(evt_stats.clone());
                                 }
                             }
                         }
@@ -306,6 +309,8 @@ async fn main() {
                     } else if line_upper.starts_with("QUEST ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_quest(name, &npc_id, &world).await)
+                    } else if line_upper.starts_with("MAP") {
+                        Some(handle_map(&world).await)
                     } else {
                         None
                     };

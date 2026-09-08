@@ -22,7 +22,9 @@
 			"description": "A warm tavern filled with laughter and the smell of fresh meals.",
 			"exits": {
 				"south": "room.square",
-				"north": "room.guest_room"
+				"north": "room.guest_room",
+				"east": "room.tower",
+				"west": "room.temple"
 			},
 			"players": [],
 			"items": [
@@ -51,7 +53,8 @@
 			"description": "The forge burns bright as steel is hammered on the anvil.",
 			"exits": {
 				"east": "room.square",
-				"west": "room.mine"
+				"west": "room.mine",
+				"south": "room.chapel"
 			},
 			"players": [],
 			"items": [
@@ -67,7 +70,8 @@
 			"description": "An abandoned mine with wooden supports creaking overhead.",
 			"exits": {
 				"east": "room.blacksmith",
-				"south": "room.cavern"
+				"south": "room.cavern",
+				"north": "room.peak"
 			},
 			"players": [],
 			"items": [
@@ -82,7 +86,8 @@
 			"exits": {
 				"north": "room.mine",
 				"south": "room.crypt",
-				"east": "room.lair"
+				"east": "room.lair",
+				"west": "room.tunnel"
 			},
 			"players": [],
 			"items": [
@@ -99,7 +104,8 @@
 			"exits": {
 				"north": "room.cavern",
 				"east": "room.ruins",
-				"west": "room.catacombs"
+				"west": "room.catacombs",
+				"south": "room.dungeon"
 			},
 			"players": [],
 			"items": [
@@ -115,7 +121,8 @@
 			"description": "Busy merchants sell food, tools and trinkets.",
 			"exits": {
 				"west": "room.square",
-				"east": "room.docks"
+				"east": "room.docks",
+				"north": "room.garden"
 			},
 			"players": [],
 			"items": [
@@ -149,7 +156,9 @@
 			"description": "A tall lighthouse overlooks the sea.",
 			"exits": {
 				"north": "room.docks",
-				"west": "room.gate"
+				"west": "room.gate",
+				"east": "room.cliff",
+				"south": "room.grotto"
 			},
 			"players": [],
 			"items": [
@@ -166,7 +175,8 @@
 			"exits": {
 				"north": "room.square",
 				"east": "room.lighthouse",
-				"south": "room.forest"
+				"south": "room.forest",
+				"west": "room.well"
 			},
 			"players": [],
 			"items": [],
@@ -198,7 +208,9 @@
 			"description": "The lake's surface is perfectly calm.",
 			"exits": {
 				"west": "room.forest",
-				"south": "room.clearing"
+				"south": "room.clearing",
+				"north": "room.waterfall",
+				"east": "room.bridge"
 			},
 			"players": [],
 			"items": [
@@ -213,7 +225,8 @@
 			"exits": {
 				"north": "room.forest",
 				"east": "room.lake",
-				"west": "room.ruins"
+				"west": "room.ruins",
+				"south": "room.swamp"
 			},
 			"players": [],
 			"items": [
@@ -230,7 +243,8 @@
 			"exits": {
 				"east": "room.forest",
 				"south": "room.clearing",
-				"west": "room.crypt"
+				"west": "room.crypt",
+				"north": "room.well"
 			},
 			"players": [],
 			"items": [
@@ -243,7 +257,8 @@
 			"name": "Dragon's Lair",
 			"description": "A massive cavern scorched by dragonfire. Charred bones litter the floor.",
 			"exits": {
-				"north": "room.cavern"
+				"north": "room.cavern",
+				"south": "room.throne"
 			},
 			"players": [],
 			"items": [],
@@ -254,7 +269,8 @@
 			"name": "Dark Catacombs",
 			"description": "An ancient burial chamber deep beneath the earth. The air is ice cold.",
 			"exits": {
-				"east": "room.crypt"
+				"east": "room.crypt",
+				"south": "room.abyss"
 			},
 			"players": [],
 			"items": [],
@@ -265,11 +281,241 @@
 			"name": "Shipwreck Beach",
 			"description": "A desolate shore strewn with broken hulls and tangled rigging.",
 			"exits": {
-				"north": "room.docks"
+				"north": "room.docks",
+				"south": "room.reef"
 			},
 			"players": [],
 			"items": [],
 			"npcs": []
+		},
+		"room.temple": {
+			"id": "room.temple",
+			"name": "Temple of Light",
+			"description": "Tall stained-glass windows bathe the stone altar in colored light.",
+			"exits": {
+				"east": "room.tavern"
+			},
+			"players": [],
+			"items": [
+				"item.holy_water"
+			],
+			"npcs": [
+				"npc.priest"
+			]
+		},
+		"room.tower": {
+			"id": "room.tower",
+			"name": "Wizard's Tower",
+			"description": "Books and star charts cover every surface. A crystal orb hums on the desk.",
+			"exits": {
+				"west": "room.tavern"
+			},
+			"players": [],
+			"items": [
+				"item.spellbook"
+			],
+			"npcs": [
+				"npc.wizard"
+			]
+		},
+		"room.garden": {
+			"id": "room.garden",
+			"name": "Royal Garden",
+			"description": "Fragrant roses and ancient hedges surround a quiet stone bench.",
+			"exits": {
+				"south": "room.market"
+			},
+			"players": [],
+			"items": [
+				"item.rose"
+			],
+			"npcs": [
+				"npc.gardener"
+			]
+		},
+		"room.well": {
+			"id": "room.well",
+			"name": "Wishing Well",
+			"description": "A moss-covered well sits at the crossroads. Coins glimmer in the dark water below.",
+			"exits": {
+				"east": "room.gate",
+				"south": "room.ruins"
+			},
+			"players": [],
+			"items": [
+				"item.coin"
+			],
+			"npcs": []
+		},
+		"room.chapel": {
+			"id": "room.chapel",
+			"name": "Abandoned Chapel",
+			"description": "Broken pews line the nave. Ivy creeps through the cracked roof.",
+			"exits": {
+				"north": "room.blacksmith"
+			},
+			"players": [],
+			"items": [
+				"item.hammer"
+			],
+			"npcs": []
+		},
+		"room.peak": {
+			"id": "room.peak",
+			"name": "Mountain Peak",
+			"description": "A windswept summit with a breathtaking view of the entire valley.",
+			"exits": {
+				"south": "room.mine"
+			},
+			"players": [],
+			"items": [
+				"item.feather"
+			],
+			"npcs": []
+		},
+		"room.tunnel": {
+			"id": "room.tunnel",
+			"name": "Hidden Tunnel",
+			"description": "A narrow passage carved by water over centuries. Spiderwebs block the way.",
+			"exits": {
+				"east": "room.cavern"
+			},
+			"players": [],
+			"items": [
+				"item.web"
+			],
+			"npcs": [
+				"npc.spider"
+			]
+		},
+		"room.abyss": {
+			"id": "room.abyss",
+			"name": "The Abyss",
+			"description": "An impossibly deep chasm. The faintest glow comes from far below.",
+			"exits": {
+				"north": "room.catacombs"
+			},
+			"players": [],
+			"items": [
+				"item.diamond"
+			],
+			"npcs": [
+				"npc.ghost"
+			]
+		},
+		"room.throne": {
+			"id": "room.throne",
+			"name": "Throne of Shadows",
+			"description": "A grand obsidian throne sits atop a dais of skulls. The air crackles with dark energy.",
+			"exits": {
+				"north": "room.lair"
+			},
+			"players": [],
+			"items": [
+				"item.crown"
+			],
+			"npcs": [
+				"npc.shade"
+			]
+		},
+		"room.dungeon": {
+			"id": "room.dungeon",
+			"name": "Dark Dungeon",
+			"description": "Rusty chains hang from the walls. Something scurries in the shadows.",
+			"exits": {
+				"north": "room.crypt"
+			},
+			"players": [],
+			"items": [
+				"item.torch"
+			],
+			"npcs": [
+				"npc.rat"
+			]
+		},
+		"room.reef": {
+			"id": "room.reef",
+			"name": "Coral Reef",
+			"description": "Shallow tidal pools reveal colorful corals and darting fish.",
+			"exits": {
+				"north": "room.beach",
+				"west": "room.grotto"
+			},
+			"players": [],
+			"items": [
+				"item.pearl"
+			],
+			"npcs": [
+				"npc.crab"
+			]
+		},
+		"room.grotto": {
+			"id": "room.grotto",
+			"name": "Sea Grotto",
+			"description": "A hidden cave behind a curtain of seawater. Bioluminescent moss lights the walls.",
+			"exits": {
+				"north": "room.lighthouse",
+				"east": "room.reef"
+			},
+			"players": [],
+			"items": [
+				"item.moss"
+			],
+			"npcs": []
+		},
+		"room.cliff": {
+			"id": "room.cliff",
+			"name": "Sea Cliffs",
+			"description": "Jagged rocks plunge into the crashing waves far below. Seabirds circle overhead.",
+			"exits": {
+				"west": "room.lighthouse"
+			},
+			"players": [],
+			"items": [],
+			"npcs": []
+		},
+		"room.swamp": {
+			"id": "room.swamp",
+			"name": "Murky Swamp",
+			"description": "Thick fog clings to the stagnant water. Dead trees claw at the sky.",
+			"exits": {
+				"north": "room.clearing"
+			},
+			"players": [],
+			"items": [
+				"item.mushroom"
+			],
+			"npcs": [
+				"npc.bandit"
+			]
+		},
+		"room.waterfall": {
+			"id": "room.waterfall",
+			"name": "Hidden Waterfall",
+			"description": "Crystal-clear water cascades down mossy rocks into a serene pool.",
+			"exits": {
+				"south": "room.lake"
+			},
+			"players": [],
+			"items": [
+				"item.gem"
+			],
+			"npcs": []
+		},
+		"room.bridge": {
+			"id": "room.bridge",
+			"name": "Stone Bridge",
+			"description": "An ancient stone bridge arches over a rushing river. Strange runes line the rails.",
+			"exits": {
+				"west": "room.lake"
+			},
+			"players": [],
+			"items": [
+				"item.rune_stone"
+			],
+			"npcs": [
+				"npc.troll"
+			]
 		}
 	},
 	"spawn": "room.gate",
@@ -447,6 +693,132 @@
 			"boss": true,
 			"boss_room": "room.beach",
 			"boss_alert": "The sea churns violently... The Kraken has surfaced at Shipwreck Beach!"
+		},
+		"npc.priest": {
+			"id": "npc.priest",
+			"name": "Temple Priest",
+			"dialogue": [
+				"May the light guide you.",
+				"This temple has stood for a thousand years.",
+				"Bring me a diamond from the depths and I shall bless you with divine protection."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.diamond"
+		},
+		"npc.wizard": {
+			"id": "npc.wizard",
+			"name": "Old Wizard",
+			"dialogue": [
+				"Knowledge is the truest power.",
+				"Have you found any ancient scrolls?",
+				"Bring me an ancient scroll and I shall reward you."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.scroll"
+		},
+		"npc.gardener": {
+			"id": "npc.gardener",
+			"name": "Royal Gardener",
+			"dialogue": [
+				"The roses are blooming beautifully this year.",
+				"Please, don't step on the flowers.",
+				"Take a rose if you wish, they grow back quickly."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": null
+		},
+		"npc.spider": {
+			"id": "npc.spider",
+			"name": "Giant Spider",
+			"dialogue": [
+				"*hisses and clicks its fangs*"
+			],
+			"hostile": true,
+			"hp": 35,
+			"damage": 9,
+			"quest": null,
+			"gold_drop": 7
+		},
+		"npc.ghost": {
+			"id": "npc.ghost",
+			"name": "Restless Ghost",
+			"dialogue": [
+				"*wails mournfully*"
+			],
+			"hostile": true,
+			"hp": 45,
+			"damage": 14,
+			"quest": null,
+			"gold_drop": 10
+		},
+		"npc.shade": {
+			"id": "npc.shade",
+			"name": "Shadow Knight",
+			"dialogue": [
+				"*dark laughter echoes*",
+				"*draws a spectral blade*"
+			],
+			"hostile": true,
+			"hp": 60,
+			"damage": 18,
+			"quest": null,
+			"gold_drop": 15
+		},
+		"npc.rat": {
+			"id": "npc.rat",
+			"name": "Dungeon Rat",
+			"dialogue": [
+				"*squeaks aggressively*"
+			],
+			"hostile": true,
+			"hp": 15,
+			"damage": 5,
+			"quest": null,
+			"gold_drop": 3
+		},
+		"npc.crab": {
+			"id": "npc.crab",
+			"name": "Giant Crab",
+			"dialogue": [
+				"*snaps its massive claws*"
+			],
+			"hostile": true,
+			"hp": 30,
+			"damage": 11,
+			"quest": null,
+			"gold_drop": 6
+		},
+		"npc.bandit": {
+			"id": "npc.bandit",
+			"name": "Swamp Bandit",
+			"dialogue": [
+				"Your gold or your life!",
+				"*unsheathes a rusty dagger*"
+			],
+			"hostile": true,
+			"hp": 40,
+			"damage": 13,
+			"quest": null,
+			"gold_drop": 12
+		},
+		"npc.troll": {
+			"id": "npc.troll",
+			"name": "Bridge Troll",
+			"dialogue": [
+				"None shall pass!",
+				"*roars and stomps the ground*"
+			],
+			"hostile": true,
+			"hp": 55,
+			"damage": 16,
+			"quest": null,
+			"gold_drop": 14
 		}
 	},
 	"items": {
@@ -601,6 +973,126 @@
 			"armor": 20,
 			"heal": null,
 			"value": 1000
+		},
+		"item.holy_water": {
+			"id": "item.holy_water",
+			"name": "Holy Water",
+			"damage": null,
+			"armor": null,
+			"heal": 30,
+			"value": 20
+		},
+		"item.spellbook": {
+			"id": "item.spellbook",
+			"name": "Spellbook",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 60
+		},
+		"item.rose": {
+			"id": "item.rose",
+			"name": "Red Rose",
+			"damage": null,
+			"armor": null,
+			"heal": 3,
+			"value": 5
+		},
+		"item.coin": {
+			"id": "item.coin",
+			"name": "Lucky Coin",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 15
+		},
+		"item.hammer": {
+			"id": "item.hammer",
+			"name": "War Hammer",
+			"damage": 18,
+			"armor": null,
+			"heal": null,
+			"value": 65
+		},
+		"item.feather": {
+			"id": "item.feather",
+			"name": "Eagle Feather",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 8
+		},
+		"item.web": {
+			"id": "item.web",
+			"name": "Spider Silk",
+			"damage": null,
+			"armor": 2,
+			"heal": null,
+			"value": 10
+		},
+		"item.diamond": {
+			"id": "item.diamond",
+			"name": "Abyssal Diamond",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 200
+		},
+		"item.crown": {
+			"id": "item.crown",
+			"name": "Shadow Crown",
+			"damage": null,
+			"armor": 12,
+			"heal": null,
+			"value": 400
+		},
+		"item.torch": {
+			"id": "item.torch",
+			"name": "Burning Torch",
+			"damage": 5,
+			"armor": null,
+			"heal": null,
+			"value": 3
+		},
+		"item.pearl": {
+			"id": "item.pearl",
+			"name": "Sea Pearl",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 50
+		},
+		"item.moss": {
+			"id": "item.moss",
+			"name": "Glowing Moss",
+			"damage": null,
+			"armor": null,
+			"heal": 12,
+			"value": 8
+		},
+		"item.mushroom": {
+			"id": "item.mushroom",
+			"name": "Swamp Mushroom",
+			"damage": null,
+			"armor": null,
+			"heal": 15,
+			"value": 6
+		},
+		"item.gem": {
+			"id": "item.gem",
+			"name": "River Gem",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 35
+		},
+		"item.rune_stone": {
+			"id": "item.rune_stone",
+			"name": "Rune Stone",
+			"damage": 12,
+			"armor": null,
+			"heal": null,
+			"value": 45
 		}
 	},
 	"quests": {
@@ -643,6 +1135,26 @@
 			"target_count": 1,
 			"reward": "item.dragon_scale",
 			"reward_count": 1
+		},
+		"quest.diamond": {
+			"id": "quest.diamond",
+			"description": "Bring 1 abyssal diamond to the Temple Priest.",
+			"giver": "npc.priest",
+			"type": "fetch",
+			"target_item": "item.diamond",
+			"target_count": 1,
+			"reward": "item.iron_shield",
+			"reward_count": 1
+		},
+		"quest.scroll": {
+			"id": "quest.scroll",
+			"description": "Bring 1 ancient scroll to the Old Wizard in the Tower.",
+			"giver": "npc.wizard",
+			"type": "fetch",
+			"target_item": "item.scroll",
+			"target_count": 1,
+			"reward": "item.chainmail",
+			"reward_count": 1
 		}
 	},
 	"shop": [
@@ -656,6 +1168,10 @@
 		"item.ale",
 		"item.leather_cap",
 		"item.chainmail",
-		"item.iron_shield"
+		"item.iron_shield",
+		"item.holy_water",
+		"item.mushroom",
+		"item.torch",
+		"item.hammer"
 	]
 }

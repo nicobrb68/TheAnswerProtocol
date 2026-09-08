@@ -56,9 +56,11 @@ pub async fn handle_disconnect(
             };
             w.players.remove(name);
             let count = w.players.len();
-            let evt = format!("EVT STATS players={}\n", count);
+            let evt_leave = format!("EVT GLOBAL LEAVE {}\n", name);
+            let evt_stats = format!("EVT STATS players={}\n", count);
             for tx in reg.values() {
-                let _ = tx.send(evt.clone());
+                let _ = tx.send(evt_leave.clone());
+                let _ = tx.send(evt_stats.clone());
             }
             tracing::info!(event = "player_disconnect", player = %name, room = %player_room_id, "player disconnected");
         },

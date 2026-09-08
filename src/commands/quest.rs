@@ -92,16 +92,25 @@ pub async fn handle_quests(username: &str, world: &Arc<Mutex<World>>) -> String 
             quest_list.push(serde_json::json!({
                 "quest_id": qid,
                 "status": "active",
-                "progress": format!("{}/{}", current, quest.target_count)
+                "progress": format!("{}/{}", current, quest.target_count),
+                "description": quest.description
             }));
         }
     }
 
     for qid in &player.quests_done {
-        quest_list.push(serde_json::json!({
-            "quest_id": qid,
-            "status": "completed"
-        }));
+        if let Some(quest) = w.quests.get(qid) {
+            quest_list.push(serde_json::json!({
+                "quest_id": qid,
+                "status": "completed",
+                "description": quest.description
+            }));
+        } else {
+            quest_list.push(serde_json::json!({
+                "quest_id": qid,
+                "status": "completed"
+            }));
+        }
     }
 
     match serde_json::to_string(&quest_list) {

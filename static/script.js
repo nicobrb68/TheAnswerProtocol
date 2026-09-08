@@ -66,6 +66,8 @@ const state = {
   activeTab: "global",
   activeNpc: null,
   activeBoss: null,
+  mapData: null,
+  mapLayout: null,
 };
 
 const pending = [];
@@ -221,6 +223,8 @@ function returnToLogin() {
   state.group = null;
   state.npcCache = {};
   state.activeBoss = null;
+  state.mapData = null;
+  state.mapLayout = null;
   pending.length = 0;
   bossIndicatorEl.hidden = true;
   screenGame.hidden = true;
@@ -333,12 +337,14 @@ function handleResponse(ctx, line) {
       if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
       sendCommand("LOOK", "LOOK");
       sendCommand("INVENTORY", "INVENTORY");
+      sendCommand("QUESTS", "QUESTS");
       return;
 
     case "DROP":
       if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
       sendCommand("LOOK", "LOOK");
       sendCommand("INVENTORY", "INVENTORY");
+      sendCommand("QUESTS", "QUESTS");
       return;
 
     case "INVENTORY": {
@@ -542,6 +548,16 @@ function handleResponse(ctx, line) {
       sendCommand("GROUP_INFO", "GROUP INFO");
       return;
 
+    case "MAP": {
+      if (isErr) return;
+      const data = safeJson(line.slice(3));
+      if (data) {
+        state.mapData = data;
+        state.mapLayout = computeMapLayout(data);
+      }
+      return;
+    }
+
     default:
       logRaw(line);
   }
@@ -669,6 +685,16 @@ function handleEvent(rest) {
     sendCommand("MARKET", "MARKET");
     return;
   }
+  if (rest.startsWith("GLOBAL JOIN ")) {
+    const who = rest.slice("GLOBAL JOIN ".length).trim();
+    logEvent(`${who} joined the world.`);
+    return;
+  }
+  if (rest.startsWith("GLOBAL LEAVE ")) {
+    const who = rest.slice("GLOBAL LEAVE ".length).trim();
+    logEvent(`${who} left the world.`);
+    return;
+  }
   if (rest.startsWith("GLOBAL ")) {
     const body = rest.slice("GLOBAL ".length);
     if (body.startsWith("[ALERT] ")) {
@@ -738,6 +764,7 @@ function applyRoom(room) {
   if (!room) return;
   state.room = room;
   renderRoom();
+  if (!document.getElementById("minimap-overlay").hidden) renderMinimap();
 }
 
 const DIRECTION_ORDER = ["north", "east", "south", "west", "up", "down", "in", "out"];
@@ -883,13 +910,24 @@ function renderQuests() {
     questListEl.innerHTML = '<li class="empty-note">no quests yet — talk to someone</li>';
     return;
   }
-  questListEl.innerHTML = state.quests.map((q) => {
+  questListEl.innerHTML = state.quests.map((q, i) => {
     const done = q.status === "completed";
+    const prog = done ? "completed" : escapeHtml(q.progress || "");
     return `<li class="quest-item${done ? " completed" : ""}">
-      <span class="quest-name">${escapeHtml(humanize(q.quest_id))}</span>
-      <span class="quest-meta">${done ? "completed" : `in progress — ${escapeHtml(q.progress || "")}`}</span>
+      <div class="quest-head">
+        <span class="quest-name">${escapeHtml(humanize(q.quest_id))}</span>
+        <span class="quest-progress">${prog}</span>
+      </div>
+      <div class="quest-desc" id="quest-desc-${i}" hidden>${escapeHtml(q.description || "")}</div>
+      <button class="btn btn-ghost btn-xs quest-info-btn" data-quest-idx="${i}" type="button">details</button>
     </li>`;
   }).join("");
+  $$("[data-quest-idx]", questListEl).forEach((btn) => {
+    btn.onclick = () => {
+      const desc = $(`#quest-desc-${btn.dataset.questIdx}`);
+      if (desc) { desc.hidden = !desc.hidden; btn.textContent = desc.hidden ? "details" : "hide"; }
+    };
+  });
 }
 
 function renderGroup() {
@@ -998,6 +1036,7 @@ function refreshAll() {
   sendCommand("WHO", "WHO");
   sendCommand("SHOP", "SHOP");
   sendCommand("MARKET", "MARKET");
+  sendCommand("MAP", "MAP");
   if (state.group) sendCommand("GROUP_INFO", "GROUP INFO");
 }
 
@@ -1110,6 +1149,133 @@ document.addEventListener("click", (e) => {
     && !e.target.closest('[data-action="item-info"]') && !e.target.closest('[data-info]')) {
     closeItemPopover();
   }
+});
+
+function computeMapLayout(mapData) {
+  const DIR_OFF = { north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0] };
+  const grid = {};
+  const positions = {};
+  const visited = new Set();
+  const queue = [{ id: mapData.spawn, col: 0, row: 0 }];
+
+  while (queue.length > 0) {
+    const { id, col, row } = queue.shift();
+    if (visited.has(id)) continue;
+
+    let fc = col, fr = row;
+    let key = `${fc},${fr}`;
+    if (grid[key]) {
+      let placed = false;
+      for (let r = 1; r < 20 && !placed; r++) {
+        for (const [dc, dr] of [[r,0],[-r,0],[0,r],[0,-r],[r,r],[-r,r],[r,-r],[-r,-r]]) {
+          const k = `${col+dc},${row+dr}`;
+          if (!grid[k]) { fc = col+dc; fr = row+dr; placed = true; break; }
+        }
+      }
+    }
+
+    key = `${fc},${fr}`;
+    grid[key] = id;
+    positions[id] = { col: fc, row: fr };
+    visited.add(id);
+
+    const room = mapData.rooms[id];
+    if (!room) continue;
+    for (const [dir, targetId] of Object.entries(room.exits)) {
+      if (visited.has(targetId)) continue;
+      const [dc, dr] = DIR_OFF[dir] || [0, 0];
+      queue.push({ id: targetId, col: fc + dc, row: fr + dr });
+    }
+  }
+
+  let minC = Infinity, maxC = -Infinity, minR = Infinity, maxR = -Infinity;
+  for (const { col, row } of Object.values(positions)) {
+    minC = Math.min(minC, col); maxC = Math.max(maxC, col);
+    minR = Math.min(minR, row); maxR = Math.max(maxR, row);
+  }
+
+  const cellW = 70, cellH = 60, padX = 50, padY = 35;
+  const pixels = {};
+  for (const [id, { col, row }] of Object.entries(positions)) {
+    pixels[id] = {
+      x: padX + (col - minC) * cellW,
+      y: padY + (row - minR) * cellH,
+    };
+  }
+
+  const edges = [];
+  const seen = new Set();
+  for (const [id, room] of Object.entries(mapData.rooms)) {
+    for (const [dir, targetId] of Object.entries(room.exits)) {
+      const ek = [id, targetId].sort().join("|");
+      if (seen.has(ek)) continue;
+      seen.add(ek);
+      const reverseDir = Object.entries(mapData.rooms[targetId]?.exits || {})
+        .find(([, t]) => t === id);
+      edges.push({ a: id, b: targetId, dirA: dir[0].toUpperCase(), dirB: reverseDir ? reverseDir[0][0].toUpperCase() : "?" });
+    }
+  }
+
+  return {
+    pixels,
+    edges,
+    width: padX * 2 + (maxC - minC) * cellW,
+    height: padY * 2 + (maxR - minR) * cellH,
+  };
+}
+
+function renderMinimap() {
+  const layout = state.mapLayout;
+  if (!layout) return;
+  const svg = document.getElementById("minimap-svg");
+  if (!svg) return;
+
+  const currentRoom = state.room?.id;
+  svg.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
+
+  let html = "";
+
+  for (const { a, b, dirA, dirB } of layout.edges) {
+    const pa = layout.pixels[a], pb = layout.pixels[b];
+    if (!pa || !pb) continue;
+
+    const dx = pb.x - pa.x, dy = pb.y - pa.y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len === 0) continue;
+    const nx = dx / len, ny = dy / len;
+    const px = -ny, py = nx;
+
+    html += `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" class="minimap-edge"/>`;
+    html += `<text x="${(pa.x + nx * 14 + px * 7).toFixed(1)}" y="${(pa.y + ny * 14 + py * 7 + 2.5).toFixed(1)}" class="minimap-dir">${dirA}</text>`;
+    html += `<text x="${(pb.x - nx * 14 + px * 7).toFixed(1)}" y="${(pb.y - ny * 14 + py * 7 + 2.5).toFixed(1)}" class="minimap-dir">${dirB}</text>`;
+  }
+
+  for (const [id, p] of Object.entries(layout.pixels)) {
+    const cur = id === currentRoom;
+    const label = state.mapData.rooms[id]?.name || id;
+    html += `<circle cx="${p.x}" cy="${p.y}" r="${cur ? 8 : 5}" class="minimap-node${cur ? " current" : ""}"/>`;
+    html += `<text x="${p.x}" y="${p.y - 11}" class="minimap-label${cur ? " current" : ""}">${escapeHtml(label)}</text>`;
+  }
+
+  svg.innerHTML = html;
+}
+
+function toggleMinimap() {
+  const overlay = document.getElementById("minimap-overlay");
+  if (overlay.hidden) {
+    renderMinimap();
+    overlay.hidden = false;
+  } else {
+    overlay.hidden = true;
+  }
+}
+
+$("#minimap-btn").addEventListener("click", toggleMinimap);
+$("#minimap-close").addEventListener("click", () => {
+  document.getElementById("minimap-overlay").hidden = true;
+});
+document.getElementById("minimap-overlay").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.hidden = true;
 });
 
 window.addEventListener("beforeunload", () => {

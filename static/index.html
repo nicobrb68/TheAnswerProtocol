@@ -86,6 +86,7 @@
       <div class="room-head">
         <h1 id="room-name">—</h1>
         <span class="room-id" id="room-id"></span>
+        <button class="btn btn-ghost btn-xs minimap-toggle" id="minimap-btn" type="button">Map</button>
       </div>
       <p class="room-desc" id="room-desc">…</p>
 
@@ -259,6 +260,17 @@
   </div>
   <ul class="item-stat-list" id="item-popover-stats"></ul>
   <span class="item-popover-id" id="item-popover-id"></span>
+</div>
+
+<!-- Minimap overlay -->
+<div id="minimap-overlay" class="minimap-overlay" hidden>
+  <div class="minimap-card">
+    <div class="minimap-head">
+      <span class="minimap-title">World Map</span>
+      <button class="btn btn-ghost btn-xs" id="minimap-close" type="button">✕</button>
+    </div>
+    <svg id="minimap-svg" class="minimap-svg" viewBox="0 0 490 355" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
 </div>
 
 <script src="script.js"></script>
