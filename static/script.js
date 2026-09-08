@@ -1147,6 +1147,28 @@ $("#npc-attack-btn").addEventListener("click", () => {
   closeNpcPopover();
 });
 
+const ARROW_KEYS = {
+  ArrowUp: "north",
+  ArrowDown: "south",
+  ArrowLeft: "west",
+  ArrowRight: "east",
+};
+
+document.addEventListener("keydown", (e) => {
+  const dir = ARROW_KEYS[e.key];
+  if (!dir || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (screenGame.hidden || !state.room) return;
+  const el = document.activeElement;
+  if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+
+  e.preventDefault();
+  if (!state.room.exits?.[dir]) {
+    showToast({ text: "You can't go that way.", type: "error", timeout: 1800 });
+    return;
+  }
+  sendCommand("MOVE", `MOVE ${dir}`);
+});
+
 document.addEventListener("click", (e) => {
   if (!npcPopover.hidden && !npcPopover.contains(e.target) && !e.target.closest('[data-action="npc"]')) {
     closeNpcPopover();
@@ -1224,7 +1246,12 @@ function computeMapLayout(mapData) {
       seen.add(ek);
       const reverseDir = Object.entries(mapData.rooms[targetId]?.exits || {})
         .find(([, t]) => t === id);
-      edges.push({ a: id, b: targetId, dirA: dir[0].toUpperCase(), dirB: reverseDir ? reverseDir[0][0].toUpperCase() : "?" });
+      edges.push({
+        a: id,
+        b: targetId,
+        dirA: dir,
+        dirB: reverseDir ? reverseDir[0] : null,
+      });
     }
   }
 
@@ -1278,9 +1305,19 @@ function renderMinimap() {
       ? `<path d="M${pa.x} ${pa.y} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${pb.x} ${pb.y}" class="minimap-edge" fill="none"/>`
       : `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" class="minimap-edge"/>`;
 
-    const la = at(0.2), lb = at(0.8);
-    html += `<text x="${la.x.toFixed(1)}" y="${(la.y + 2.5).toFixed(1)}" class="minimap-dir">${dirA}</text>`;
-    html += `<text x="${lb.x.toFixed(1)}" y="${(lb.y + 2.5).toFixed(1)}" class="minimap-dir">${dirB}</text>`;
+    const label = (p, dir, from) => {
+      if (!dir) return "";
+      const live = from === currentRoom;
+      const letter = dir[0].toUpperCase();
+      const text = `<text x="${p.x.toFixed(1)}" y="${(p.y + 2.5).toFixed(1)}" class="minimap-dir${live ? " live" : ""}">${letter}</text>`;
+      return live
+        ? `<g class="minimap-move" data-move="${dir}"><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9" class="minimap-hit"/>${text}</g>`
+        : text;
+    };
+
+    const tOff = Math.min(0.4, 24 / len);
+    html += label(at(tOff), dirA, a);
+    html += label(at(1 - tOff), dirB, b);
   }
 
   for (const [id, p] of Object.entries(layout.pixels)) {
@@ -1291,6 +1328,10 @@ function renderMinimap() {
   }
 
   svg.innerHTML = html;
+
+  $$("[data-move]", svg).forEach((el) => {
+    el.addEventListener("click", () => sendCommand("MOVE", `MOVE ${el.dataset.move}`));
+  });
 }
 
 function toggleMinimap() {
