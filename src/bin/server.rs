@@ -293,7 +293,7 @@ async fn main() {
                         Some(handle_shop(&world).await)
                     } else if line_upper.starts_with("MARKET CANCEL ") {
                         let index = get_args(get_args(&line_trimmed));
-                        Some(handle_market_cancel(name, index, &world).await)
+                        Some(handle_market_cancel(name, index, &world, &registry).await)
                     } else if line_upper.starts_with("MARKET BUY ") {
                         let index = get_args(get_args(&line_trimmed));
                         Some(handle_market_buy(name, index, &world, &registry).await)
@@ -301,7 +301,7 @@ async fn main() {
                         Some(handle_market(&world).await)
                     } else if line_upper.starts_with("SELL ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
-                        Some(handle_sell(name, &item_id, &world).await)
+                        Some(handle_sell(name, &item_id, &world, &registry).await)
                     } else if line_upper.starts_with("SLEEP") {
                         Some(handle_sleep(name, &world, &registry).await)
                     } else if line_upper.starts_with("QUESTS") {

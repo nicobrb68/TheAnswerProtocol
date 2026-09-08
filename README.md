@@ -345,6 +345,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **Chat broadcast format**: Chat messages are broadcast as `(SCOPE) username: message` (e.g., `(GLOBAL) alice: hello`), not prefixed with `EVT`.
 - **EVT SLEEP**: Notifies other players in the room when someone rests, not defined in the RFC.
 - **EVT GROUP LEADER, EVT GROUP DISBAND, EVT GROUP KICK**: Additional group events for leadership transfer, group dissolution, and member kicking.
+- **EVT MARKET LISTED, EVT MARKET CANCELLED, EVT MARKET BOUGHT, EVT MARKET SOLD**: Market events not in the RFC, so clients can keep listings in sync in real time.
 - **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE**: Additional error codes not in the RFC.
 
 ### Events
@@ -361,6 +362,10 @@ Disconnects from the server. The player is removed from the world, removed from 
 | `EVT ROOM ITEM RESPAWN <item>` | An item reappears in the room 30 seconds after being taken |
 | `EVT SLEEP <player>` | A player rests in the sleep room (sent to other players in the room) |
 | `EVT GLOBAL [ALERT] ...` | Boss spawn announcement (sent to all connected players) |
+| `EVT MARKET LISTED <seller> <item> <price>` | A player listed an item on the market (sent to all other players) |
+| `EVT MARKET CANCELLED <seller> <item>` | A player withdrew their listing (sent to all other players) |
+| `EVT MARKET BOUGHT <buyer> <item>` | A listing was purchased (sent to all players except buyer and seller) |
+| `EVT MARKET SOLD <buyer> bought your <item> for <price> gold` | Your listing was purchased (sent only to the seller) |
 | `EVT GROUP INVITE <inviter> id=<group_id>` | You received a group invitation |
 | `EVT GROUP JOIN <player>` | A player joined your group (sent to all group members) |
 | `EVT GROUP LEAVE <player>` | A player left or was kicked from your group |

@@ -856,7 +856,7 @@ button, input {
 
 .minimap-svg .minimap-label {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 7.5px;
   fill: var(--ink-soft);
   text-anchor: middle;
   pointer-events: none;
@@ -865,7 +865,7 @@ button, input {
 .minimap-svg .minimap-label.current {
   fill: var(--ink);
   font-weight: 700;
-  font-size: 9.5px;
+  font-size: 8px;
 }
 
 .minimap-svg .minimap-dir {

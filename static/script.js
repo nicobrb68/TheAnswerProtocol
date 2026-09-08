@@ -677,6 +677,33 @@ function handleEvent(rest) {
     if (state.group) sendCommand("GROUP_INFO", "GROUP INFO");
     return;
   }
+  if (rest.startsWith("MARKET LISTED ")) {
+    const m = rest.match(/^MARKET LISTED (\S+) (\S+) (\d+)$/);
+    if (m) {
+      const [, seller, itemId, price] = m;
+      logEvent(`${seller} lists ${state.itemCache[itemId]?.name || humanize(itemId)} for ${price} gold.`);
+      sendCommand("MARKET", "MARKET");
+    }
+    return;
+  }
+  if (rest.startsWith("MARKET CANCELLED ")) {
+    const m = rest.match(/^MARKET CANCELLED (\S+) (\S+)$/);
+    if (m) {
+      const [, seller, itemId] = m;
+      logEvent(`${seller} withdraws ${state.itemCache[itemId]?.name || humanize(itemId)} from the market.`);
+      sendCommand("MARKET", "MARKET");
+    }
+    return;
+  }
+  if (rest.startsWith("MARKET BOUGHT ")) {
+    const m = rest.match(/^MARKET BOUGHT (\S+) (\S+)$/);
+    if (m) {
+      const [, buyer, itemId] = m;
+      logEvent(`${buyer} buys ${state.itemCache[itemId]?.name || humanize(itemId)} off the market.`);
+      sendCommand("MARKET", "MARKET");
+    }
+    return;
+  }
   if (rest.startsWith("MARKET SOLD ")) {
     const msg = rest.slice("MARKET SOLD ".length).trim();
     logEvent(msg);

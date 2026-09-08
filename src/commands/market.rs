@@ -28,7 +28,25 @@ pub async fn handle_market(world: &Arc<Mutex<World>>) -> String {
     }
 }
 
-pub async fn handle_sell(username: &str, item_id: &str, world: &Arc<Mutex<World>>) -> String {
+async fn broadcast_market(
+    evt: String,
+    skip: &[&str],
+    registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>,
+) {
+    let reg = registry.lock().await;
+    for (name, tx) in reg.iter() {
+        if !skip.contains(&name.as_str()) {
+            let _ = tx.send(evt.clone());
+        }
+    }
+}
+
+pub async fn handle_sell(
+    username: &str,
+    item_id: &str,
+    world: &Arc<Mutex<World>>,
+    registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>,
+) -> String {
     let mut w = world.lock().await;
 
     let player = match w.get_player(username) {
@@ -60,10 +78,23 @@ pub async fn handle_sell(username: &str, item_id: &str, world: &Arc<Mutex<World>
 
     tracing::info!(event = "market_sell", player = %username, item = %item_full_id, price = price, "item listed on market");
 
+    drop(w);
+
+    broadcast_market(
+        format!("EVT MARKET LISTED {} {} {}\n", username, item_full_id, price),
+        &[username],
+        registry,
+    ).await;
+
     format!("OK listed={} price={}\n", item_full_id, price)
 }
 
-pub async fn handle_market_cancel(username: &str, index_str: &str, world: &Arc<Mutex<World>>) -> String {
+pub async fn handle_market_cancel(
+    username: &str,
+    index_str: &str,
+    world: &Arc<Mutex<World>>,
+    registry: &Arc<Mutex<HashMap<String, UnboundedSender<String>>>>,
+) -> String {
     let mut w = world.lock().await;
 
     let index: usize = match index_str.parse() {
@@ -88,6 +119,14 @@ pub async fn handle_market_cancel(username: &str, index_str: &str, world: &Arc<M
     }
 
     tracing::info!(event = "market_cancel", player = %username, item = %item_id, "listing cancelled");
+
+    drop(w);
+
+    broadcast_market(
+        format!("EVT MARKET CANCELLED {} {}\n", username, item_id),
+        &[username],
+        registry,
+    ).await;
 
     format!("OK cancelled={}\n", item_id)
 }
@@ -141,10 +180,18 @@ pub async fn handle_market_buy(
     drop(w);
 
     let evt = format!("EVT MARKET SOLD {} bought your {} for {} gold\n", username, item_name, price);
-    let reg = registry.lock().await;
-    if let Some(tx) = reg.get(&seller) {
-        let _ = tx.send(evt);
+    {
+        let reg = registry.lock().await;
+        if let Some(tx) = reg.get(&seller) {
+            let _ = tx.send(evt);
+        }
     }
+
+    broadcast_market(
+        format!("EVT MARKET BOUGHT {} {}\n", username, item_id),
+        &[username, seller.as_str()],
+        registry,
+    ).await;
 
     let buyer_gold = {
         let w = world.lock().await;
