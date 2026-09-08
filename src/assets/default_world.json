@@ -14,7 +14,9 @@
 			"items": [],
 			"npcs": [
 				"npc.guard"
-			]
+			],
+			"map_x": 5,
+			"map_y": 2
 		},
 		"room.tavern": {
 			"id": "room.tavern",
@@ -32,7 +34,9 @@
 			],
 			"npcs": [
 				"npc.bartender"
-			]
+			],
+			"map_x": 5,
+			"map_y": 1
 		},
 		"room.guest_room": {
 			"id": "room.guest_room",
@@ -45,7 +49,9 @@
 			"items": [
 				"item.key"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 5,
+			"map_y": 0
 		},
 		"room.blacksmith": {
 			"id": "room.blacksmith",
@@ -62,7 +68,9 @@
 			],
 			"npcs": [
 				"npc.blacksmith"
-			]
+			],
+			"map_x": 3,
+			"map_y": 2
 		},
 		"room.mine": {
 			"id": "room.mine",
@@ -77,7 +85,9 @@
 			"items": [
 				"item.pickaxe"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 1,
+			"map_y": 2
 		},
 		"room.cavern": {
 			"id": "room.cavern",
@@ -95,7 +105,9 @@
 			],
 			"npcs": [
 				"npc.goblin"
-			]
+			],
+			"map_x": 1,
+			"map_y": 3
 		},
 		"room.crypt": {
 			"id": "room.crypt",
@@ -113,7 +125,9 @@
 			],
 			"npcs": [
 				"npc.skeleton"
-			]
+			],
+			"map_x": 1,
+			"map_y": 4
 		},
 		"room.market": {
 			"id": "room.market",
@@ -131,7 +145,9 @@
 			],
 			"npcs": [
 				"npc.merchant"
-			]
+			],
+			"map_x": 7,
+			"map_y": 2
 		},
 		"room.docks": {
 			"id": "room.docks",
@@ -148,7 +164,9 @@
 			],
 			"npcs": [
 				"npc.fisher"
-			]
+			],
+			"map_x": 9,
+			"map_y": 2
 		},
 		"room.lighthouse": {
 			"id": "room.lighthouse",
@@ -166,7 +184,9 @@
 			],
 			"npcs": [
 				"npc.keeper"
-			]
+			],
+			"map_x": 9,
+			"map_y": 3
 		},
 		"room.gate": {
 			"id": "room.gate",
@@ -182,7 +202,9 @@
 			"items": [],
 			"npcs": [
 				"npc.guard"
-			]
+			],
+			"map_x": 5,
+			"map_y": 3
 		},
 		"room.forest": {
 			"id": "room.forest",
@@ -200,7 +222,9 @@
 			],
 			"npcs": [
 				"npc.wolf"
-			]
+			],
+			"map_x": 5,
+			"map_y": 4
 		},
 		"room.lake": {
 			"id": "room.lake",
@@ -216,7 +240,9 @@
 			"items": [
 				"item.fish"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 7,
+			"map_y": 4
 		},
 		"room.clearing": {
 			"id": "room.clearing",
@@ -234,7 +260,9 @@
 			],
 			"npcs": [
 				"npc.hermit"
-			]
+			],
+			"map_x": 5,
+			"map_y": 5
 		},
 		"room.ruins": {
 			"id": "room.ruins",
@@ -250,7 +278,9 @@
 			"items": [
 				"item.scroll"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 4,
+			"map_y": 4
 		},
 		"room.lair": {
 			"id": "room.lair",
@@ -262,7 +292,9 @@
 			},
 			"players": [],
 			"items": [],
-			"npcs": []
+			"npcs": [],
+			"map_x": 2,
+			"map_y": 4
 		},
 		"room.catacombs": {
 			"id": "room.catacombs",
@@ -274,7 +306,9 @@
 			},
 			"players": [],
 			"items": [],
-			"npcs": []
+			"npcs": [],
+			"map_x": 0,
+			"map_y": 4
 		},
 		"room.beach": {
 			"id": "room.beach",
@@ -286,7 +320,9 @@
 			},
 			"players": [],
 			"items": [],
-			"npcs": []
+			"npcs": [],
+			"map_x": 11,
+			"map_y": 3
 		},
 		"room.temple": {
 			"id": "room.temple",
@@ -301,7 +337,9 @@
 			],
 			"npcs": [
 				"npc.priest"
-			]
+			],
+			"map_x": 4,
+			"map_y": 1
 		},
 		"room.tower": {
 			"id": "room.tower",
@@ -316,7 +354,9 @@
 			],
 			"npcs": [
 				"npc.wizard"
-			]
+			],
+			"map_x": 6,
+			"map_y": 1
 		},
 		"room.garden": {
 			"id": "room.garden",
@@ -331,7 +371,9 @@
 			],
 			"npcs": [
 				"npc.gardener"
-			]
+			],
+			"map_x": 7,
+			"map_y": 1
 		},
 		"room.well": {
 			"id": "room.well",
@@ -345,7 +387,9 @@
 			"items": [
 				"item.coin"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 4,
+			"map_y": 3
 		},
 		"room.chapel": {
 			"id": "room.chapel",
@@ -358,7 +402,9 @@
 			"items": [
 				"item.hammer"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 3,
+			"map_y": 3
 		},
 		"room.peak": {
 			"id": "room.peak",
@@ -371,7 +417,9 @@
 			"items": [
 				"item.feather"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 1,
+			"map_y": 1
 		},
 		"room.tunnel": {
 			"id": "room.tunnel",
@@ -386,7 +434,9 @@
 			],
 			"npcs": [
 				"npc.spider"
-			]
+			],
+			"map_x": 0,
+			"map_y": 3
 		},
 		"room.abyss": {
 			"id": "room.abyss",
@@ -401,7 +451,9 @@
 			],
 			"npcs": [
 				"npc.ghost"
-			]
+			],
+			"map_x": 0,
+			"map_y": 5
 		},
 		"room.throne": {
 			"id": "room.throne",
@@ -416,7 +468,9 @@
 			],
 			"npcs": [
 				"npc.shade"
-			]
+			],
+			"map_x": 2,
+			"map_y": 5
 		},
 		"room.dungeon": {
 			"id": "room.dungeon",
@@ -431,7 +485,9 @@
 			],
 			"npcs": [
 				"npc.rat"
-			]
+			],
+			"map_x": 1,
+			"map_y": 5
 		},
 		"room.reef": {
 			"id": "room.reef",
@@ -447,7 +503,9 @@
 			],
 			"npcs": [
 				"npc.crab"
-			]
+			],
+			"map_x": 11,
+			"map_y": 4
 		},
 		"room.grotto": {
 			"id": "room.grotto",
@@ -461,7 +519,9 @@
 			"items": [
 				"item.moss"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 9,
+			"map_y": 4
 		},
 		"room.cliff": {
 			"id": "room.cliff",
@@ -472,7 +532,9 @@
 			},
 			"players": [],
 			"items": [],
-			"npcs": []
+			"npcs": [],
+			"map_x": 10,
+			"map_y": 3
 		},
 		"room.swamp": {
 			"id": "room.swamp",
@@ -487,7 +549,9 @@
 			],
 			"npcs": [
 				"npc.bandit"
-			]
+			],
+			"map_x": 5,
+			"map_y": 6
 		},
 		"room.waterfall": {
 			"id": "room.waterfall",
@@ -500,7 +564,9 @@
 			"items": [
 				"item.gem"
 			],
-			"npcs": []
+			"npcs": [],
+			"map_x": 7,
+			"map_y": 3
 		},
 		"room.bridge": {
 			"id": "room.bridge",
@@ -515,7 +581,9 @@
 			],
 			"npcs": [
 				"npc.troll"
-			]
+			],
+			"map_x": 8,
+			"map_y": 4
 		}
 	},
 	"spawn": "room.gate",

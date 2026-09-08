@@ -1152,39 +1152,45 @@ document.addEventListener("click", (e) => {
 });
 
 function computeMapLayout(mapData) {
-  const DIR_OFF = { north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0] };
-  const grid = {};
+  const hasCoords = Object.values(mapData.rooms).some((r) => r.map_x != null && r.map_y != null);
+
   const positions = {};
-  const visited = new Set();
-  const queue = [{ id: mapData.spawn, col: 0, row: 0 }];
-
-  while (queue.length > 0) {
-    const { id, col, row } = queue.shift();
-    if (visited.has(id)) continue;
-
-    let fc = col, fr = row;
-    let key = `${fc},${fr}`;
-    if (grid[key]) {
-      let placed = false;
-      for (let r = 1; r < 20 && !placed; r++) {
-        for (const [dc, dr] of [[r,0],[-r,0],[0,r],[0,-r],[r,r],[-r,r],[r,-r],[-r,-r]]) {
-          const k = `${col+dc},${row+dr}`;
-          if (!grid[k]) { fc = col+dc; fr = row+dr; placed = true; break; }
-        }
+  if (hasCoords) {
+    for (const [id, room] of Object.entries(mapData.rooms)) {
+      if (room.map_x != null && room.map_y != null) {
+        positions[id] = { col: room.map_x, row: room.map_y };
       }
     }
-
-    key = `${fc},${fr}`;
-    grid[key] = id;
-    positions[id] = { col: fc, row: fr };
-    visited.add(id);
-
-    const room = mapData.rooms[id];
-    if (!room) continue;
-    for (const [dir, targetId] of Object.entries(room.exits)) {
-      if (visited.has(targetId)) continue;
-      const [dc, dr] = DIR_OFF[dir] || [0, 0];
-      queue.push({ id: targetId, col: fc + dc, row: fr + dr });
+  } else {
+    const DIR_OFF = { north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0] };
+    const grid = {};
+    const visited = new Set();
+    const queue = [{ id: mapData.spawn, col: 0, row: 0 }];
+    while (queue.length > 0) {
+      const { id, col, row } = queue.shift();
+      if (visited.has(id)) continue;
+      let fc = col, fr = row, key = `${fc},${fr}`;
+      if (grid[key]) {
+        for (let r = 1; r < 20; r++) {
+          let placed = false;
+          for (const [dc, dr] of [[r,0],[-r,0],[0,r],[0,-r]]) {
+            const k = `${col+dc},${row+dr}`;
+            if (!grid[k]) { fc = col+dc; fr = row+dr; placed = true; break; }
+          }
+          if (placed) break;
+        }
+      }
+      key = `${fc},${fr}`;
+      grid[key] = id;
+      positions[id] = { col: fc, row: fr };
+      visited.add(id);
+      const room = mapData.rooms[id];
+      if (!room) continue;
+      for (const [dir, targetId] of Object.entries(room.exits)) {
+        if (visited.has(targetId)) continue;
+        const [dc, dr] = DIR_OFF[dir] || [0, 0];
+        queue.push({ id: targetId, col: fc + dc, row: fr + dr });
+      }
     }
   }
 
@@ -1194,7 +1200,7 @@ function computeMapLayout(mapData) {
     minR = Math.min(minR, row); maxR = Math.max(maxR, row);
   }
 
-  const cellW = 70, cellH = 60, padX = 50, padY = 35;
+  const cellW = 80, cellH = 70, padX = 60, padY = 40;
   const pixels = {};
   for (const [id, { col, row }] of Object.entries(positions)) {
     pixels[id] = {
@@ -1233,6 +1239,7 @@ function renderMinimap() {
   const currentRoom = state.room?.id;
   svg.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
 
+  const nodes = Object.entries(layout.pixels);
   let html = "";
 
   for (const { a, b, dirA, dirB } of layout.edges) {
@@ -1240,14 +1247,34 @@ function renderMinimap() {
     if (!pa || !pb) continue;
 
     const dx = pb.x - pa.x, dy = pb.y - pa.y;
-    const len = Math.sqrt(dx * dx + dy * dy);
+    const len = Math.hypot(dx, dy);
     if (len === 0) continue;
     const nx = dx / len, ny = dy / len;
     const px = -ny, py = nx;
 
-    html += `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" class="minimap-edge"/>`;
-    html += `<text x="${(pa.x + nx * 14 + px * 7).toFixed(1)}" y="${(pa.y + ny * 14 + py * 7 + 2.5).toFixed(1)}" class="minimap-dir">${dirA}</text>`;
-    html += `<text x="${(pb.x - nx * 14 + px * 7).toFixed(1)}" y="${(pb.y - ny * 14 + py * 7 + 2.5).toFixed(1)}" class="minimap-dir">${dirB}</text>`;
+    let side = 0;
+    for (const [id, p] of nodes) {
+      if (id === a || id === b) continue;
+      const t = ((p.x - pa.x) * nx + (p.y - pa.y) * ny) / len;
+      if (t <= 0.05 || t >= 0.95) continue;
+      const perp = (p.x - pa.x) * px + (p.y - pa.y) * py;
+      if (Math.abs(perp) < 20) { side = perp >= 0 ? -1 : 1; break; }
+    }
+
+    const mx = (pa.x + pb.x) / 2, my = (pa.y + pb.y) / 2;
+    const cx = mx + px * side * 56, cy = my + py * side * 56;
+    const at = (t) => ({
+      x: (1 - t) ** 2 * pa.x + 2 * (1 - t) * t * cx + t * t * pb.x,
+      y: (1 - t) ** 2 * pa.y + 2 * (1 - t) * t * cy + t * t * pb.y,
+    });
+
+    html += side
+      ? `<path d="M${pa.x} ${pa.y} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${pb.x} ${pb.y}" class="minimap-edge" fill="none"/>`
+      : `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" class="minimap-edge"/>`;
+
+    const la = at(0.16), lb = at(0.84);
+    html += `<text x="${la.x.toFixed(1)}" y="${(la.y + 2.5).toFixed(1)}" class="minimap-dir">${dirA}</text>`;
+    html += `<text x="${lb.x.toFixed(1)}" y="${(lb.y + 2.5).toFixed(1)}" class="minimap-dir">${dirB}</text>`;
   }
 
   for (const [id, p] of Object.entries(layout.pixels)) {

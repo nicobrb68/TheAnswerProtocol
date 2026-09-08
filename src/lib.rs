@@ -15,6 +15,10 @@ pub struct Room {
     pub players: Vec<String>,
     pub items: Vec<String>,
     pub npcs: Vec<String>,
+    #[serde(default)]
+    pub map_x: Option<i32>,
+    #[serde(default)]
+    pub map_y: Option<i32>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

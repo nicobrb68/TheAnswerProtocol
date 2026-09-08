@@ -12,6 +12,12 @@ pub async fn handle_map(world: &Arc<Mutex<World>>) -> String {
             .map(|(dir, target)| (dir.clone(), serde_json::Value::String(target.clone())))
             .collect();
         obj.insert("exits".into(), serde_json::Value::Object(exits));
+        if let Some(x) = room.map_x {
+            obj.insert("map_x".into(), serde_json::Value::Number(x.into()));
+        }
+        if let Some(y) = room.map_y {
+            obj.insert("map_y".into(), serde_json::Value::Number(y.into()));
+        }
         rooms.insert(id.clone(), serde_json::Value::Object(obj));
     }
     let mut result = serde_json::Map::new();

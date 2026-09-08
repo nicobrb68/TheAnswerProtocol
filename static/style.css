@@ -787,7 +787,7 @@ button, input {
   border-radius: 4px;
   box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
   padding: 1rem 1.25rem 1.25rem;
-  width: min(560px, 100%);
+  width: min(95vw, 1100px);
   max-height: 90vh;
   overflow: auto;
 }
@@ -845,9 +845,20 @@ button, input {
 
 .minimap-svg .minimap-dir {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 700;
   fill: var(--amber-dim);
   text-anchor: middle;
   pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.minimap-svg .minimap-label {
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
