@@ -91,6 +91,9 @@ pub async fn handle_attack(
     let status;
     let mut spawn_room = String::new();
     let mut is_boss_kill = false;
+    // Co-attackers are paid too, and may have left the room or died since —
+    // they need a direct notice, not a room broadcast.
+    let mut reward_notices: Vec<(String, u32)> = Vec::new();
 
     if npc_hp == 0 {
         if let Some(room) = w.get_mut_room(&current_room) {
@@ -128,6 +131,9 @@ pub async fn handle_attack(
             for attacker in &attackers {
                 if let Some(p) = w.get_mut_player(attacker) {
                     p.gold += npc_gold_drop;
+                    if attacker != username {
+                        reward_notices.push((attacker.clone(), p.gold));
+                    }
                 }
             }
         }
@@ -172,6 +178,18 @@ pub async fn handle_attack(
             world,
             registry
         ).await;
+
+        if !reward_notices.is_empty() {
+            let reg = registry.lock().await;
+            for (attacker, total) in &reward_notices {
+                if let Some(tx) = reg.get(attacker) {
+                    let _ = tx.send(format!(
+                        "EVT COMBAT REWARD npc={} gold={} total={}\n",
+                        npc_full_id, npc_gold_drop, total
+                    ));
+                }
+            }
+        }
         if is_boss_kill {
             let msg = format!("EVT GLOBAL [DEFEAT] {} has been slain by {}! boss={}\n", npc_name, username, npc_full_id);
             let reg = registry.lock().await;

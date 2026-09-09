@@ -43,6 +43,8 @@ const groupDisbandBtn = $("#group-disband-btn");
 const toastStack = $("#toast-stack");
 const npcPopover = $("#npc-popover");
 const itemPopover = $("#item-popover");
+const sellPopover = $("#sell-popover");
+const sellOptionsEl = $("#sell-options");
 
 const goldTextEl = $("#gold-text");
 const bossIndicatorEl = $("#boss-indicator");
@@ -68,6 +70,7 @@ const state = {
   activeBoss: null,
   mapData: null,
   mapLayout: null,
+  sellItem: null,
 };
 
 const pending = [];
@@ -232,6 +235,8 @@ function returnToLogin() {
   pending.length = 0;
   npcPopover.hidden = true;
   itemPopover.hidden = true;
+  sellPopover.hidden = true;
+  state.sellItem = null;
   document.getElementById("minimap-inline").hidden = true;
   Object.values(panes).forEach((p) => { if (p) p.innerHTML = ""; });
   bossIndicatorEl.hidden = true;
@@ -333,10 +338,16 @@ function handleResponse(ctx, line) {
     }
 
     case "EXAMINE": {
-      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); closeItemPopover(); return; }
+      if (isErr) {
+        if (ctx.meta.quiet) return;
+        showToast({ text: friendlyError(line), type: "error" });
+        closeItemPopover();
+        return;
+      }
       const data = safeJson(line.slice(3));
       if (!data) return;
       state.itemCache[data.id] = data;
+      if (ctx.meta.quiet) { renderSellPopover(); return; }
       showItemPopover(data);
       return;
     }
@@ -617,6 +628,18 @@ function handleEvent(rest) {
     logCombat(combatText.replace(/ npc=\S+( hp=\d+)?$/, ""));
     return;
   }
+  if (rest.startsWith("COMBAT REWARD ")) {
+    const m = rest.match(/^COMBAT REWARD npc=(\S+) gold=(\d+) total=(\d+)$/);
+    if (m) {
+      const [, npcId, gold, total] = m;
+      const npcLabel = state.npcCache[npcId]?.name || humanize(npcId);
+      state.me.gold = Number(total);
+      renderHp();
+      logCombat(`${npcLabel} was defeated — you earn ${gold} gold for taking part.`);
+      showToast({ text: `+${gold} gold for helping defeat ${npcLabel}.` });
+    }
+    return;
+  }
   if (rest.startsWith("ROOM ITEM TAKEN ")) {
     const m = rest.match(/^ROOM ITEM TAKEN (\S+) (\S+)$/);
     if (m) {
@@ -894,7 +917,6 @@ function renderRoom() {
 }
 
 function renderInventory() {
-  const canTrade = !!state.room?.can_trade;
   inventoryListEl.innerHTML = state.inventory.length
     ? state.inventory.map((id) => `
         <li class="inventory-item">
@@ -902,17 +924,11 @@ function renderInventory() {
           <span class="inventory-item-actions">
             <button class="btn btn-ghost btn-xs" data-info="${escapeHtml(id)}" type="button" title="Item info" aria-label="Item info">ⓘ</button>
             <button class="btn btn-ghost btn-xs" data-use="${escapeHtml(id)}" type="button">use</button>
-            ${canTrade
-              ? `<button class="btn btn-ghost btn-xs" data-merchant="${escapeHtml(id)}" type="button" title="Sell to the merchant now, at a reduced price">merchant</button>`
-              : ""}
-            <button class="btn btn-ghost btn-xs" data-sell="${escapeHtml(id)}" type="button" title="List on the player market at full price">list</button>
+            <button class="btn btn-ghost btn-xs" data-sell="${escapeHtml(id)}" type="button">sell</button>
             <button class="btn btn-ghost btn-xs" data-drop="${escapeHtml(id)}" type="button">drop</button>
           </span>
         </li>`).join("")
     : '<li class="empty-note">empty-handed</li>';
-  $$('[data-merchant]', inventoryListEl).forEach((btn) => {
-    btn.onclick = () => sendCommand("SHOP_SELL", `SHOP SELL ${btn.dataset.merchant}`);
-  });
   $$('[data-drop]', inventoryListEl).forEach((btn) => {
     btn.onclick = () => sendCommand("DROP", `DROP ${btn.dataset.drop}`);
   });
@@ -920,7 +936,7 @@ function renderInventory() {
     btn.onclick = () => sendCommand("USE", `USE ${btn.dataset.use}`);
   });
   $$('[data-sell]', inventoryListEl).forEach((btn) => {
-    btn.onclick = () => sendCommand("SELL", `SELL ${btn.dataset.sell}`);
+    btn.onclick = (ev) => openSellPopover(btn.dataset.sell, ev.currentTarget);
   });
   $$('[data-info]', inventoryListEl).forEach((btn) => {
     btn.onclick = (ev) => requestItemInfo(btn.dataset.info, ev.currentTarget);
@@ -1089,6 +1105,68 @@ function closeItemPopover() {
   pendingItemAnchor = null;
 }
 
+// Mirrors MERCHANT_RATE in src/commands/shop.rs — the merchant pays 80%.
+const MERCHANT_RATE = 0.8;
+
+function openSellPopover(itemId, anchorEl) {
+  state.sellItem = itemId;
+  renderSellPopover();
+
+  sellPopover.hidden = false;
+  const rect = anchorEl.getBoundingClientRect();
+  const top = Math.min(window.innerHeight - 200, rect.bottom + 8 + window.scrollY);
+  const left = Math.min(window.innerWidth - 280, rect.left + window.scrollX);
+  sellPopover.style.top = `${Math.max(8, top)}px`;
+  sellPopover.style.left = `${Math.max(8, left)}px`;
+
+  // The price only becomes known once the item has been examined.
+  if (state.itemCache[itemId]?.value == null) {
+    sendCommand("EXAMINE", `EXAMINE ${itemId}`, { itemId, quiet: true });
+  }
+}
+
+function closeSellPopover() {
+  sellPopover.hidden = true;
+  state.sellItem = null;
+}
+
+function renderSellPopover() {
+  const itemId = state.sellItem;
+  if (!itemId) return;
+
+  const cached = state.itemCache[itemId];
+  const value = cached?.value;
+  const canTrade = !!state.room?.can_trade;
+
+  $("#sell-popover-name").textContent = `Sell ${cached?.name || humanize(itemId)}`;
+
+  const merchantPrice = value != null ? Math.max(1, Math.floor(value * MERCHANT_RATE)) : null;
+  const merchantNote = canTrade
+    ? (merchantPrice != null ? `${merchantPrice} gold, paid now` : "Paid immediately, at a reduced price")
+    : "Only at the Marketplace";
+  const marketNote = value != null
+    ? `${value} gold, once a buyer takes it`
+    : "Full price, whenever a buyer takes it";
+
+  sellOptionsEl.innerHTML = `
+    <button class="sell-option" type="button" data-choice="merchant"${canTrade ? "" : " disabled"}>
+      <span class="sell-option-label">Merchant</span>
+      <span class="sell-option-note">${escapeHtml(merchantNote)}</span>
+    </button>
+    <button class="sell-option" type="button" data-choice="market">
+      <span class="sell-option-label">Player market</span>
+      <span class="sell-option-note">${escapeHtml(marketNote)}</span>
+    </button>`;
+
+  $$("[data-choice]", sellOptionsEl).forEach((btn) => {
+    btn.onclick = () => {
+      if (btn.dataset.choice === "merchant") sendCommand("SHOP_SELL", `SHOP SELL ${itemId}`);
+      else sendCommand("SELL", `SELL ${itemId}`);
+      closeSellPopover();
+    };
+  });
+}
+
 function refreshAll() {
   sendCommand("LOOK", "LOOK");
   sendCommand("STATUS", "STATUS");
@@ -1188,6 +1266,7 @@ $("#chat-form").addEventListener("submit", (e) => {
 
 $("#npc-popover-close").addEventListener("click", closeNpcPopover);
 $("#item-popover-close").addEventListener("click", closeItemPopover);
+$("#sell-popover-close").addEventListener("click", closeSellPopover);
 $("#npc-talk-btn").addEventListener("click", () => {
   if (!state.activeNpc) return;
   sendCommand("TALK", `TALK ${state.activeNpc}`, { npcId: state.activeNpc });
@@ -1231,6 +1310,9 @@ document.addEventListener("click", (e) => {
   if (!itemPopover.hidden && !itemPopover.contains(e.target)
     && !e.target.closest('[data-action="item-info"]') && !e.target.closest('[data-info]')) {
     closeItemPopover();
+  }
+  if (!sellPopover.hidden && !sellPopover.contains(e.target) && !e.target.closest('[data-sell]')) {
+    closeSellPopover();
   }
 });
 

@@ -746,6 +746,36 @@ button, input {
 }
 .npc-popover-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
+.sell-options { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.sell-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  width: 100%;
+  font-family: var(--font-mono);
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--paper-shadow);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.65rem;
+  cursor: pointer;
+  transition: background-color 120ms, border-color 120ms;
+}
+.sell-option:hover:not(:disabled) {
+  background: rgba(169, 117, 43, 0.12);
+  border-color: var(--amber-dim);
+}
+.sell-option:disabled { opacity: 0.45; cursor: not-allowed; border-style: dashed; }
+.sell-option-label { font-size: 0.82rem; font-weight: 600; }
+.sell-option-note {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
 .item-stat-list {
   list-style: none;
   margin: 0 0 0.5rem;

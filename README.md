@@ -208,6 +208,8 @@ Attacks a hostile NPC in the current room. The NPC is matched by partial ID. The
 
 All attacks broadcast `EVT ROOM COMBAT <username> attacks <npc_name> for <damage> damage npc=<npc_id> hp=<remaining_hp>` to other players in the room, allowing their clients to display real-time NPC health updates.
 
+Every player who damaged the NPC is paid `gold_drop`, not just whoever lands the killing blow. The killer learns of it through the `gold_earned` field of their own response; each other attacker is sent `EVT COMBAT REWARD npc=<npc_id> gold=<amount> total=<new_gold>` directly over their own connection, since they may have left the room or died before the kill. `total` is the player's new gold balance, so a client can update it without re-issuing `STATUS`.
+
 - **Success (combat continues)**: `OK {"attacker_hp": <player_hp>, "target_hp": <npc_hp>, "damage": <player_damage>, "status": "combat"}`
 - **Success (NPC dies)**: `OK {"attacker_hp": <player_hp>, "target_hp": 0, "damage": <player_damage>, "status": "victory"}`
 - **Success (player dies)**: `OK {"attacker_hp": 0, "target_hp": <npc_hp>, "damage": <player_damage>, "status": "death", "respawn_room": "<room_id>", "respawn_hp": 50}`
@@ -352,6 +354,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **EVT SLEEP**: Notifies other players in the room when someone rests, not defined in the RFC.
 - **EVT GROUP LEADER, EVT GROUP DISBAND, EVT GROUP KICK**: Additional group events for leadership transfer, group dissolution, and member kicking.
 - **EVT MARKET LISTED, EVT MARKET CANCELLED, EVT MARKET BOUGHT, EVT MARKET SOLD**: Market events not in the RFC, so clients can keep listings in sync in real time.
+- **EVT COMBAT REWARD**: Not in the RFC. Tells a co-attacker that their share of an NPC's gold was paid when someone else landed the killing blow.
 - **SHOP SELL**: Extension command not in the RFC. Sells an item to the merchant at 80% of its value, restricted to `merchant_room`.
 - **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE**: Additional error codes not in the RFC.
 
@@ -368,6 +371,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 | `EVT ROOM ITEM DROPPED <item> <player>` | A player drops an item (sent to other players in the room) |
 | `EVT ROOM ITEM RESPAWN <item>` | An item reappears in the room 30 seconds after being taken |
 | `EVT SLEEP <player>` | A player rests in the sleep room (sent to other players in the room) |
+| `EVT COMBAT REWARD npc=<id> gold=<n> total=<n>` | An NPC you damaged was killed by someone else; you were paid your share (sent directly to each surviving co-attacker, wherever they are) |
 | `EVT GLOBAL [ALERT] ...` | Boss spawn announcement (sent to all connected players) |
 | `EVT MARKET LISTED <seller> <item> <price>` | A player listed an item on the market (sent to all other players) |
 | `EVT MARKET CANCELLED <seller> <item>` | A player withdrew their listing (sent to all other players) |
