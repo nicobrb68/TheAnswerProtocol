@@ -375,6 +375,7 @@ button, input {
   transition: background-color 120ms, border-color 120ms;
 }
 .exit-btn:disabled { opacity: 0.25; cursor: not-allowed; border-style: dashed; }
+.exit-btn.barred { opacity: 0.6; border-style: solid; border-color: var(--danger-dim); color: var(--danger); }
 .exit-btn:not(:disabled):hover { background: rgba(169, 117, 43, 0.14); border-color: var(--amber-dim); }
 .exit-btn:not(:disabled):active { transform: translateY(1px); }
 

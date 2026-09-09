@@ -16,6 +16,8 @@ pub struct Room {
     pub items: Vec<String>,
     pub npcs: Vec<String>,
     #[serde(default)]
+    pub guarded: bool,
+    #[serde(default)]
     pub map_x: Option<i32>,
     #[serde(default)]
     pub map_y: Option<i32>,
@@ -34,10 +36,17 @@ pub struct Quest {
     pub giver: String,
     #[serde(rename = "type")]
     pub quest_type: String,
+    #[serde(default)]
     pub target_item: String,
+    /// Enemy to defeat for `kill`, recipient to hand the goods to for `deliver`.
+    #[serde(default)]
+    pub target_npc: String,
     pub target_count: u32,
     pub reward: String,
     pub reward_count: u32,
+    /// Quest that must be completed before this one is offered.
+    #[serde(default)]
+    pub requires: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -51,7 +60,11 @@ pub struct Player {
     pub gold: u32,
     pub status: PlayerState,
     pub current_room: String,
-    pub group_id: Option<String>
+    pub group_id: Option<String>,
+    #[serde(default)]
+    pub kills: HashMap<String, u32>,
+    #[serde(default)]
+    pub entered_from: Option<String>,
 }
 
 impl Player {
@@ -67,6 +80,8 @@ impl Player {
             status: PlayerState::Alive,
             current_room,
             group_id: None,
+            kills: HashMap::new(),
+            entered_from: None,
         }
     }
 }
@@ -215,6 +230,7 @@ pub enum TapError {
     CannotSleepHere,
     ItemNotUsable,
     MerchantNotHere,
+    RoomGuarded,
     PlayerDead,
     // 9xx - System
     ConnectionFailed,
@@ -238,6 +254,7 @@ impl TapError {
             TapError::CannotSleepHere => "ERR 410 CANNOT_SLEEP_HERE\n".to_string(),
             TapError::ItemNotUsable   => "ERR 411 ITEM_NOT_USABLE\n".to_string(),
             TapError::MerchantNotHere => "ERR 413 MERCHANT_NOT_HERE\n".to_string(),
+            TapError::RoomGuarded     => "ERR 414 ROOM_GUARDED\n".to_string(),
             TapError::CannotKickSelf       => "ERR 407 CANNOT_KICK_SELF\n".to_string(),
             TapError::PlayerNotInGroup    => "ERR 404 PLAYER_NOT_IN_GROUP\n".to_string(),
             TapError::InviteNotFound       => "ERR 404 INVITE_NOT_FOUND\n".to_string(),

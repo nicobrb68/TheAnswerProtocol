@@ -107,7 +107,8 @@
 				"npc.goblin"
 			],
 			"map_x": 1,
-			"map_y": 3
+			"map_y": 3,
+			"guarded": true
 		},
 		"room.crypt": {
 			"id": "room.crypt",
@@ -609,7 +610,7 @@
 			"hostile": false,
 			"hp": null,
 			"damage": null,
-			"quest": null
+			"quest": "quest.parcel"
 		},
 		"npc.blacksmith": {
 			"id": "npc.blacksmith",
@@ -648,7 +649,7 @@
 			"hostile": false,
 			"hp": null,
 			"damage": null,
-			"quest": null
+			"quest": "quest.shade"
 		},
 		"npc.keeper": {
 			"id": "npc.keeper",
@@ -795,7 +796,7 @@
 			"hostile": false,
 			"hp": null,
 			"damage": null,
-			"quest": null
+			"quest": "quest.wolves"
 		},
 		"npc.spider": {
 			"id": "npc.spider",
@@ -1219,6 +1220,40 @@
 			"target_count": 1,
 			"reward": "item.chainmail",
 			"reward_count": 1
+		},
+		"quest.wolves": {
+			"id": "quest.wolves",
+			"description": "Wolves keep coming out of the trees and wrecking the beds. Put down 2 of them, then come back to the Gardener.",
+			"giver": "npc.gardener",
+			"type": "kill",
+			"target_item": "",
+			"target_npc": "npc.wolf",
+			"target_count": 2,
+			"reward": "item.herbs",
+			"reward_count": 2
+		},
+		"quest.shade": {
+			"id": "quest.shade",
+			"description": "A shade haunts the old Throne Room. Destroy it and tell the Fisherman it is done.",
+			"giver": "npc.fisher",
+			"type": "kill",
+			"target_item": "",
+			"target_npc": "npc.shade",
+			"target_count": 1,
+			"reward": "item.holy_water",
+			"reward_count": 2,
+			"requires": "quest.wolves"
+		},
+		"quest.parcel": {
+			"id": "quest.parcel",
+			"description": "The Bartender hands you a cask of ale. Carry it to the Merchant in the Marketplace.",
+			"giver": "npc.bartender",
+			"type": "deliver",
+			"target_item": "item.ale",
+			"target_npc": "npc.merchant",
+			"target_count": 1,
+			"reward": "item.coin",
+			"reward_count": 3
 		}
 	},
 	"shop": [

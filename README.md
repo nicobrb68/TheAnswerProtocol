@@ -355,8 +355,10 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **EVT GROUP LEADER, EVT GROUP DISBAND, EVT GROUP KICK**: Additional group events for leadership transfer, group dissolution, and member kicking.
 - **EVT MARKET LISTED, EVT MARKET CANCELLED, EVT MARKET BOUGHT, EVT MARKET SOLD**: Market events not in the RFC, so clients can keep listings in sync in real time.
 - **EVT COMBAT REWARD**: Not in the RFC. Tells a co-attacker that their share of an NPC's gold was paid when someone else landed the killing blow.
+- **Quest types (`fetch` / `kill` / `deliver`) and the `requires` prerequisite**: The RFC supplies QUEST and QUESTS but leaves progression, completion, rewards and quest chains to the implementer. See Quest System below.
+- **Guarded rooms**: Extension not in the RFC. A room flagged `guarded` only lets a player leave the way they came in until every hostile in it is dead.
 - **SHOP SELL**: Extension command not in the RFC. Sells an item to the merchant at 80% of its value, restricted to `merchant_room`.
-- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE**: Additional error codes not in the RFC.
+- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE, ERR 414 ROOM_GUARDED**: Additional error codes not in the RFC.
 
 ### Events
 
@@ -415,6 +417,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 | 409 | PLAYER_DEAD | Player is dead and cannot perform this action |
 | 410 | CANNOT_SLEEP_HERE | SLEEP was used outside the designated sleep room |
 | 413 | MERCHANT_NOT_HERE | `SHOP SELL` used outside the merchant's room |
+| 414 | ROOM_GUARDED | Tried to press deeper into a guarded room while its defenders still stand |
 | 900 | CONNECTION_FAILED | TCP connection error |
 | 901 | SEND_FAILED | Failed to serialize or send a response |
 | 902 | FLOODING | Client exceeded the rate limit and was kicked |
@@ -505,36 +508,58 @@ A player-to-player marketplace. Any player can list an item from their inventory
 
 ## Quest System
 
-Quests are fetch-type: the player must collect specific items and return them to the quest-giving NPC.
+Quests come in three types. The RFC supplies the `QUEST` and `QUESTS` commands but leaves progression, completion, rewards and quest chains to the implementer, so the design below is ours.
+
+| Type | Objective | Turned in to |
+|---|---|---|
+| `fetch` | Hold `target_count` copies of `target_item` | The giver |
+| `kill` | Defeat `target_count` of `target_npc` | The giver |
+| `deliver` | The giver hands you the goods on accept; carry them across the world | `target_npc`, **not** the giver |
+
+A quest may also declare `requires`, naming another quest that must be completed first. Until then the giver answers `ERR 406 NO_QUEST_AVAILABLE`, which is how quest chains are built.
 
 ### Available Quests
 
-| Quest | Giver | Location | Objective | Reward |
-|---|---|---|---|---|
-| quest.herbs | Old Hermit | Sacred Grove | Bring 1 Healing Herbs | 2 Health Potions |
-| quest.sword | Village Blacksmith | Blacksmith Forge | Bring 1 Iron Sword | 1 Battle Axe |
-| quest.pearl | Old Fisher | Harbor Docks | Bring 2 Sea Pearls | 1 Sea Trident |
-| quest.mushroom | Swamp Witch | Murky Swamp | Bring 2 Glowing Mushrooms | 1 Enchanted Staff |
+| Quest | Type | Giver (location) | Objective | Reward | Requires |
+|---|---|---|---|---|---|
+| `quest.herbs` | fetch | Old Hermit (Forest Clearing) | Bring 1 × Healing Herbs | 1 × Blue Crystal | — |
+| `quest.iron` | fetch | Village Blacksmith (Blacksmith) | Bring 1 × Iron Sword | 2 × Frothy Ale | — |
+| `quest.crystal` | fetch | Lighthouse Keeper (Lighthouse) | Bring 1 × Blue Crystal | 1 × Plate Armor | — |
+| `quest.treasure` | fetch | Village Guard (Village Square) | Bring 1 × Ancient Treasure | 1 × Dragon Scale Armor | — |
+| `quest.diamond` | fetch | Temple Priest (Temple of Light) | Bring 1 × Abyssal Diamond | 1 × Iron Shield | — |
+| `quest.scroll` | fetch | Old Wizard (Wizard's Tower) | Bring 1 × Ancient Scroll | 1 × Chainmail Vest | — |
+| `quest.wolves` | kill | Royal Gardener (Royal Garden) | Defeat 2 × Forest Wolf | 2 × Healing Herbs | — |
+| `quest.shade` | kill | Old Fisher (Harbor Docks) | Defeat 1 × Shadow Knight | 2 × Holy Water | `quest.wolves` |
+| `quest.parcel` | deliver | Tavern Bartender (The Prancing Pony) | Carry Frothy Ale to Market Merchant (Marketplace) | 3 × Lucky Coin | — |
 
 ### Quest Flow
 
-1. **Find the NPC**: Go to the room where the quest-giving NPC is located.
-2. **Accept the quest**: Send `QUEST <npc>` (e.g., `QUEST hermit`). The server adds the quest to your active quest list and returns the full quest details as JSON, describing what items to collect and what you will receive.
-3. **Collect items**: Explore the world and use `TAKE` to pick up the required items. Use `QUESTS` at any time to check your progress (e.g., `"progress": "0/1"` or `"progress": "1/1"`).
-4. **Turn in the quest**: Return to the quest NPC and send `QUEST <npc>` again. If you have enough items, the quest items are consumed from your inventory, the reward items are added, and the quest is marked as completed. The server returns a confirmation with the reward details.
-5. **Quest completion**: Once completed, a quest cannot be accepted again from the same NPC. The NPC returns `ERR 406 NO_QUEST_AVAILABLE` for that player.
+1. **Accept**: `QUEST <npc>` at the giver's room. The server returns the quest as JSON and adds it to your active list. A `deliver` quest also drops the parcel straight into your inventory.
+2. **Progress**: `QUESTS` reports `"progress": "1/2"` and the quest `type`. Progress is counted live — items held for `fetch`/`deliver`, kills recorded for `kill`.
+3. **Turn in**: `QUEST <npc>` again, at the giver — or at the recipient for a `deliver`. Short of the target you get `ERR 408 QUEST_NOT_COMPLETE`.
+4. **Reward**: the objective is consumed (items removed, or the kill count debited by `target_count`) and the reward is added to your inventory.
+5. **Done**: a completed quest cannot be taken again; the giver answers `ERR 406 NO_QUEST_AVAILABLE`.
 
 ### Quest Validation
 
-- A player can only have each quest active once
-- A completed quest cannot be re-accepted
-- The required items must be in the player's inventory at turn-in time
-- Quest items are consumed (removed from inventory) upon successful turn-in
-- Reward items are added to inventory upon successful turn-in
+- A player can hold each quest active only once, and a completed quest cannot be re-accepted
+- A `requires` prerequisite must be in the player's completed list before the quest is offered
+- A `deliver` quest is refused by its own giver — only the named recipient closes it
+- Kills count for **every** player who damaged the NPC, not only whoever struck last, so a group hunt credits the whole group
+- Kills are cumulative and are debited on turn-in, so a kill made before accepting a quest still counts toward it
+- At startup the server refuses to run if any quest names an unknown item, NPC, prerequisite, giver or reward, or an unknown `type`
+
+### Guarded Rooms
+
+A room may set `"guarded": true`. While any hostile NPC in it is still alive, the only exit that works is the one the player walked in through — every other direction answers `ERR 414 ROOM_GUARDED`. Kill what is in there and the room opens up.
+
+`LOOK` reports `"locked": true` plus `"locked_exit"` (the room you came from) while the lock holds, so a client can grey out the barred directions instead of letting the player discover them by trial and error.
+
+In the default world, **Crystal Cavern** is guarded by the Cave Goblin: the whole underground (Tunnel, Crypt, Dragon Lair and everything past them) stays shut until it is dealt with. Since NPCs respawn 30 seconds after dying, a player still standing in the room when the goblin returns is locked in again.
 
 ## World Design
 
-The default world contains **21 rooms** organized across five distinct areas. Difficulty increases as players move further from the village.
+The default world contains **34 rooms** organized across five distinct areas. Difficulty increases as players move further from the village.
 
 ```
                         Frozen Peak

@@ -19,7 +19,22 @@ pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<Worl
         Some(id) => id.clone(),
         None => return TapError::NoExit.message(),
     };
-    if let Some(p) = w.get_mut_player(username) { p.current_room = new_room_id.clone(); }
+
+    // A guarded room only lets you back out the way you came in, until every
+    // hostile in it has been put down.
+    if room.guarded {
+        let still_hostile = room.npcs.iter()
+            .any(|id| w.get_npc(id).map(|n| n.hostile).unwrap_or(false));
+        let came_from = w.get_player(username).and_then(|p| p.entered_from.clone());
+        if still_hostile && came_from.as_deref() != Some(new_room_id.as_str()) {
+            return TapError::RoomGuarded.message();
+        }
+    }
+
+    if let Some(p) = w.get_mut_player(username) {
+        p.current_room = new_room_id.clone();
+        p.entered_from = Some(current_room.clone());
+    }
     if let Some(r) = w.get_mut_room(&current_room) { r.players.retain(|p| p != username); }
     if let Some(r) = w.get_mut_room(&new_room_id) { r.players.push(username.to_string()); }
     drop(w);

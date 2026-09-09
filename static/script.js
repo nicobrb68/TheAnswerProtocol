@@ -121,6 +121,7 @@ const ERROR_MESSAGES = {
   "901": "Message failed to send.",
   "902": "Slow down — you're sending commands too fast.",
   "413": "There's no merchant here to trade with.",
+  "414": "Something here blocks your way — defeat it first.",
 };
 
 function friendlyError(line) {
@@ -855,9 +856,14 @@ function renderRoom() {
     btn.className = `exit-btn compass-${slot}`;
     btn.type = "button";
     btn.textContent = humanize(dir);
-    if (exits[dir]) {
+    const barred = room.locked && exits[dir] && exits[dir] !== room.locked_exit;
+    if (exits[dir] && !barred) {
       btn.title = `Move ${dir} → ${humanize(exits[dir])}`;
       btn.onclick = () => sendCommand("MOVE", `MOVE ${dir}`);
+    } else if (barred) {
+      btn.disabled = true;
+      btn.title = "Blocked — defeat what guards this room first";
+      btn.classList.add("barred");
     } else {
       btn.disabled = true;
       btn.title = "No exit";

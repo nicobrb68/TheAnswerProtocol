@@ -127,9 +127,10 @@ pub async fn handle_attack(
             });
         }
 
-        if npc_gold_drop > 0 {
-            for attacker in &attackers {
-                if let Some(p) = w.get_mut_player(attacker) {
+        for attacker in &attackers {
+            if let Some(p) = w.get_mut_player(attacker) {
+                *p.kills.entry(npc_full_id.clone()).or_insert(0) += 1;
+                if npc_gold_drop > 0 {
                     p.gold += npc_gold_drop;
                     if attacker != username {
                         reward_notices.push((attacker.clone(), p.gold));

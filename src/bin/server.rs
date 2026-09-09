@@ -69,8 +69,26 @@ async fn main() {
         fatal("Sleep room does not exist in world file");
     }
     for (qid, quest) in &world.quests {
-        if !world.items.contains_key(&quest.target_item) {
-            fatal(&format!("Quest {} references unknown target_item: {}", qid, quest.target_item));
+        match quest.quest_type.as_str() {
+            "fetch" | "deliver" => {
+                if !world.items.contains_key(&quest.target_item) {
+                    fatal(&format!("Quest {} references unknown target_item: {}", qid, quest.target_item));
+                }
+                if quest.quest_type == "deliver" && !world.npcs.contains_key(&quest.target_npc) {
+                    fatal(&format!("Deliver quest {} references unknown target_npc: {}", qid, quest.target_npc));
+                }
+            }
+            "kill" => {
+                if !world.npcs.contains_key(&quest.target_npc) {
+                    fatal(&format!("Kill quest {} references unknown target_npc: {}", qid, quest.target_npc));
+                }
+            }
+            other => fatal(&format!("Quest {} has unknown type: {}", qid, other)),
+        }
+        if let Some(required) = &quest.requires {
+            if !world.quests.contains_key(required) {
+                fatal(&format!("Quest {} requires unknown quest: {}", qid, required));
+            }
         }
         if !world.items.contains_key(&quest.reward) {
             fatal(&format!("Quest {} references unknown reward: {}", qid, quest.reward));
