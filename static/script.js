@@ -410,6 +410,7 @@ function handleResponse(ctx, line) {
       else if (data.status === "death") logCombat(`${npcLabel} struck you down.${armorMsg} You wake up back at a safe place.`);
       else logCombat(`You hit ${npcLabel} for ${data.damage}. They hit you for ${data.npc_damage}${armorMsg}. [${npcLabel}: ${data.target_hp} HP | You: ${data.attacker_hp} HP]`);
       sendCommand("STATUS", "STATUS");
+      if (data.status === "victory") sendCommand("QUESTS", "QUESTS");
       if (data.status === "victory" || data.status === "death") sendCommand("LOOK", "LOOK");
       else renderRoom();
       return;
@@ -433,10 +434,13 @@ function handleResponse(ctx, line) {
       if (!data) return;
       if (data.status === "completed") {
         showToast({ text: `Quest complete! +${data.reward_count} × ${humanize(data.reward)}` });
-        sendCommand("INVENTORY", "INVENTORY");
+      } else if (data.type === "deliver") {
+        showToast({ text: `New quest: ${data.description} — ${humanize(data.target_item)} added to your pack.` });
       } else {
         showToast({ text: `New quest: ${data.description}` });
       }
+      // Accepting a delivery hands over the parcel, so the inventory moves either way.
+      sendCommand("INVENTORY", "INVENTORY");
       sendCommand("QUESTS", "QUESTS");
       return;
     }
@@ -640,8 +644,13 @@ function handleEvent(rest) {
       const npcLabel = state.npcCache[npcId]?.name || humanize(npcId);
       state.me.gold = Number(total);
       renderHp();
-      logCombat(`${npcLabel} was defeated — you earn ${gold} gold for taking part.`);
-      showToast({ text: `+${gold} gold for helping defeat ${npcLabel}.` });
+      const earned = Number(gold);
+      logCombat(earned > 0
+        ? `${npcLabel} was defeated — you earn ${gold} gold for taking part.`
+        : `${npcLabel} was defeated — your part in it counts.`);
+      if (earned > 0) showToast({ text: `+${gold} gold for helping defeat ${npcLabel}.` });
+      // The kill was credited to every attacker, so a kill quest may have moved.
+      sendCommand("QUESTS", "QUESTS");
     }
     return;
   }
