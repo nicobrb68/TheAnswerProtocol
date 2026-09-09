@@ -465,17 +465,18 @@ Combat in TAP is a simple exchange-based system where each `ATTACK` command resu
 
 ### Weapon Damage Bonuses
 
-| Weapon | Location | Damage bonus |
+A player's hit is `10 + the best damage bonus they carry`.
+
+| Weapon | Source | Damage bonus |
 |---|---|---|
-| Enchanted Staff | Ancient Ruins (or quest reward) | +25 |
-| Battle Axe | Frozen Peak (or quest reward) | +20 |
-| Sea Trident | Quest reward | +18 |
-| Iron Sword | Blacksmith Forge | +15 |
-| Shadow Dagger | Deep Forest | +12 |
-| Pickaxe | Abandoned Mine | +8 |
-| Bone Club | Forgotten Crypt | +6 |
+| Dawnbreaker 🔒 | **Quest only** (`quest.skeleton`) | +30 |
+| War Hammer | Abandoned Chapel, Shop | +18 |
+| Iron Sword | Blacksmith, Shop | +15 |
+| Rune Stone | Stone Bridge | +12 |
+| Pickaxe | Old Mine, Shop | +8 |
+| Burning Torch | Dark Dungeon, Shop | +5 |
 | Wooden Branch | Whispering Forest | +3 |
-| Fresh Fish | Harbor Docks | +1 |
+| Fresh Fish | Crystal Lake | +1 |
 | No weapon (base) | — | +0 |
 
 ### NPC Regeneration
@@ -529,14 +530,14 @@ A quest may also declare `requires`, naming another quest that must be completed
 | `quest.diamond` | fetch | Temple Priest — Temple of Light | Temple of Light | Bring 1 × Abyssal Diamond | 1 × Iron Shield | — | — |
 | `quest.scroll` | fetch | Old Wizard — Wizard's Tower | Wizard's Tower | Bring 1 × Ancient Scroll | 1 × Chainmail Vest | — | — |
 | `quest.wolves` | kill | Royal Gardener — Royal Garden | Royal Garden | Defeat 2 × Forest Wolf | 2 × Healing Herbs | — | `quest.shade`, `quest.pelts` |
-| `quest.shade` | kill | Old Fisher — Harbor Docks | Harbor Docks | Defeat 1 × Shadow Knight | 2 × Holy Water | `quest.wolves` | — |
+| `quest.shade` | kill | Old Fisher — Harbor Docks | Harbor Docks | Defeat 1 × Shadow Knight | 1 × Aegis of the Deep 🔒 | `quest.wolves` | — |
 | `quest.parcel` | deliver | Tavern Bartender — The Prancing Pony | Marketplace | Carry Frothy Ale to Market Merchant | 3 × Lucky Coin | — | — |
 | `quest.ore` | fetch | Grizzled Miner — Old Mine | Old Mine | Bring 2 × Iron Ore | 1 × Oil Lantern | — | `quest.goblin` |
 | `quest.goblin` | kill | Well Warden — Wishing Well | Wishing Well | Defeat 1 × Cave Goblin | 1 × Silver Key | `quest.ore` | `quest.skeleton` |
-| `quest.skeleton` | kill | Cloister Monk — Abandoned Chapel | Abandoned Chapel | Defeat 1 × Skeleton Warrior | 1 × Warding Amulet | `quest.goblin` | — |
+| `quest.skeleton` | kill | Cloister Monk — Abandoned Chapel | Abandoned Chapel | Defeat 1 × Skeleton Warrior | 1 × Dawnbreaker 🔒 | `quest.goblin` | — |
 | `quest.crab` | kill | Pearl Diver — Sea Grotto | Sea Grotto | Defeat 2 × Giant Crab | 2 × Sea Pearl | — | `quest.chalice` |
-| `quest.chalice` | fetch | Ruin Scholar — Ancient Ruins | Ancient Ruins | Bring 1 × Silver Chalice | 1 × Abyssal Diamond | `quest.crab` | — |
-| `quest.pelts` | fetch | Wandering Hunter — Mountain Peak | Mountain Peak | Bring 2 × Wolf Pelt | 2 × Hemp Rope | `quest.wolves` | — |
+| `quest.chalice` | fetch | Ruin Scholar — Ancient Ruins | Ancient Ruins | Bring 1 × Silver Chalice | 1 × Old Tom's Last Resort 🔒 | `quest.crab` | — |
+| `quest.pelts` | fetch | Wandering Hunter — Mountain Peak | Mountain Peak | Bring 2 × Wolf Pelt | 1 × Warding Amulet | `quest.wolves` | — |
 | `quest.troll` | kill | Market Merchant — Marketplace | Marketplace | Defeat 1 × Bridge Troll | 1 × Shadow Crown | — | — |
 | `quest.oil` | deliver | Beachcomber — Shipwreck Beach | Lighthouse | Carry Flask of Oil to Lighthouse Keeper | 5 × Lucky Coin | — | — |
 
@@ -647,14 +648,48 @@ The world contains 21 NPCs with three roles:
 
 ### Items
 
-The world contains 26 items distributed across rooms, with stronger equipment found in more dangerous areas:
+The world holds **43 items**. Only the strongest weapon, the strongest armor and the strongest drink cannot be bought or found — they are handed out solely at the end of a quest chain, and are marked 🔒 below.
 
-- **Weapons** (9): Enchanted Staff (25 dmg, Ancient Ruins), Battle Axe (20 dmg, Frozen Peak), Sea Trident (18 dmg, quest reward), Iron Sword (15 dmg, Blacksmith), Shadow Dagger (12 dmg, Deep Forest), Pickaxe (8 dmg, Mine), Bone Club (6 dmg, Crypt), Wooden Branch (3 dmg, Forest), Fresh Fish (1 dmg, Docks)
-- **Healing** (7): Health Potion (35 hp, Murky Swamp), Phoenix Feather (30 hp, Frozen Peak), Healing Herbs (20 hp, Sacred Grove), Glowing Mushroom (15 hp, Crystal Cavern), Frothy Ale (10 hp, Tavern), Loaf of Bread (8 hp, Market), Fresh Apple (5 hp, Market)
-- **Quest Items**: Sea Pearl (Shipwreck Beach), Glowing Mushroom (Crystal Cavern), Healing Herbs (Sacred Grove), Iron Sword (Blacksmith)
-- **Miscellaneous**: Old Key, Blue Crystal, Ancient Treasure, Hemp Rope, Oil Lantern, Broken Compass, Ancient Scroll, Dark Gem, Dragon Scale, Phoenix Feather
+#### Unique quest rewards
 
-All items respawn in their original room 30 seconds after being picked up. Multiple players can each pick up the same item once it respawns.
+| Item | Stat | Earned from | Chain |
+|---|---|---|---|
+| Dawnbreaker | 30 damage — best weapon in the game | `quest.skeleton` | ore → goblin → skeleton |
+| Aegis of the Deep | 28 armor — best armor in the game | `quest.shade` | wolves → shade |
+| Old Tom's Last Resort | 99 HP — a full heal in one swig | `quest.chalice` | crab → chalice |
+
+They cannot be bought from the shop, do not lie in any room, and never respawn. The only other way to hold one is to buy it from a player who earned it and listed it on the market.
+
+#### Armor
+
+| Armor | Source | Damage absorbed |
+|---|---|---|
+| Aegis of the Deep 🔒 | **Quest only** (`quest.shade`) | up to 28 |
+| Dragon Scale Armor | **Quest only** (`quest.treasure`) | up to 20 |
+| Plate Armor | **Quest only** (`quest.crystal`) | up to 15 |
+| Shadow Crown | Throne of Shadows, quest reward | up to 12 |
+| Iron Shield | Shop, quest reward | up to 10 |
+| Chainmail Vest | Shop, quest reward | up to 6 |
+| Warding Amulet | **Quest only** (`quest.pelts`) | up to 4 |
+| Leather Cap | Shop | up to 3 |
+| Spider Silk | Hidden Tunnel | up to 2 |
+
+#### Consumables
+
+| Consumable | Source | Restores |
+|---|---|---|
+| Old Tom's Last Resort 🔒 | **Quest only** (`quest.chalice`) | 99 HP |
+| Holy Water | Temple of Light, Shop | 30 HP |
+| Healing Herbs | Forest Clearing, Shop, quest reward | 20 HP |
+| Swamp Mushroom | Murky Swamp, Shop | 15 HP |
+| Glowing Moss | Sea Grotto | 12 HP |
+| Frothy Ale | The Prancing Pony, Shop, quest reward | 10 HP |
+| Loaf of Bread | Marketplace, Shop | 8 HP |
+| Fresh Fish | Crystal Lake | 6 HP |
+| Fresh Apple | Marketplace, Shop | 5 HP |
+| Red Rose | Royal Garden | 3 HP |
+
+Every item that lies in a room respawns there 30 seconds after being picked up, so several players can each collect their own copy. Quest rewards are minted on turn-in instead.
 
 ## Server Logging
 

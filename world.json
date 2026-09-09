@@ -1330,6 +1330,30 @@
 			"armor": null,
 			"heal": null,
 			"value": 70
+		},
+		"item.dawnbreaker": {
+			"id": "item.dawnbreaker",
+			"name": "Dawnbreaker",
+			"damage": 30,
+			"armor": null,
+			"heal": null,
+			"value": 400
+		},
+		"item.aegis": {
+			"id": "item.aegis",
+			"name": "Aegis of the Deep",
+			"damage": null,
+			"armor": 28,
+			"heal": null,
+			"value": 380
+		},
+		"item.last_resort": {
+			"id": "item.last_resort",
+			"name": "Old Tom's Last Resort",
+			"damage": null,
+			"armor": null,
+			"heal": 99,
+			"value": 250
 		}
 	},
 	"quests": {
@@ -1412,8 +1436,8 @@
 			"target_item": "",
 			"target_npc": "npc.shade",
 			"target_count": 1,
-			"reward": "item.holy_water",
-			"reward_count": 2,
+			"reward": "item.aegis",
+			"reward_count": 1,
 			"requires": "quest.wolves"
 		},
 		"quest.parcel": {
@@ -1458,7 +1482,7 @@
 			"target_item": "",
 			"target_npc": "npc.skeleton",
 			"target_count": 1,
-			"reward": "item.amulet",
+			"reward": "item.dawnbreaker",
 			"reward_count": 1,
 			"requires": "quest.goblin"
 		},
@@ -1481,7 +1505,7 @@
 			"target_item": "item.chalice",
 			"target_npc": "",
 			"target_count": 1,
-			"reward": "item.diamond",
+			"reward": "item.last_resort",
 			"reward_count": 1,
 			"requires": "quest.crab"
 		},
@@ -1493,8 +1517,8 @@
 			"target_item": "item.wolf_pelt",
 			"target_npc": "",
 			"target_count": 2,
-			"reward": "item.rope",
-			"reward_count": 2,
+			"reward": "item.amulet",
+			"reward_count": 1,
 			"requires": "quest.wolves"
 		},
 		"quest.troll": {
