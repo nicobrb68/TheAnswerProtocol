@@ -26,6 +26,7 @@ const roomNameEl = $("#room-name");
 const roomIdEl = $("#room-id");
 const roomDescEl = $("#room-desc");
 const exitRowEl = $("#exit-row");
+const roomLockedEl = $("#room-locked");
 const playersListEl = $("#players-list");
 const itemsListEl = $("#items-list");
 const npcsListEl = $("#npcs-list");
@@ -71,6 +72,7 @@ const state = {
   mapData: null,
   mapLayout: null,
   sellItem: null,
+  lockedRoom: null,
 };
 
 const pending = [];
@@ -238,6 +240,8 @@ function returnToLogin() {
   itemPopover.hidden = true;
   sellPopover.hidden = true;
   state.sellItem = null;
+  state.lockedRoom = null;
+  roomLockedEl.hidden = true;
   document.getElementById("minimap-inline").hidden = true;
   Object.values(panes).forEach((p) => { if (p) p.innerHTML = ""; });
   bossIndicatorEl.hidden = true;
@@ -876,6 +880,17 @@ function renderRoom() {
   center.disabled = true;
   center.textContent = "◈";
   exitRowEl.appendChild(center);
+
+  if (room.locked) {
+    const back = room.locked_exit ? humanize(room.locked_exit) : "the way you came";
+    const msg = `Barred. Something here still guards this room — until it falls, the only way out is back to ${back}.`;
+    roomLockedEl.textContent = msg;
+    roomLockedEl.hidden = false;
+    if (state.lockedRoom !== room.id) { state.lockedRoom = room.id; logCombat(msg); }
+  } else {
+    roomLockedEl.hidden = true;
+    if (state.lockedRoom === room.id) { state.lockedRoom = null; logEvent("The way is clear — this room no longer holds you."); }
+  }
 
   const others = (room.players || []).filter((p) => p !== state.me.username);
   playersListEl.innerHTML = others.length

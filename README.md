@@ -520,17 +520,44 @@ A quest may also declare `requires`, naming another quest that must be completed
 
 ### Available Quests
 
-| Quest | Type | Giver (location) | Objective | Reward | Requires |
-|---|---|---|---|---|---|
-| `quest.herbs` | fetch | Old Hermit (Forest Clearing) | Bring 1 × Healing Herbs | 1 × Blue Crystal | — |
-| `quest.iron` | fetch | Village Blacksmith (Blacksmith) | Bring 1 × Iron Sword | 2 × Frothy Ale | — |
-| `quest.crystal` | fetch | Lighthouse Keeper (Lighthouse) | Bring 1 × Blue Crystal | 1 × Plate Armor | — |
-| `quest.treasure` | fetch | Village Guard (Village Square) | Bring 1 × Ancient Treasure | 1 × Dragon Scale Armor | — |
-| `quest.diamond` | fetch | Temple Priest (Temple of Light) | Bring 1 × Abyssal Diamond | 1 × Iron Shield | — |
-| `quest.scroll` | fetch | Old Wizard (Wizard's Tower) | Bring 1 × Ancient Scroll | 1 × Chainmail Vest | — |
-| `quest.wolves` | kill | Royal Gardener (Royal Garden) | Defeat 2 × Forest Wolf | 2 × Healing Herbs | — |
-| `quest.shade` | kill | Old Fisher (Harbor Docks) | Defeat 1 × Shadow Knight | 2 × Holy Water | `quest.wolves` |
-| `quest.parcel` | deliver | Tavern Bartender (The Prancing Pony) | Carry Frothy Ale to Market Merchant (Marketplace) | 3 × Lucky Coin | — |
+| Quest | Type | Given by | Turned in at | Objective | Reward | Requires | Unlocks |
+|---|---|---|---|---|---|---|---|
+| `quest.herbs` | fetch | Old Hermit — Forest Clearing | Forest Clearing | Bring 1 × Healing Herbs | 1 × Blue Crystal | — | — |
+| `quest.iron` | fetch | Village Blacksmith — Blacksmith | Blacksmith | Bring 1 × Iron Sword | 2 × Frothy Ale | — | — |
+| `quest.crystal` | fetch | Lighthouse Keeper — Lighthouse | Lighthouse | Bring 1 × Blue Crystal | 1 × Plate Armor | — | — |
+| `quest.treasure` | fetch | Village Guard — Village Square | Village Square | Bring 1 × Ancient Treasure | 1 × Dragon Scale Armor | — | — |
+| `quest.diamond` | fetch | Temple Priest — Temple of Light | Temple of Light | Bring 1 × Abyssal Diamond | 1 × Iron Shield | — | — |
+| `quest.scroll` | fetch | Old Wizard — Wizard's Tower | Wizard's Tower | Bring 1 × Ancient Scroll | 1 × Chainmail Vest | — | — |
+| `quest.wolves` | kill | Royal Gardener — Royal Garden | Royal Garden | Defeat 2 × Forest Wolf | 2 × Healing Herbs | — | `quest.shade`, `quest.pelts` |
+| `quest.shade` | kill | Old Fisher — Harbor Docks | Harbor Docks | Defeat 1 × Shadow Knight | 2 × Holy Water | `quest.wolves` | — |
+| `quest.parcel` | deliver | Tavern Bartender — The Prancing Pony | Marketplace | Carry Frothy Ale to Market Merchant | 3 × Lucky Coin | — | — |
+| `quest.ore` | fetch | Grizzled Miner — Old Mine | Old Mine | Bring 2 × Iron Ore | 1 × Oil Lantern | — | `quest.goblin` |
+| `quest.goblin` | kill | Well Warden — Wishing Well | Wishing Well | Defeat 1 × Cave Goblin | 1 × Silver Key | `quest.ore` | `quest.skeleton` |
+| `quest.skeleton` | kill | Cloister Monk — Abandoned Chapel | Abandoned Chapel | Defeat 1 × Skeleton Warrior | 1 × Warding Amulet | `quest.goblin` | — |
+| `quest.crab` | kill | Pearl Diver — Sea Grotto | Sea Grotto | Defeat 2 × Giant Crab | 2 × Sea Pearl | — | `quest.chalice` |
+| `quest.chalice` | fetch | Ruin Scholar — Ancient Ruins | Ancient Ruins | Bring 1 × Silver Chalice | 1 × Abyssal Diamond | `quest.crab` | — |
+| `quest.pelts` | fetch | Wandering Hunter — Mountain Peak | Mountain Peak | Bring 2 × Wolf Pelt | 2 × Hemp Rope | `quest.wolves` | — |
+| `quest.troll` | kill | Market Merchant — Marketplace | Marketplace | Defeat 1 × Bridge Troll | 1 × Shadow Crown | — | — |
+| `quest.oil` | deliver | Beachcomber — Shipwreck Beach | Lighthouse | Carry Flask of Oil to Lighthouse Keeper | 5 × Lucky Coin | — | — |
+
+A `deliver` quest is the only one closed somewhere other than where it was taken — the **Turned in at** column shows where each one ends.
+
+### Quest Chains
+
+```
+quest.wolves  (kill, Royal Gardener)
+  └─ quest.shade  (kill, Old Fisher)
+  └─ quest.pelts  (fetch, Wandering Hunter)
+
+quest.ore  (fetch, Grizzled Miner)
+  └─ quest.goblin  (kill, Well Warden)
+    └─ quest.skeleton  (kill, Cloister Monk)
+
+quest.crab  (kill, Pearl Diver)
+  └─ quest.chalice  (fetch, Ruin Scholar)
+```
+
+Everything else stands alone. A quest whose `requires` is unmet is simply not offered: the giver answers `ERR 406 NO_QUEST_AVAILABLE`, exactly as if it were already finished.
 
 ### Quest Flow
 

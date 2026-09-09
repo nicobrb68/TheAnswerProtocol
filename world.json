@@ -83,9 +83,12 @@
 			},
 			"players": [],
 			"items": [
-				"item.pickaxe"
+				"item.pickaxe",
+				"item.ore"
 			],
-			"npcs": [],
+			"npcs": [
+				"npc.miner"
+			],
 			"map_x": 1,
 			"map_y": 2
 		},
@@ -101,7 +104,8 @@
 			},
 			"players": [],
 			"items": [
-				"item.crystal"
+				"item.crystal",
+				"item.ore"
 			],
 			"npcs": [
 				"npc.goblin"
@@ -219,7 +223,8 @@
 			},
 			"players": [],
 			"items": [
-				"item.branch"
+				"item.branch",
+				"item.wolf_pelt"
 			],
 			"npcs": [
 				"npc.wolf"
@@ -254,7 +259,8 @@
 			},
 			"players": [],
 			"items": [
-				"item.herbs"
+				"item.herbs",
+				"item.wolf_pelt"
 			],
 			"npcs": [
 				"npc.hermit"
@@ -275,7 +281,9 @@
 			"items": [
 				"item.scroll"
 			],
-			"npcs": [],
+			"npcs": [
+				"npc.scholar"
+			],
 			"map_x": 4,
 			"map_y": 4
 		},
@@ -317,7 +325,9 @@
 			},
 			"players": [],
 			"items": [],
-			"npcs": [],
+			"npcs": [
+				"npc.beachcomber"
+			],
 			"map_x": 11,
 			"map_y": 2
 		},
@@ -384,7 +394,9 @@
 			"items": [
 				"item.coin"
 			],
-			"npcs": [],
+			"npcs": [
+				"npc.warden"
+			],
 			"map_x": 4,
 			"map_y": 3
 		},
@@ -399,7 +411,9 @@
 			"items": [
 				"item.hammer"
 			],
-			"npcs": [],
+			"npcs": [
+				"npc.monk"
+			],
 			"map_x": 3,
 			"map_y": 3
 		},
@@ -414,7 +428,9 @@
 			"items": [
 				"item.feather"
 			],
-			"npcs": [],
+			"npcs": [
+				"npc.hunter"
+			],
 			"map_x": 1,
 			"map_y": 1
 		},
@@ -514,9 +530,12 @@
 			},
 			"players": [],
 			"items": [
-				"item.moss"
+				"item.moss",
+				"item.chalice"
 			],
-			"npcs": [],
+			"npcs": [
+				"npc.diver"
+			],
 			"map_x": 9,
 			"map_y": 4
 		},
@@ -636,7 +655,7 @@
 			"hostile": false,
 			"hp": null,
 			"damage": null,
-			"quest": null
+			"quest": "quest.troll"
 		},
 		"npc.fisher": {
 			"id": "npc.fisher",
@@ -884,6 +903,111 @@
 			"damage": 16,
 			"quest": null,
 			"gold_drop": 14
+		},
+		"npc.miner": {
+			"id": "npc.miner",
+			"name": "Grizzled Miner",
+			"dialogue": [
+				"Thirty years in this shaft and the ore still hides from me."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.ore",
+			"gold_drop": 0,
+			"boss": false,
+			"boss_room": null,
+			"boss_alert": null
+		},
+		"npc.monk": {
+			"id": "npc.monk",
+			"name": "Cloister Monk",
+			"dialogue": [
+				"The chapel is quiet now. Too quiet, some would say."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.skeleton",
+			"gold_drop": 0,
+			"boss": false,
+			"boss_room": null,
+			"boss_alert": null
+		},
+		"npc.scholar": {
+			"id": "npc.scholar",
+			"name": "Ruin Scholar",
+			"dialogue": [
+				"These stones predate the village by a thousand years."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.chalice",
+			"gold_drop": 0,
+			"boss": false,
+			"boss_room": null,
+			"boss_alert": null
+		},
+		"npc.hunter": {
+			"id": "npc.hunter",
+			"name": "Wandering Hunter",
+			"dialogue": [
+				"I track what others flee from."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.pelts",
+			"gold_drop": 0,
+			"boss": false,
+			"boss_room": null,
+			"boss_alert": null
+		},
+		"npc.diver": {
+			"id": "npc.diver",
+			"name": "Pearl Diver",
+			"dialogue": [
+				"The reef gives up its treasures grudgingly."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.crab",
+			"gold_drop": 0,
+			"boss": false,
+			"boss_room": null,
+			"boss_alert": null
+		},
+		"npc.warden": {
+			"id": "npc.warden",
+			"name": "Well Warden",
+			"dialogue": [
+				"Coins go in. Wishes rarely come out."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.goblin",
+			"gold_drop": 0,
+			"boss": false,
+			"boss_room": null,
+			"boss_alert": null
+		},
+		"npc.beachcomber": {
+			"id": "npc.beachcomber",
+			"name": "Beachcomber",
+			"dialogue": [
+				"The sea gives back what it takes. Eventually."
+			],
+			"hostile": false,
+			"hp": null,
+			"damage": null,
+			"quest": "quest.oil",
+			"gold_drop": 0,
+			"boss": false,
+			"boss_room": null,
+			"boss_alert": null
 		}
 	},
 	"items": {
@@ -1158,6 +1282,54 @@
 			"armor": null,
 			"heal": null,
 			"value": 45
+		},
+		"item.ore": {
+			"id": "item.ore",
+			"name": "Iron Ore",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 12
+		},
+		"item.lantern_oil": {
+			"id": "item.lantern_oil",
+			"name": "Flask of Oil",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 9
+		},
+		"item.silver_key": {
+			"id": "item.silver_key",
+			"name": "Silver Key",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 25
+		},
+		"item.amulet": {
+			"id": "item.amulet",
+			"name": "Warding Amulet",
+			"damage": null,
+			"armor": 4,
+			"heal": null,
+			"value": 60
+		},
+		"item.wolf_pelt": {
+			"id": "item.wolf_pelt",
+			"name": "Wolf Pelt",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 14
+		},
+		"item.chalice": {
+			"id": "item.chalice",
+			"name": "Silver Chalice",
+			"damage": null,
+			"armor": null,
+			"heal": null,
+			"value": 70
 		}
 	},
 	"quests": {
@@ -1254,6 +1426,98 @@
 			"target_count": 1,
 			"reward": "item.coin",
 			"reward_count": 3
+		},
+		"quest.ore": {
+			"id": "quest.ore",
+			"description": "Dig 2 lumps of iron ore out of the mine workings and bring them to the Grizzled Miner.",
+			"giver": "npc.miner",
+			"type": "fetch",
+			"target_item": "item.ore",
+			"target_npc": "",
+			"target_count": 2,
+			"reward": "item.lantern",
+			"reward_count": 1
+		},
+		"quest.goblin": {
+			"id": "quest.goblin",
+			"description": "The Cave Goblin bars the deep tunnels. Put it down, then tell the Well Warden.",
+			"giver": "npc.warden",
+			"type": "kill",
+			"target_item": "",
+			"target_npc": "npc.goblin",
+			"target_count": 1,
+			"reward": "item.silver_key",
+			"reward_count": 1,
+			"requires": "quest.ore"
+		},
+		"quest.skeleton": {
+			"id": "quest.skeleton",
+			"description": "With the tunnels open, clear the Skeleton Warrior out of the Forgotten Crypt.",
+			"giver": "npc.monk",
+			"type": "kill",
+			"target_item": "",
+			"target_npc": "npc.skeleton",
+			"target_count": 1,
+			"reward": "item.amulet",
+			"reward_count": 1,
+			"requires": "quest.goblin"
+		},
+		"quest.crab": {
+			"id": "quest.crab",
+			"description": "Giant crabs have overrun the Coral Reef. Kill 2 and report to the Pearl Diver.",
+			"giver": "npc.diver",
+			"type": "kill",
+			"target_item": "",
+			"target_npc": "npc.crab",
+			"target_count": 2,
+			"reward": "item.pearl",
+			"reward_count": 2
+		},
+		"quest.chalice": {
+			"id": "quest.chalice",
+			"description": "A silver chalice lies in the Sea Grotto. Bring it to the Ruin Scholar.",
+			"giver": "npc.scholar",
+			"type": "fetch",
+			"target_item": "item.chalice",
+			"target_npc": "",
+			"target_count": 1,
+			"reward": "item.diamond",
+			"reward_count": 1,
+			"requires": "quest.crab"
+		},
+		"quest.pelts": {
+			"id": "quest.pelts",
+			"description": "Bring the Wandering Hunter 2 wolf pelts to prove you can track.",
+			"giver": "npc.hunter",
+			"type": "fetch",
+			"target_item": "item.wolf_pelt",
+			"target_npc": "",
+			"target_count": 2,
+			"reward": "item.rope",
+			"reward_count": 2,
+			"requires": "quest.wolves"
+		},
+		"quest.troll": {
+			"id": "quest.troll",
+			"description": "The Bridge Troll shakes down everyone crossing the Stone Bridge. End it.",
+			"giver": "npc.merchant",
+			"type": "kill",
+			"target_item": "",
+			"target_npc": "npc.troll",
+			"target_count": 1,
+			"reward": "item.crown",
+			"reward_count": 1
+		},
+		"quest.oil": {
+			"id": "quest.oil",
+			"description": "The lighthouse is running dry. Carry this flask of oil to the Lighthouse Keeper.",
+			"giver": "npc.beachcomber",
+			"type": "deliver",
+			"target_item": "item.lantern_oil",
+			"target_npc": "npc.keeper",
+			"target_count": 1,
+			"reward": "item.coin",
+			"reward_count": 5
 		}
 	},
 	"shop": [

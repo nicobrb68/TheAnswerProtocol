@@ -317,6 +317,17 @@ button, input {
   margin: 0.6rem 0 1.5rem;
 }
 
+.room-locked {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--danger-dim);
+  background: rgba(200, 92, 79, 0.12);
+  border: 1px solid rgba(200, 92, 79, 0.4);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
 .room-block { margin-bottom: 1.5rem; }
 .room-block h2 {
   font-family: var(--font-mono);
