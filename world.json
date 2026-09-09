@@ -1237,5 +1237,6 @@
 		"item.mushroom",
 		"item.torch",
 		"item.hammer"
-	]
+	],
+	"merchant_room": "room.market"
 }

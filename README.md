@@ -266,6 +266,12 @@ Puts an item from the player's inventory up for sale on the player market. The i
 - **Success**: `OK listed=<item_id> price=<amount>`
 - **Errors**: `ERR 404 ITEM_NOT_IN_INVENTORY`
 
+#### `SHOP SELL <item>`
+
+Sells an item from the player's inventory directly to the merchant, for **80% of its value**, rounded down (minimum 1 gold). Payment is immediate. Only works in the merchant's room, defined by the `merchant_room` field of the world file (default: `room.market` — Marketplace); anywhere else it returns `ERR 413 MERCHANT_NOT_HERE`. The server refuses to start if `merchant_room` names a room that does not exist.
+
+This is the impatient alternative to `SELL`: the merchant always buys, but pays less than the player market would. `LOOK` reports `can_trade: true` while standing in that room, so clients can show the option only where it applies.
+
 #### `MARKET`
 
 Lists all items currently for sale on the player market. Each entry includes the item details, seller name, price, and a numeric index used for purchasing.
@@ -346,7 +352,8 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **EVT SLEEP**: Notifies other players in the room when someone rests, not defined in the RFC.
 - **EVT GROUP LEADER, EVT GROUP DISBAND, EVT GROUP KICK**: Additional group events for leadership transfer, group dissolution, and member kicking.
 - **EVT MARKET LISTED, EVT MARKET CANCELLED, EVT MARKET BOUGHT, EVT MARKET SOLD**: Market events not in the RFC, so clients can keep listings in sync in real time.
-- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE**: Additional error codes not in the RFC.
+- **SHOP SELL**: Extension command not in the RFC. Sells an item to the merchant at 80% of its value, restricted to `merchant_room`.
+- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE**: Additional error codes not in the RFC.
 
 ### Events
 
@@ -403,6 +410,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 | 408 | QUEST_NOT_COMPLETE | Player does not have enough quest items to turn in |
 | 409 | PLAYER_DEAD | Player is dead and cannot perform this action |
 | 410 | CANNOT_SLEEP_HERE | SLEEP was used outside the designated sleep room |
+| 413 | MERCHANT_NOT_HERE | `SHOP SELL` used outside the merchant's room |
 | 900 | CONNECTION_FAILED | TCP connection error |
 | 901 | SEND_FAILED | Failed to serialize or send a response |
 | 902 | FLOODING | Client exceeded the rate limit and was kicked |

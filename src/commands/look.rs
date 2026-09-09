@@ -20,5 +20,8 @@ pub async fn handle_look(username: &str, world: &Arc<Mutex<World>>) -> String {
     if player.current_room == w.sleep_room {
         value.as_object_mut().map(|o| o.insert("can_sleep".to_string(), json!(true)));
     }
+    if w.merchant_room.as_deref() == Some(player.current_room.as_str()) {
+        value.as_object_mut().map(|o| o.insert("can_trade".to_string(), json!(true)));
+    }
     format!("OK {}\n", value)
 }

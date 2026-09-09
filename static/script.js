@@ -117,6 +117,7 @@ const ERROR_MESSAGES = {
   "900": "Connection failed.",
   "901": "Message failed to send.",
   "902": "Slow down — you're sending commands too fast.",
+  "413": "There's no merchant here to trade with.",
 };
 
 function friendlyError(line) {
@@ -460,6 +461,18 @@ function handleResponse(ctx, line) {
       return;
     }
 
+    case "SHOP_SELL": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const m = line.match(/sold=(\S+) price=(\d+) gold=(\d+)/);
+      if (m) {
+        state.me.gold = Number(m[3]);
+        renderHp();
+        showToast({ text: `Sold ${humanize(m[1])} to the merchant for ${m[2]} gold.` });
+      }
+      sendCommand("INVENTORY", "INVENTORY");
+      return;
+    }
+
     case "MARKET": {
       if (isErr) return;
       const arr = safeJson(line.slice(3));
@@ -798,6 +811,7 @@ function applyRoom(room) {
   if (!room) return;
   state.room = room;
   renderRoom();
+  renderInventory();
   if (!document.getElementById("minimap-inline").hidden) renderMinimap();
 }
 
@@ -880,6 +894,7 @@ function renderRoom() {
 }
 
 function renderInventory() {
+  const canTrade = !!state.room?.can_trade;
   inventoryListEl.innerHTML = state.inventory.length
     ? state.inventory.map((id) => `
         <li class="inventory-item">
@@ -887,11 +902,17 @@ function renderInventory() {
           <span class="inventory-item-actions">
             <button class="btn btn-ghost btn-xs" data-info="${escapeHtml(id)}" type="button" title="Item info" aria-label="Item info">ⓘ</button>
             <button class="btn btn-ghost btn-xs" data-use="${escapeHtml(id)}" type="button">use</button>
-            <button class="btn btn-ghost btn-xs" data-sell="${escapeHtml(id)}" type="button">sell</button>
+            ${canTrade
+              ? `<button class="btn btn-ghost btn-xs" data-merchant="${escapeHtml(id)}" type="button" title="Sell to the merchant now, at a reduced price">merchant</button>`
+              : ""}
+            <button class="btn btn-ghost btn-xs" data-sell="${escapeHtml(id)}" type="button" title="List on the player market at full price">list</button>
             <button class="btn btn-ghost btn-xs" data-drop="${escapeHtml(id)}" type="button">drop</button>
           </span>
         </li>`).join("")
     : '<li class="empty-note">empty-handed</li>';
+  $$('[data-merchant]', inventoryListEl).forEach((btn) => {
+    btn.onclick = () => sendCommand("SHOP_SELL", `SHOP SELL ${btn.dataset.merchant}`);
+  });
   $$('[data-drop]', inventoryListEl).forEach((btn) => {
     btn.onclick = () => sendCommand("DROP", `DROP ${btn.dataset.drop}`);
   });

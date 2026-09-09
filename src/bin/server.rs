@@ -27,7 +27,7 @@ use tap::commands::attack::handle_attack;
 use tap::commands::sleep::handle_sleep;
 use tap::commands::examine::handle_examine;
 use tap::commands::use_item::handle_use;
-use tap::commands::shop::{handle_shop, handle_shop_buy};
+use tap::commands::shop::{handle_shop, handle_shop_buy, handle_shop_sell};
 use tap::commands::market::{handle_market, handle_sell, handle_market_buy, handle_market_cancel};
 use tap::commands::map::handle_map;
 use tap::utils::{fatal, get_args};
@@ -77,6 +77,11 @@ async fn main() {
         }
         if !world.npcs.contains_key(&quest.giver) {
             fatal(&format!("Quest {} references unknown giver: {}", qid, quest.giver));
+        }
+    }
+    if let Some(room) = &world.merchant_room {
+        if !world.rooms.contains_key(room) {
+            fatal(&format!("merchant_room references unknown room: {}", room));
         }
     }
     for shop_item in &world.shop {
@@ -286,6 +291,9 @@ async fn main() {
                         Some(handle_attack(name, &npc_id, &world, &registry).await)
                     } else if line_upper.starts_with("STATUS") {
                         Some(handle_status(name, &world).await)
+                    } else if line_upper.starts_with("SHOP SELL ") {
+                        let item_id = get_args(get_args(&line_trimmed)).to_lowercase();
+                        Some(handle_shop_sell(name, &item_id, &world).await)
                     } else if line_upper.starts_with("SHOP BUY ") {
                         let item_id = get_args(get_args(&line_trimmed)).to_lowercase();
                         Some(handle_shop_buy(name, &item_id, &world).await)

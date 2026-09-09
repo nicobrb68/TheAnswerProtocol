@@ -22,6 +22,54 @@ pub async fn handle_shop(world: &Arc<Mutex<World>>) -> String {
     }
 }
 
+/// The merchant pays less than an item is worth, so listing on the player
+/// market stays the better deal for anyone willing to wait for a buyer.
+const MERCHANT_RATE: u32 = 80;
+
+pub fn merchant_price(value: u32) -> u32 {
+    (value * MERCHANT_RATE / 100).max(1)
+}
+
+pub async fn handle_shop_sell(username: &str, item_id: &str, world: &Arc<Mutex<World>>) -> String {
+    let mut w = world.lock().await;
+
+    let merchant_room = match &w.merchant_room {
+        Some(room) => room.clone(),
+        None => return TapError::MerchantNotHere.message(),
+    };
+
+    let player = match w.get_player(username) {
+        Some(p) => p,
+        None => return TapError::PlayerNotFound.message(),
+    };
+
+    if player.current_room != merchant_room {
+        return TapError::MerchantNotHere.message();
+    }
+
+    let item_full_id = match player.inventory.iter().find(|id| id.contains(item_id)) {
+        Some(id) => id.clone(),
+        None => return TapError::ItemNotInInventory.message(),
+    };
+
+    let price = match w.items.get(&item_full_id) {
+        Some(item) => merchant_price(item.value),
+        None => return TapError::ItemNotFound.message(),
+    };
+
+    if let Some(p) = w.get_mut_player(username) {
+        if let Some(pos) = p.inventory.iter().position(|i| i == &item_full_id) {
+            p.inventory.remove(pos);
+        }
+        p.gold += price;
+    }
+
+    tracing::info!(event = "shop_sell", player = %username, item = %item_full_id, price = price, "item sold to merchant");
+
+    format!("OK sold={} price={} gold={}\n", item_full_id, price,
+        w.get_player(username).map(|p| p.gold).unwrap_or(0))
+}
+
 pub async fn handle_shop_buy(username: &str, item_id: &str, world: &Arc<Mutex<World>>) -> String {
     let mut w = world.lock().await;
 
