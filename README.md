@@ -210,9 +210,11 @@ All attacks broadcast `EVT ROOM COMBAT <username> attacks <npc_name> for <damage
 
 Every player who damaged the NPC is paid `gold_drop`, not just whoever lands the killing blow. The killer learns of it through the `gold_earned` field of their own response; each other attacker is sent `EVT COMBAT REWARD npc=<npc_id> gold=<amount> total=<new_gold>` directly over their own connection, since they may have left the room or died before the kill. `total` is the player's new gold balance, so a client can update it without re-issuing `STATUS`.
 
-- **Success (combat continues)**: `OK {"attacker_hp": <player_hp>, "target_hp": <npc_hp>, "damage": <player_damage>, "status": "combat"}`
-- **Success (NPC dies)**: `OK {"attacker_hp": <player_hp>, "target_hp": 0, "damage": <player_damage>, "status": "victory"}`
-- **Success (player dies)**: `OK {"attacker_hp": 0, "target_hp": <npc_hp>, "damage": <player_damage>, "status": "death", "respawn_room": "<room_id>", "respawn_hp": 50}`
+- **Success (combat continues)**: `OK {"attacker_hp": <player_hp>, "target_hp": <npc_hp>, "damage": <player_damage>, "absorbed": <armor_absorbed>, "npc_damage": <damage_taken>, "riposte": <riposte_spent>, "status": "combat"}`
+- **Success (NPC dies)**: `OK {"attacker_hp": <player_hp>, "target_hp": 0, "damage": <player_damage>, "absorbed": <armor_absorbed>, "npc_damage": 0, "riposte": <riposte_spent>, "status": "victory", "gold_earned": <gold>}`
+- **Success (player dies)**: `OK {"attacker_hp": 0, "target_hp": <npc_hp>, "damage": <player_damage>, "absorbed": <armor_absorbed>, "npc_damage": <damage_taken>, "riposte": <riposte_spent>, "status": "death", "respawn_room": "<room_id>", "respawn_hp": 50}`
+
+Every outcome reports `damage` and `target_hp`, so a client can always show the blow the player landed — including the round that kills them.
 - **Errors**: `ERR 404 NPC_NOT_FOUND`, `ERR 405 NPC_NOT_HOSTILE` (NPC is friendly), `ERR 409 PLAYER_DEAD`
 
 #### `STATUS`

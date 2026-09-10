@@ -239,11 +239,11 @@ pub async fn handle_attack(
     }
 
     if status == "death" {
-        format!("OK {{\"attacker_hp\": 0, \"target_hp\": {}, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"status\": \"death\", \"respawn_room\": \"{}\", \"respawn_hp\": 50}}\n",
-            npc_hp, player_damage, absorbed, effective_npc_damage, spawn_room)
+        format!("OK {{\"attacker_hp\": 0, \"target_hp\": {}, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"riposte\": {}, \"status\": \"death\", \"respawn_room\": \"{}\", \"respawn_hp\": 50}}\n",
+            npc_hp, player_damage, absorbed, effective_npc_damage, riposte, spawn_room)
     } else if status == "victory" {
-        format!("OK {{\"attacker_hp\": {}, \"target_hp\": 0, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"status\": \"victory\", \"gold_earned\": {}}}\n",
-            player_hp, player_damage, absorbed, effective_npc_damage, npc_gold_drop)
+        format!("OK {{\"attacker_hp\": {}, \"target_hp\": 0, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"riposte\": {}, \"status\": \"victory\", \"gold_earned\": {}}}\n",
+            player_hp, player_damage, absorbed, effective_npc_damage, riposte, npc_gold_drop)
     } else {
         format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"riposte\": {}, \"status\": \"combat\"}}\n",
             player_hp, npc_hp, player_damage, absorbed, effective_npc_damage, riposte)

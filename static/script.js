@@ -411,13 +411,15 @@ function handleResponse(ctx, line) {
       }
       const npcLabel = state.npcCache[ctx.meta.npcId]?.name || humanize(ctx.meta.npcId);
       const armorMsg = data.absorbed > 0 ? ` (${data.absorbed} absorbed)` : "";
+      const rip = data.riposte ? ` (incl. +${data.riposte} riposte)` : "";
       if (data.status === "victory") {
         const goldMsg = data.gold_earned ? ` +${data.gold_earned} gold` : "";
-        logCombat(`You defeated ${npcLabel}! (-${data.damage} HP dealt)${goldMsg}`);
+        logCombat(`You hit ${npcLabel} for ${data.damage}${rip} and it drops. You defeated ${npcLabel}!${goldMsg}`);
       }
-      else if (data.status === "death") logCombat(`${npcLabel} struck you down.${armorMsg} You wake up back at a safe place.`);
+      else if (data.status === "death") {
+        logCombat(`You hit ${npcLabel} for ${data.damage}${rip}, leaving it at ${data.target_hp} HP. It struck back for ${data.npc_damage}${armorMsg} and put you down — you wake up at a safe place with ${data.respawn_hp} HP.`);
+      }
       else {
-        const rip = data.riposte ? ` (incl. +${data.riposte} riposte)` : "";
         logCombat(`You hit ${npcLabel} for ${data.damage}${rip}. They hit you for ${data.npc_damage}${armorMsg}. [${npcLabel}: ${data.target_hp} HP | You: ${data.attacker_hp} HP]`);
       }
       state.combatNpc = (data.status === "victory" || data.status === "death") ? null : ctx.meta.npcId;
