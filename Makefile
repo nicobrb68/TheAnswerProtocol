@@ -10,7 +10,7 @@ run-server:
 	cargo run --bin server -- src/assets/default_world.json
 
 run-client:
-	cargo run --bin client_cli
+	cargo run --bin client_cli 0.0.0.0 7534
 
 run-client-gui:
 	cargo run --bin client_gui
