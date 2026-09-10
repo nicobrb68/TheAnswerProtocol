@@ -691,6 +691,7 @@ function handleEvent(rest) {
       delete state.npcCache[npcId];
       if (state.room) state.room.npcs = (state.room.npcs || []).filter((n) => n !== npcId);
       renderRoom();
+      if (state.room?.locked) sendCommand("LOOK", "LOOK");
     } else {
       const hpMatch = combatText.match(/npc=(\S+) hp=(\d+)$/);
       if (hpMatch) {
@@ -738,6 +739,15 @@ function handleEvent(rest) {
       logEvent(`${who} drops ${state.itemCache[itemId]?.name || humanize(itemId)}.`);
       renderRoom();
     }
+    return;
+  }
+  if (rest.startsWith("ROOM NPC RESPAWN ")) {
+    const npcId = rest.slice("ROOM NPC RESPAWN ".length).trim();
+    if (state.room && !(state.room.npcs || []).includes(npcId)) {
+      state.room.npcs = [...(state.room.npcs || []), npcId];
+    }
+    logEvent(`${state.npcCache[npcId]?.name || humanize(npcId)} returns.`);
+    sendCommand("LOOK", "LOOK");
     return;
   }
   if (rest.startsWith("ROOM ITEM RESPAWN ")) {

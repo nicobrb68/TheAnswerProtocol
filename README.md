@@ -368,6 +368,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **EVT SLEEP**: Notifies other players in the room when someone rests, not defined in the RFC.
 - **EVT GROUP LEADER, EVT GROUP DISBAND, EVT GROUP KICK**: Additional group events for leadership transfer, group dissolution, and member kicking.
 - **EVT MARKET LISTED, EVT MARKET CANCELLED, EVT MARKET BOUGHT, EVT MARKET SOLD**: Market events not in the RFC, so clients can keep listings in sync in real time.
+- **EVT ROOM NPC RESPAWN**: Not in the RFC. Mirrors `EVT ROOM ITEM RESPAWN` so clients can track a guarded room re-locking.
 - **EVT COMBAT REWARD**: Not in the RFC. Tells a co-attacker that their share of an NPC's gold was paid when someone else landed the killing blow.
 - **Quest types (`fetch` / `kill` / `deliver`) and the `requires` prerequisite**: The RFC supplies QUEST and QUESTS but leaves progression, completion, rewards and quest chains to the implementer. See Quest System below.
 - **Guarded rooms**: Extension not in the RFC. A room flagged `guarded` only lets a player leave the way they came in until every hostile in it is dead.
@@ -389,6 +390,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 | `EVT ROOM ITEM TAKEN <item> <player>` | A player picks up an item (sent to other players in the room) |
 | `EVT ROOM ITEM DROPPED <item> <player>` | A player drops an item (sent to other players in the room) |
 | `EVT ROOM ITEM RESPAWN <item>` | An item reappears in the room 30 seconds after being taken |
+| `EVT ROOM NPC RESPAWN <npc>` | An NPC returns to the room 30 seconds after being killed — this can re-lock a guarded room |
 | `EVT SLEEP <player>` | A player rests in the sleep room (sent to other players in the room) |
 | `EVT COMBAT REWARD npc=<id> gold=<n> total=<n>` | An NPC you damaged was killed by someone else; you were paid your share (sent directly to each surviving co-attacker, wherever they are) |
 | `EVT GLOBAL [ALERT] ...` | Boss spawn announcement (sent to all connected players) |
@@ -648,6 +650,8 @@ Everything else stands alone. A quest whose `requires` is unmet is simply not of
 A room may set `"guarded": true`. While any hostile NPC in it is still alive, the only exit that works is the one the player walked in through — every other direction answers `ERR 414 ROOM_GUARDED`. Kill what is in there and the room opens up.
 
 `LOOK` reports `"locked": true` plus `"locked_exit"` (the room you came from) while the lock holds, so a client can grey out the barred directions instead of letting the player discover them by trial and error.
+
+The lock is recomputed on every `LOOK`, and both edges are pushed to everyone in the room: `EVT ROOM COMBAT <npc> defeated by <player>` when the guard falls, and `EVT ROOM NPC RESPAWN <npc>` when it returns. Without the second one a client would keep showing open exits after the room had quietly re-locked.
 
 In the default world, **Crystal Cavern** is guarded by the Cave Goblin: the whole underground (Tunnel, Crypt, Dragon Lair and everything past them) stays shut until it is dealt with. Since NPCs respawn 30 seconds after dying, a player still standing in the room when the goblin returns is locked in again.
 

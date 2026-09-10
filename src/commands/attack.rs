@@ -125,16 +125,30 @@ pub async fn handle_attack(
 
         if !crate::events::boss::is_boss(&npc_full_id, &w.npcs) {
             let world_clone = Arc::clone(world);
+            let registry_clone = Arc::clone(registry);
             let room_clone = current_room.clone();
             let npc_clone = npc_full_id.clone();
             tokio::spawn(async move {
                 tokio::time::sleep(Duration::from_secs(NPC_RESPAWN_SECS)).await;
-                let mut w = world_clone.lock().await;
-                if let Some(room) = w.get_mut_room(&room_clone) {
-                    if !room.npcs.contains(&npc_clone) {
-                        room.npcs.push(npc_clone.clone());
-                        tracing::info!(event = "npc_respawn", npc = %npc_clone, room = %room_clone, "npc respawned");
+                let respawned = {
+                    let mut w = world_clone.lock().await;
+                    match w.get_mut_room(&room_clone) {
+                        Some(room) if !room.npcs.contains(&npc_clone) => {
+                            room.npcs.push(npc_clone.clone());
+                            tracing::info!(event = "npc_respawn", npc = %npc_clone, room = %room_clone, "npc respawned");
+                            true
+                        }
+                        _ => false,
                     }
+                };
+                if respawned {
+                    notify_room(
+                        &room_clone,
+                        &format!("EVT ROOM NPC RESPAWN {}\n", npc_clone),
+                        None,
+                        &world_clone,
+                        &registry_clone,
+                    ).await;
                 }
             });
         }
