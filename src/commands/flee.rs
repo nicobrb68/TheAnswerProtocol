@@ -9,9 +9,6 @@ use crate::events::room::notify_room;
 
 const FLEE_SUCCESS_PERCENT: u32 = 70;
 
-/// No RNG crate for a single dice roll: `RandomState` is seeded by the OS and
-/// re-keyed on each construction. The clock is *not* usable here — `subsec_nanos()`
-/// is microsecond-granular on macOS, so `% 100` was always 0 and every escape worked.
 fn roll() -> u32 {
     (RandomState::new().build_hasher().finish() % 100) as u32
 }
@@ -52,7 +49,6 @@ pub async fn handle_flee(
         None => return TapError::NpcNotFound.message(),
     };
 
-    // You retreat the way you came in; that also keeps a guarded room honest.
     let escape_room = came_from
         .filter(|r| w.get_room(&current_room).map(|c| c.exits.values().any(|t| t == r)).unwrap_or(false))
         .or_else(|| w.get_room(&current_room).and_then(|r| r.exits.values().next().cloned()));
@@ -63,7 +59,6 @@ pub async fn handle_flee(
     };
 
     if roll() >= FLEE_SUCCESS_PERCENT {
-        // Botched it: the NPC gets a free swing and the fight goes on.
         let mut armor_bonus: u32 = 0;
         for item_id in &player_inventory {
             if let Some(arm) = w.items.get(item_id).and_then(|i| i.armor) {

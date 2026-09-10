@@ -22,8 +22,6 @@ pub async fn handle_shop(world: &Arc<Mutex<World>>) -> String {
     }
 }
 
-/// The merchant pays less than an item is worth, so listing on the player
-/// market stays the better deal for anyone willing to wait for a buyer.
 const MERCHANT_RATE: u32 = 80;
 
 pub fn merchant_price(value: u32) -> u32 {

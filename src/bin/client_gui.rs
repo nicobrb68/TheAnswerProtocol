@@ -43,8 +43,6 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-// Assets are served from disk on every request; without this a browser keeps
-// running an old script.js after the GUI is updated.
 async fn no_cache(mut res: Response) -> Response {
     let headers = res.headers_mut();
     headers.insert(CACHE_CONTROL, HeaderValue::from_static("no-store, no-cache, must-revalidate"));

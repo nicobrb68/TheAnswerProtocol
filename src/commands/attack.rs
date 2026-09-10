@@ -81,17 +81,21 @@ pub async fn handle_attack(
 
     let (player_hp, effective_npc_damage) = match w.get_mut_player(username) {
         Some(p) => {
-            // Bracing from a previous DEFEND halves whatever gets through the armor.
-            let incoming = if p.defending {
-                p.defending = false;
-                (effective_npc_damage / 2).max(1)
-            } else {
-                effective_npc_damage
-            };
-            p.hp = p.hp.saturating_sub(incoming);
             p.braced_bonus = 0;
             p.in_combat_with = Some(npc_full_id.clone());
-            (p.hp, incoming)
+
+            if npc_hp == 0 {
+                (p.hp, 0)
+            } else {
+                let incoming = if p.defending {
+                    p.defending = false;
+                    (effective_npc_damage / 2).max(1)
+                } else {
+                    effective_npc_damage
+                };
+                p.hp = p.hp.saturating_sub(incoming);
+                (p.hp, incoming)
+            }
         },
         None => return TapError::PlayerNotFound.message(),
     };
@@ -101,8 +105,6 @@ pub async fn handle_attack(
     let status;
     let mut spawn_room = String::new();
     let mut is_boss_kill = false;
-    // Co-attackers are paid too, and may have left the room or died since —
-    // they need a direct notice, not a room broadcast.
     let mut reward_notices: Vec<(String, u32)> = Vec::new();
 
     if npc_hp == 0 {
@@ -145,7 +147,6 @@ pub async fn handle_attack(
                 }
                 *p.kills.entry(npc_full_id.clone()).or_insert(0) += 1;
                 p.gold += npc_gold_drop;
-                // Notified even for a gold-less kill: it still advances their kill quests.
                 if attacker != username {
                     reward_notices.push((attacker.clone(), p.gold));
                 }

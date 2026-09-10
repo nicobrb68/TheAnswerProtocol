@@ -20,14 +20,11 @@ pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<Worl
         None => return TapError::NoExit.message(),
     };
 
-    // Walking out used to be a free, guaranteed escape, which made FLEE pointless.
-    // Disengaging is now a deliberate act with a chance of failing.
     let engaged = w.get_player(username).and_then(|p| p.in_combat_with.clone());
     if let Some(foe) = engaged {
         if room.npcs.contains(&foe) {
             return TapError::InCombat.message();
         }
-        // Opponent gone (killed or respawned elsewhere): stale state, let them walk.
         if let Some(p) = w.get_mut_player(username) {
             p.in_combat_with = None;
             p.defending = false;
@@ -39,8 +36,6 @@ pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<Worl
         None => return TapError::NoExit.message(),
     };
 
-    // A guarded room only lets you back out the way you came in, until every
-    // hostile in it has been put down.
     if room.guarded {
         let still_hostile = room.npcs.iter()
             .any(|id| w.get_npc(id).map(|n| n.hostile).unwrap_or(false));

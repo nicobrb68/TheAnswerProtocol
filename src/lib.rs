@@ -38,13 +38,11 @@ pub struct Quest {
     pub quest_type: String,
     #[serde(default)]
     pub target_item: String,
-    /// Enemy to defeat for `kill`, recipient to hand the goods to for `deliver`.
     #[serde(default)]
     pub target_npc: String,
     pub target_count: u32,
     pub reward: String,
     pub reward_count: u32,
-    /// Quest that must be completed before this one is offered.
     #[serde(default)]
     pub requires: Option<String>,
 }
@@ -65,13 +63,10 @@ pub struct Player {
     pub kills: HashMap<String, u32>,
     #[serde(default)]
     pub entered_from: Option<String>,
-    /// NPC this player is currently locked in combat with, if any.
     #[serde(default)]
     pub in_combat_with: Option<String>,
-    /// Set by DEFEND, consumed by the next NPC strike.
     #[serde(default)]
     pub defending: bool,
-    /// Damage turned aside by DEFEND, added to the next strike as a riposte.
     #[serde(default)]
     pub braced_bonus: u32,
 }

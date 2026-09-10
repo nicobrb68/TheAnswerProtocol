@@ -5,8 +5,6 @@ use tokio::sync::mpsc::UnboundedSender;
 use crate::{World, PlayerState, TapError};
 use crate::events::room::notify_room;
 
-/// Give up this round's strike to brace. The NPC still takes its turn, but the
-/// blow is halved on top of whatever the armor already absorbs.
 pub async fn handle_defend(
     username: &str,
     world: &Arc<Mutex<World>>,
@@ -29,7 +27,6 @@ pub async fn handle_defend(
     let current_room = player.current_room.clone();
     let player_inventory = player.inventory.clone();
 
-    // Walking out of the room ends the fight, so a stale opponent means no combat.
     if !w.get_room(&current_room).map(|r| r.npcs.contains(&npc_full_id)).unwrap_or(false) {
         if let Some(p) = w.get_mut_player(username) {
             p.in_combat_with = None;
@@ -62,9 +59,7 @@ pub async fn handle_defend(
     let (player_hp, died, riposte) = match w.get_mut_player(username) {
         Some(p) => {
             p.hp = p.hp.saturating_sub(incoming);
-            // Braced for the *next* incoming strike too, so holding the line pays off.
             p.defending = true;
-            // What you turned aside comes back as extra damage on your next strike.
             p.braced_bonus += blocked;
             (p.hp, p.hp == 0, p.braced_bonus)
         }

@@ -2,11 +2,9 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use crate::{World, TapError};
 
-/// How far along an active quest is, as (current, required).
 fn quest_progress(player: &crate::Player, quest: &crate::Quest) -> (u32, u32) {
     let current = match quest.quest_type.as_str() {
         "kill" => *player.kills.get(&quest.target_npc).unwrap_or(&0),
-        // `deliver` hands the goods over on accept, so holding them is the progress.
         _ => player.inventory.iter().filter(|i| *i == &quest.target_item).count() as u32,
     };
     (current.min(quest.target_count), quest.target_count)
@@ -61,7 +59,6 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
         None => return TapError::PlayerNotFound.message(),
     };
 
-    // A delivery is handed in to its recipient, not to the NPC who gave it out.
     let delivery = player.quests_active.iter()
         .filter_map(|qid| w.quests.get(qid).map(|q| (qid.clone(), q.clone())))
         .find(|(_, q)| q.quest_type == "deliver" && q.target_npc == npc_full_id);
@@ -89,7 +86,6 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
     };
 
     if player.quests_active.contains(&quest_id) {
-        // A delivery can only be closed by its recipient.
         if quest.quest_type == "deliver" {
             return TapError::QuestNotComplete.message();
         }
@@ -108,7 +104,6 @@ pub async fn handle_quest(username: &str, npc_id: &str, world: &Arc<Mutex<World>
 
     if let Some(p) = w.get_mut_player(username) {
         p.quests_active.push(quest_id.clone());
-        // The giver hands over the parcel up front.
         if quest.quest_type == "deliver" {
             for _ in 0..quest.target_count {
                 p.inventory.push(quest.target_item.clone());
@@ -186,7 +181,6 @@ pub async fn handle_abandon_quest(username: &str, quest_id: &str, world: &Arc<Mu
 
     let mut to_remove = if quest.quest_type == "deliver" { quest.target_count } else { 0 };
     if let Some(p) = w.get_mut_player(username) {
-        // The parcel was lent for the trip, so it goes back with the quest.
         p.inventory.retain(|i| {
             if to_remove > 0 && i == &quest.target_item { to_remove -= 1; false } else { true }
         });

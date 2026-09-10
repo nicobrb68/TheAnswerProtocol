@@ -503,7 +503,6 @@ function handleResponse(ctx, line) {
       } else {
         showToast({ text: `New quest: ${data.description}` });
       }
-      // Accepting a delivery hands over the parcel, so the inventory moves either way.
       sendCommand("INVENTORY", "INVENTORY");
       sendCommand("QUESTS", "QUESTS");
       return;
@@ -713,7 +712,6 @@ function handleEvent(rest) {
         ? `${npcLabel} was defeated — you earn ${gold} gold for taking part.`
         : `${npcLabel} was defeated — your part in it counts.`);
       if (earned > 0) showToast({ text: `+${gold} gold for helping defeat ${npcLabel}.` });
-      // The kill was credited to every attacker, so a kill quest may have moved.
       sendCommand("QUESTS", "QUESTS");
     }
     return;
@@ -906,7 +904,6 @@ function renderCombat() {
   combatRiposteEl.textContent = state.riposte ? ` — riposte charged +${state.riposte}` : "";
 }
 
-// Engaging bars the exits, so they have to be redrawn whenever combat starts or ends.
 function renderCombatAndExits() {
   renderCombat();
   if (state.room) renderRoom();
@@ -1223,7 +1220,6 @@ function closeItemPopover() {
   pendingItemAnchor = null;
 }
 
-// Mirrors MERCHANT_RATE in src/commands/shop.rs — the merchant pays 80%.
 const MERCHANT_RATE = 0.8;
 
 function openSellPopover(itemId, anchorEl) {
@@ -1237,7 +1233,6 @@ function openSellPopover(itemId, anchorEl) {
   sellPopover.style.top = `${Math.max(8, top)}px`;
   sellPopover.style.left = `${Math.max(8, left)}px`;
 
-  // The price only becomes known once the item has been examined.
   if (state.itemCache[itemId]?.value == null) {
     sendCommand("EXAMINE", `EXAMINE ${itemId}`, { itemId, quiet: true });
   }
