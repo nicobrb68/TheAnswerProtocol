@@ -71,6 +71,9 @@ pub struct Player {
     /// Set by DEFEND, consumed by the next NPC strike.
     #[serde(default)]
     pub defending: bool,
+    /// Damage turned aside by DEFEND, added to the next strike as a riposte.
+    #[serde(default)]
+    pub braced_bonus: u32,
 }
 
 impl Player {
@@ -90,6 +93,7 @@ impl Player {
             entered_from: None,
             in_combat_with: None,
             defending: false,
+            braced_bonus: 0,
         }
     }
 }
@@ -240,6 +244,7 @@ pub enum TapError {
     MerchantNotHere,
     RoomGuarded,
     NotInCombat,
+    InCombat,
     QuestNotActive,
     PlayerDead,
     // 9xx - System
@@ -266,6 +271,7 @@ impl TapError {
             TapError::MerchantNotHere => "ERR 413 MERCHANT_NOT_HERE\n".to_string(),
             TapError::RoomGuarded     => "ERR 414 ROOM_GUARDED\n".to_string(),
             TapError::NotInCombat     => "ERR 415 NOT_IN_COMBAT\n".to_string(),
+            TapError::InCombat        => "ERR 416 IN_COMBAT\n".to_string(),
             TapError::QuestNotActive  => "ERR 404 QUEST_NOT_ACTIVE\n".to_string(),
             TapError::CannotKickSelf       => "ERR 407 CANNOT_KICK_SELF\n".to_string(),
             TapError::PlayerNotInGroup    => "ERR 404 PLAYER_NOT_IN_GROUP\n".to_string(),

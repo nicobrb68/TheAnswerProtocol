@@ -28,6 +28,7 @@ const roomDescEl = $("#room-desc");
 const exitRowEl = $("#exit-row");
 const roomLockedEl = $("#room-locked");
 const combatBarEl = $("#combat-bar");
+const combatRiposteEl = $("#combat-riposte");
 const playersListEl = $("#players-list");
 const itemsListEl = $("#items-list");
 const npcsListEl = $("#npcs-list");
@@ -75,6 +76,7 @@ const state = {
   sellItem: null,
   lockedRoom: null,
   combatNpc: null,
+  riposte: 0,
 };
 
 const pending = [];
@@ -127,6 +129,7 @@ const ERROR_MESSAGES = {
   "413": "There's no merchant here to trade with.",
   "414": "Something here blocks your way — defeat it first.",
   "415": "You are not in a fight right now.",
+  "416": "You're in a fight — break away with Flee first.",
 };
 
 function friendlyError(line) {
@@ -245,6 +248,7 @@ function returnToLogin() {
   state.sellItem = null;
   state.lockedRoom = null;
   state.combatNpc = null;
+  state.riposte = 0;
   roomLockedEl.hidden = true;
   document.getElementById("minimap-inline").hidden = true;
   Object.values(panes).forEach((p) => { if (p) p.innerHTML = ""; });
@@ -412,9 +416,13 @@ function handleResponse(ctx, line) {
         logCombat(`You defeated ${npcLabel}! (-${data.damage} HP dealt)${goldMsg}`);
       }
       else if (data.status === "death") logCombat(`${npcLabel} struck you down.${armorMsg} You wake up back at a safe place.`);
-      else logCombat(`You hit ${npcLabel} for ${data.damage}. They hit you for ${data.npc_damage}${armorMsg}. [${npcLabel}: ${data.target_hp} HP | You: ${data.attacker_hp} HP]`);
+      else {
+        const rip = data.riposte ? ` (incl. +${data.riposte} riposte)` : "";
+        logCombat(`You hit ${npcLabel} for ${data.damage}${rip}. They hit you for ${data.npc_damage}${armorMsg}. [${npcLabel}: ${data.target_hp} HP | You: ${data.attacker_hp} HP]`);
+      }
       state.combatNpc = (data.status === "victory" || data.status === "death") ? null : ctx.meta.npcId;
-      renderCombat();
+      state.riposte = 0;
+      renderCombatAndExits();
       sendCommand("STATUS", "STATUS");
       if (data.status === "victory") sendCommand("QUESTS", "QUESTS");
       if (data.status === "victory" || data.status === "death") sendCommand("LOOK", "LOOK");
@@ -432,10 +440,11 @@ function handleResponse(ctx, line) {
         logCombat(`${label} broke through your guard. You wake up back at a safe place.`);
         sendCommand("LOOK", "LOOK");
       } else {
-        logCombat(`You brace against ${label}: ${data.blocked} blocked, ${data.npc_damage} through. [You: ${data.attacker_hp} HP]`);
+        state.riposte = data.riposte || 0;
+        logCombat(`You brace against ${label}: ${data.blocked} blocked, ${data.npc_damage} through — riposte charged +${state.riposte}. [You: ${data.attacker_hp} HP]`);
       }
       sendCommand("STATUS", "STATUS");
-      renderCombat();
+      renderCombatAndExits();
       return;
     }
 
@@ -458,7 +467,7 @@ function handleResponse(ctx, line) {
         showToast({ text: "You couldn't get away.", type: "error" });
       }
       sendCommand("STATUS", "STATUS");
-      renderCombat();
+      renderCombatAndExits();
       return;
     }
 
@@ -891,7 +900,16 @@ function renderHp() {
 function renderCombat() {
   const foe = state.combatNpc;
   combatBarEl.hidden = !foe;
-  if (foe) $("#combat-foe").textContent = state.npcCache[foe]?.name || humanize(foe);
+  if (!foe) { state.riposte = 0; return; }
+  $("#combat-foe").textContent = state.npcCache[foe]?.name || humanize(foe);
+  combatRiposteEl.hidden = !state.riposte;
+  combatRiposteEl.textContent = state.riposte ? ` — riposte charged +${state.riposte}` : "";
+}
+
+// Engaging bars the exits, so they have to be redrawn whenever combat starts or ends.
+function renderCombatAndExits() {
+  renderCombat();
+  if (state.room) renderRoom();
 }
 
 function renderBossIndicator() {
@@ -932,13 +950,16 @@ function renderRoom() {
     btn.className = `exit-btn compass-${slot}`;
     btn.type = "button";
     btn.textContent = humanize(dir);
-    const barred = room.locked && exits[dir] && exits[dir] !== room.locked_exit;
+    const barred = (room.locked && exits[dir] && exits[dir] !== room.locked_exit)
+      || (state.combatNpc && exits[dir]);
     if (exits[dir] && !barred) {
       btn.title = `Move ${dir} → ${humanize(exits[dir])}`;
       btn.onclick = () => sendCommand("MOVE", `MOVE ${dir}`);
     } else if (barred) {
       btn.disabled = true;
-      btn.title = "Blocked — defeat what guards this room first";
+      btn.title = state.combatNpc
+        ? "You're in a fight — break away with Flee first"
+        : "Blocked — defeat what guards this room first";
       btn.classList.add("barred");
     } else {
       btn.disabled = true;
@@ -1308,6 +1329,9 @@ connectForm.addEventListener("submit", (e) => {
 $("#quit-btn").addEventListener("click", () => sendCommand("QUIT", "QUIT"));
 $("#look-refresh").addEventListener("click", () => refreshAll());
 sleepBtn.addEventListener("click", () => sendCommand("SLEEP", "SLEEP"));
+$("#attack-btn").addEventListener("click", () => {
+  if (state.combatNpc) sendCommand("ATTACK", `ATTACK ${state.combatNpc}`, { npcId: state.combatNpc });
+});
 $("#defend-btn").addEventListener("click", () => sendCommand("DEFEND", "DEFEND"));
 $("#flee-btn").addEventListener("click", () => sendCommand("FLEE", "FLEE"));
 $("#inventory-refresh").addEventListener("click", () => sendCommand("INVENTORY", "INVENTORY"));

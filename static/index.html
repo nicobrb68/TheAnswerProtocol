@@ -119,8 +119,9 @@
       </div>
 
       <div class="combat-bar" id="combat-bar" hidden>
-        <span class="combat-label">In combat with <strong id="combat-foe">—</strong></span>
-        <button class="btn btn-secondary btn-sm" id="defend-btn" type="button" title="Give up your strike to halve the next blow">🛡 Defend</button>
+        <span class="combat-label">In combat with <strong id="combat-foe">—</strong><span id="combat-riposte" class="combat-riposte" hidden></span></span>
+        <button class="btn btn-danger btn-sm" id="attack-btn" type="button" title="Strike your opponent">⚔ Attack</button>
+        <button class="btn btn-secondary btn-sm" id="defend-btn" type="button" title="Give up your strike to halve the blow and charge a riposte">🛡 Defend</button>
         <button class="btn btn-ghost btn-sm" id="flee-btn" type="button" title="Try to break away — it can fail">🏃 Flee</button>
       </div>
 

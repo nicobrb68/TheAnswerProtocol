@@ -59,12 +59,14 @@ pub async fn handle_defend(
 
     let npc_hp = w.get_npc(&npc_full_id).and_then(|n| n.hp).unwrap_or(0);
 
-    let (player_hp, died) = match w.get_mut_player(username) {
+    let (player_hp, died, riposte) = match w.get_mut_player(username) {
         Some(p) => {
             p.hp = p.hp.saturating_sub(incoming);
             // Braced for the *next* incoming strike too, so holding the line pays off.
             p.defending = true;
-            (p.hp, p.hp == 0)
+            // What you turned aside comes back as extra damage on your next strike.
+            p.braced_bonus += blocked;
+            (p.hp, p.hp == 0, p.braced_bonus)
         }
         None => return TapError::PlayerNotFound.message(),
     };
@@ -82,6 +84,7 @@ pub async fn handle_defend(
             p.current_room = spawn_room.clone();
             p.in_combat_with = None;
             p.defending = false;
+            p.braced_bonus = 0;
         }
         tracing::info!(event = "combat_death", player = %username, npc = %npc_name, respawn = %spawn_room, "player killed while defending");
     }
@@ -104,6 +107,6 @@ pub async fn handle_defend(
             npc_hp, blocked, incoming);
     }
 
-    format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"blocked\": {}, \"npc_damage\": {}, \"status\": \"defend\"}}\n",
-        player_hp, npc_hp, blocked, incoming)
+    format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"blocked\": {}, \"npc_damage\": {}, \"riposte\": {}, \"status\": \"defend\"}}\n",
+        player_hp, npc_hp, blocked, incoming, riposte)
 }

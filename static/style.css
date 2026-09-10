@@ -330,6 +330,7 @@ button, input {
 }
 .combat-label { font-size: 0.8rem; color: var(--danger-dim); margin-right: auto; }
 .combat-label strong { color: var(--danger); }
+.combat-riposte { color: var(--amber-dim); font-weight: 600; }
 
 .room-locked {
   font-family: var(--font-mono);

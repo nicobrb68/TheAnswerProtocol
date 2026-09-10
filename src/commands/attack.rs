@@ -63,7 +63,8 @@ pub async fn handle_attack(
             }
         }
     }
-    let player_damage = 10 + weapon_bonus;
+    let riposte = w.get_player(username).map(|p| p.braced_bonus).unwrap_or(0);
+    let player_damage = 10 + weapon_bonus + riposte;
     let absorbed = armor_bonus.min(npc_damage.saturating_sub(1));
     let effective_npc_damage = npc_damage - absorbed;
 
@@ -88,6 +89,7 @@ pub async fn handle_attack(
                 effective_npc_damage
             };
             p.hp = p.hp.saturating_sub(incoming);
+            p.braced_bonus = 0;
             p.in_combat_with = Some(npc_full_id.clone());
             (p.hp, incoming)
         },
@@ -242,7 +244,7 @@ pub async fn handle_attack(
         format!("OK {{\"attacker_hp\": {}, \"target_hp\": 0, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"status\": \"victory\", \"gold_earned\": {}}}\n",
             player_hp, player_damage, absorbed, effective_npc_damage, npc_gold_drop)
     } else {
-        format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"status\": \"combat\"}}\n",
-            player_hp, npc_hp, player_damage, absorbed, effective_npc_damage)
+        format!("OK {{\"attacker_hp\": {}, \"target_hp\": {}, \"damage\": {}, \"absorbed\": {}, \"npc_damage\": {}, \"riposte\": {}, \"status\": \"combat\"}}\n",
+            player_hp, npc_hp, player_damage, absorbed, effective_npc_damage, riposte)
     }
 }

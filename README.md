@@ -270,7 +270,7 @@ Puts an item from the player's inventory up for sale on the player market. The i
 
 #### `DEFEND`
 
-Spends the round bracing instead of striking. The opponent still attacks, but the blow is halved after armor (minimum 1), and you stay braced for the following strike. Returns `{"attacker_hp", "target_hp", "blocked", "npc_damage", "status"}` with status `defend`, or `death` if the blow still finishes you. Outside a fight: `ERR 415 NOT_IN_COMBAT`.
+Spends the round bracing instead of striking. The opponent still attacks, but the blow is halved after armor (minimum 1), you stay braced for the following strike, and the damage you turned aside is banked as a riposte added to your next `ATTACK` (it accumulates across consecutive `DEFEND`s). Returns `{"attacker_hp", "target_hp", "blocked", "npc_damage", "riposte", "status"}` with status `defend`, or `death` if the blow still finishes you. Outside a fight: `ERR 415 NOT_IN_COMBAT`.
 
 #### `FLEE`
 
@@ -370,9 +370,10 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **Quest types (`fetch` / `kill` / `deliver`) and the `requires` prerequisite**: The RFC supplies QUEST and QUESTS but leaves progression, completion, rewards and quest chains to the implementer. See Quest System below.
 - **Guarded rooms**: Extension not in the RFC. A room flagged `guarded` only lets a player leave the way they came in until every hostile in it is dead.
 - **DEFEND, FLEE**: Combat commands the RFC names as implementer's choice (§6.1.1). See Combat System.
+- **ERR 416 IN_COMBAT on MOVE**: Leaving a room mid-fight is refused so that `FLEE` carries a real risk.
 - **ABANDON_QUEST**: Quest command the RFC names as implementer's choice (§6.1.2, "COMPLETE_QUEST, ABANDON_QUEST, or similar").
 - **SHOP SELL**: Extension command not in the RFC. Sells an item to the merchant at 80% of its value, restricted to `merchant_room`.
-- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE, ERR 414 ROOM_GUARDED, ERR 415 NOT_IN_COMBAT, ERR 404 QUEST_NOT_ACTIVE**: Additional error codes not in the RFC.
+- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE, ERR 414 ROOM_GUARDED, ERR 415 NOT_IN_COMBAT, ERR 416 IN_COMBAT, ERR 404 QUEST_NOT_ACTIVE**: Additional error codes not in the RFC.
 
 ### Events
 
@@ -433,6 +434,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 | 413 | MERCHANT_NOT_HERE | `SHOP SELL` used outside the merchant's room |
 | 414 | ROOM_GUARDED | Tried to press deeper into a guarded room while its defenders still stand |
 | 415 | NOT_IN_COMBAT | `DEFEND` or `FLEE` used while not fighting |
+| 416 | IN_COMBAT | `MOVE` attempted while engaged — break away with `FLEE` first |
 | 404 | QUEST_NOT_ACTIVE | `ABANDON_QUEST` on a quest the player does not hold |
 | 900 | CONNECTION_FAILED | TCP connection error |
 | 901 | SEND_FAILED | Failed to serialize or send a response |
@@ -456,7 +458,7 @@ Combat is **round-based, and a round is driven by one player command** — there
 | Action | Effect on the round |
 |---|---|
 | `ATTACK <npc>` | Strike, then take the counter-attack |
-| `DEFEND` | Skip your strike and brace — the counter-attack is halved |
+| `DEFEND` | Skip your strike and brace — the counter-attack is halved and a riposte is charged |
 | `FLEE` | Try to break away instead of trading blows |
 | `USE <item>` | Drink or apply an item (does not end the fight) |
 
@@ -465,7 +467,8 @@ Combat is **round-based, and a round is driven by one player command** — there
 A player carries an `in_combat_with` field naming their current opponent.
 
 - **Entered** by `ATTACK` on a hostile NPC.
-- **Left** when the NPC dies, when the player is downed, on a successful `FLEE`, or by simply walking out with `MOVE`.
+- **Left** when the NPC dies, when the player is downed, or on a successful `FLEE`.
+- **`MOVE` is refused while engaged** (`ERR 416 IN_COMBAT`). Walking out used to be a free, guaranteed escape, which made `FLEE` pointless — disengaging is now a deliberate act that can fail. If the opponent is gone (killed by someone else, or respawned elsewhere) the stale state is cleared and the player walks freely.
 - `DEFEND` and `FLEE` outside a fight return `ERR 415 NOT_IN_COMBAT`, so they can never be used as free actions.
 
 Combat is not exclusive: several players may fight the same NPC at once, and every one of them is credited for the kill (see below).
@@ -481,7 +484,13 @@ damage taken    = npc_damage - absorbed
 
 The armor clamp at `npc_damage - 1` is deliberate: no armor set can make a player invulnerable.
 
-`DEFEND` also leaves you braced for the **next** incoming strike, so holding the line for a round pays off even if you go back to attacking. Against the Forest Wolf (10 damage, no armor) a defended round costs 5 HP instead of 10.
+`DEFEND` is not just damage mitigation — that would only ever delay a loss. Bracing does three things:
+
+1. **Halves the blow** this round.
+2. **Keeps you braced** for the next incoming strike, so the softening carries over even once you go back to attacking.
+3. **Charges a riposte**: whatever you turned aside is banked and added to your next `ATTACK`, and it accumulates across consecutive `DEFEND`s.
+
+Against the Forest Wolf (10 damage, no armor): a braced round costs 5 HP instead of 10 and banks +5. Brace twice, and the following strike lands for 20 instead of 10. Trading a round of damage for a bigger, safer one is a real choice rather than a stall — and against a heavy hitter, bracing is how you survive long enough to land it.
 
 ### Fleeing
 
