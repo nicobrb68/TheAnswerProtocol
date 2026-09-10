@@ -695,6 +695,7 @@ function handleEvent(rest) {
         state.combatNpc = null;
         state.riposte = 0;
       }
+      if (state.activeNpc === npcId) closeNpcPopover();
       renderCombatAndExits();
       if (state.room?.locked) sendCommand("LOOK", "LOOK");
     } else {
@@ -945,7 +946,12 @@ const sleepBtn = $("#sleep-btn");
 
 function applyRoom(room) {
   if (!room) return;
-  if (state.room && room.id !== state.room.id) state.combatNpc = null;
+  if (state.room && room.id !== state.room.id) {
+    state.combatNpc = null;
+    closeNpcPopover();
+    closeItemPopover();
+    closeSellPopover();
+  }
   state.room = room;
   renderRoom();
   renderInventory();
