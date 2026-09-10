@@ -240,6 +240,7 @@ pub enum TapError {
     RoomGuarded,
     NotInCombat,
     InCombat,
+    UnknownCommand,
     QuestNotActive,
     PlayerDead,
     // 9xx - System
@@ -253,6 +254,7 @@ impl TapError {
         match self {
             // 0xx - Protocol
             TapError::NotAuthenticated     => "ERR 000 NOT_AUTHENTICATED\n".to_string(),
+            TapError::UnknownCommand       => "ERR 400 UNKNOWN_COMMAND\n".to_string(),
             // 2xx - Authentication
             TapError::NameInUse            => "ERR 201 NAME_IN_USE\n".to_string(),
             TapError::InvalidUsername      => "ERR 202 INVALID_USER_NAME\n".to_string(),

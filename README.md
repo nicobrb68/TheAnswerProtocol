@@ -372,6 +372,7 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **EVT COMBAT REWARD**: Not in the RFC. Tells a co-attacker that their share of an NPC's gold was paid when someone else landed the killing blow.
 - **Quest types (`fetch` / `kill` / `deliver`) and the `requires` prerequisite**: The RFC supplies QUEST and QUESTS but leaves progression, completion, rewards and quest chains to the implementer. See Quest System below.
 - **Guarded rooms**: Extension not in the RFC. A room flagged `guarded` only lets a player leave the way they came in until every hostile in it is dead.
+- **ERR 400 UNKNOWN_COMMAND**: Not in the RFC's table. Every non-empty line now gets exactly one reply — an unrecognised command included. Silence was not merely untidy: clients that pair replies to requests in order (ours does) desynchronise permanently after a single unanswered line, so every later reply is attributed to the wrong request. Blank lines stay silent.
 - **DEFEND, FLEE**: Combat commands the RFC names as implementer's choice (§6.1.1). See Combat System.
 - **ERR 416 IN_COMBAT on MOVE**: Leaving a room mid-fight is refused so that `FLEE` carries a real risk.
 - **ABANDON_QUEST**: Quest command the RFC names as implementer's choice (§6.1.2, "COMPLETE_QUEST, ABANDON_QUEST, or similar").
@@ -437,6 +438,8 @@ Disconnects from the server. The player is removed from the world, removed from 
 | 410 | CANNOT_SLEEP_HERE | SLEEP was used outside the designated sleep room |
 | 413 | MERCHANT_NOT_HERE | `SHOP SELL` used outside the merchant's room |
 | 414 | ROOM_GUARDED | Tried to press deeper into a guarded room while its defenders still stand |
+| 000 | NOT_AUTHENTICATED | Any command other than `CONNECT`/`QUIT` sent before authenticating |
+| 400 | UNKNOWN_COMMAND | The server did not recognise the command (or a required argument was missing) |
 | 415 | NOT_IN_COMBAT | `DEFEND` or `FLEE` used while not fighting |
 | 416 | IN_COMBAT | `MOVE` attempted while engaged — break away with `FLEE` first |
 | 404 | QUEST_NOT_ACTIVE | `ABANDON_QUEST` on a quest the player does not hold |

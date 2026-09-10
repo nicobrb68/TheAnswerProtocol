@@ -350,6 +350,10 @@ async fn main() {
                         None
                     };
 
+                    let res = res.or_else(|| {
+                        if line_trimmed.is_empty() { None } else { Some(tap::TapError::UnknownCommand.message()) }
+                    });
+
                     if let Some(res) = res {
                         if res.starts_with("ERR") {
                             tracing::warn!(event = "response", ip = %addr, player = %name, response = %res.trim(), "error response sent");
@@ -366,6 +370,9 @@ async fn main() {
                     }
                     line.clear();
                 } else {
+                    if !line_trimmed.is_empty() {
+                        let _ = tx.send(tap::TapError::NotAuthenticated.message());
+                    }
                     line.clear();
                 }
             }
