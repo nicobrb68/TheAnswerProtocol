@@ -21,7 +21,7 @@ use tap::commands::talk::handle_talk;
 use tap::commands::take::handle_take;
 use tap::commands::drop::handle_drop;
 use tap::commands::inventory::handle_inventory;
-use tap::commands::quest::{handle_quest, handle_quests};
+use tap::commands::quest::{handle_quest, handle_quests, handle_abandon_quest};
 use tap::commands::status::handle_status;
 use tap::commands::attack::handle_attack;
 use tap::commands::sleep::handle_sleep;
@@ -30,6 +30,8 @@ use tap::commands::use_item::handle_use;
 use tap::commands::shop::{handle_shop, handle_shop_buy, handle_shop_sell};
 use tap::commands::market::{handle_market, handle_sell, handle_market_buy, handle_market_cancel};
 use tap::commands::map::handle_map;
+use tap::commands::defend::handle_defend;
+use tap::commands::flee::handle_flee;
 use tap::utils::{fatal, get_args};
 
 use tap::events::room::notify_room;
@@ -330,6 +332,13 @@ async fn main() {
                         Some(handle_sell(name, &item_id, &world, &registry).await)
                     } else if line_upper.starts_with("SLEEP") {
                         Some(handle_sleep(name, &world, &registry).await)
+                    } else if line_upper.starts_with("DEFEND") {
+                        Some(handle_defend(name, &world, &registry).await)
+                    } else if line_upper.starts_with("FLEE") {
+                        Some(handle_flee(name, &world, &registry).await)
+                    } else if line_upper.starts_with("ABANDON_QUEST ") {
+                        let qid = get_args(&line_trimmed).to_lowercase();
+                        Some(handle_abandon_quest(name, &qid, &world).await)
                     } else if line_upper.starts_with("QUESTS") {
                         Some(handle_quests(name, &world).await)
                     } else if line_upper.starts_with("QUEST ") {

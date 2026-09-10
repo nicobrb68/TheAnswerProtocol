@@ -65,6 +65,12 @@ pub struct Player {
     pub kills: HashMap<String, u32>,
     #[serde(default)]
     pub entered_from: Option<String>,
+    /// NPC this player is currently locked in combat with, if any.
+    #[serde(default)]
+    pub in_combat_with: Option<String>,
+    /// Set by DEFEND, consumed by the next NPC strike.
+    #[serde(default)]
+    pub defending: bool,
 }
 
 impl Player {
@@ -82,6 +88,8 @@ impl Player {
             group_id: None,
             kills: HashMap::new(),
             entered_from: None,
+            in_combat_with: None,
+            defending: false,
         }
     }
 }
@@ -231,6 +239,8 @@ pub enum TapError {
     ItemNotUsable,
     MerchantNotHere,
     RoomGuarded,
+    NotInCombat,
+    QuestNotActive,
     PlayerDead,
     // 9xx - System
     ConnectionFailed,
@@ -255,6 +265,8 @@ impl TapError {
             TapError::ItemNotUsable   => "ERR 411 ITEM_NOT_USABLE\n".to_string(),
             TapError::MerchantNotHere => "ERR 413 MERCHANT_NOT_HERE\n".to_string(),
             TapError::RoomGuarded     => "ERR 414 ROOM_GUARDED\n".to_string(),
+            TapError::NotInCombat     => "ERR 415 NOT_IN_COMBAT\n".to_string(),
+            TapError::QuestNotActive  => "ERR 404 QUEST_NOT_ACTIVE\n".to_string(),
             TapError::CannotKickSelf       => "ERR 407 CANNOT_KICK_SELF\n".to_string(),
             TapError::PlayerNotInGroup    => "ERR 404 PLAYER_NOT_IN_GROUP\n".to_string(),
             TapError::InviteNotFound       => "ERR 404 INVITE_NOT_FOUND\n".to_string(),

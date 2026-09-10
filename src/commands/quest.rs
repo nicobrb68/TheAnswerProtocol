@@ -165,3 +165,35 @@ pub async fn handle_quests(username: &str, world: &Arc<Mutex<World>>) -> String 
         Err(_) => TapError::SendFailed.message(),
     }
 }
+
+pub async fn handle_abandon_quest(username: &str, quest_id: &str, world: &Arc<Mutex<World>>) -> String {
+    let mut w = world.lock().await;
+
+    let player = match w.get_player(username) {
+        Some(p) => p,
+        None => return TapError::PlayerNotFound.message(),
+    };
+
+    let full_id = match player.quests_active.iter().find(|q| q.contains(quest_id)).cloned() {
+        Some(id) => id,
+        None => return TapError::QuestNotActive.message(),
+    };
+
+    let quest = match w.quests.get(&full_id) {
+        Some(q) => q.clone(),
+        None => return TapError::QuestNotActive.message(),
+    };
+
+    let mut to_remove = if quest.quest_type == "deliver" { quest.target_count } else { 0 };
+    if let Some(p) = w.get_mut_player(username) {
+        // The parcel was lent for the trip, so it goes back with the quest.
+        p.inventory.retain(|i| {
+            if to_remove > 0 && i == &quest.target_item { to_remove -= 1; false } else { true }
+        });
+        p.quests_active.retain(|q| q != &full_id);
+    }
+
+    tracing::info!(event = "quest_abandon", player = %username, quest = %full_id, kind = %quest.quest_type, "quest abandoned");
+
+    format!("OK {{\"quest_id\": \"{}\", \"status\": \"abandoned\"}}\n", full_id)
+}

@@ -78,10 +78,18 @@ pub async fn handle_attack(
     }
     let npc_hp = npc.hp.unwrap_or(0);
 
-    let player_hp = match w.get_mut_player(username) {
+    let (player_hp, effective_npc_damage) = match w.get_mut_player(username) {
         Some(p) => {
-            p.hp = p.hp.saturating_sub(effective_npc_damage);
-            p.hp
+            // Bracing from a previous DEFEND halves whatever gets through the armor.
+            let incoming = if p.defending {
+                p.defending = false;
+                (effective_npc_damage / 2).max(1)
+            } else {
+                effective_npc_damage
+            };
+            p.hp = p.hp.saturating_sub(incoming);
+            p.in_combat_with = Some(npc_full_id.clone());
+            (p.hp, incoming)
         },
         None => return TapError::PlayerNotFound.message(),
     };
@@ -129,6 +137,10 @@ pub async fn handle_attack(
 
         for attacker in &attackers {
             if let Some(p) = w.get_mut_player(attacker) {
+                if p.in_combat_with.as_deref() == Some(npc_full_id.as_str()) {
+                    p.in_combat_with = None;
+                    p.defending = false;
+                }
                 *p.kills.entry(npc_full_id.clone()).or_insert(0) += 1;
                 p.gold += npc_gold_drop;
                 // Notified even for a gold-less kill: it still advances their kill quests.
@@ -153,6 +165,8 @@ pub async fn handle_attack(
             p.hp = 50;
             p.status = PlayerState::Alive;
             p.current_room = spawn_room.clone();
+            p.in_combat_with = None;
+            p.defending = false;
         }
         tracing::info!(event = "combat_death", player = %username, npc = %npc_name, respawn = %spawn_room, "player killed");
         status = "death";

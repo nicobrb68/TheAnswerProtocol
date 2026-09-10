@@ -27,6 +27,7 @@ const roomIdEl = $("#room-id");
 const roomDescEl = $("#room-desc");
 const exitRowEl = $("#exit-row");
 const roomLockedEl = $("#room-locked");
+const combatBarEl = $("#combat-bar");
 const playersListEl = $("#players-list");
 const itemsListEl = $("#items-list");
 const npcsListEl = $("#npcs-list");
@@ -73,6 +74,7 @@ const state = {
   mapLayout: null,
   sellItem: null,
   lockedRoom: null,
+  combatNpc: null,
 };
 
 const pending = [];
@@ -124,6 +126,7 @@ const ERROR_MESSAGES = {
   "902": "Slow down — you're sending commands too fast.",
   "413": "There's no merchant here to trade with.",
   "414": "Something here blocks your way — defeat it first.",
+  "415": "You are not in a fight right now.",
 };
 
 function friendlyError(line) {
@@ -241,6 +244,7 @@ function returnToLogin() {
   sellPopover.hidden = true;
   state.sellItem = null;
   state.lockedRoom = null;
+  state.combatNpc = null;
   roomLockedEl.hidden = true;
   document.getElementById("minimap-inline").hidden = true;
   Object.values(panes).forEach((p) => { if (p) p.innerHTML = ""; });
@@ -409,10 +413,61 @@ function handleResponse(ctx, line) {
       }
       else if (data.status === "death") logCombat(`${npcLabel} struck you down.${armorMsg} You wake up back at a safe place.`);
       else logCombat(`You hit ${npcLabel} for ${data.damage}. They hit you for ${data.npc_damage}${armorMsg}. [${npcLabel}: ${data.target_hp} HP | You: ${data.attacker_hp} HP]`);
+      state.combatNpc = (data.status === "victory" || data.status === "death") ? null : ctx.meta.npcId;
+      renderCombat();
       sendCommand("STATUS", "STATUS");
       if (data.status === "victory") sendCommand("QUESTS", "QUESTS");
       if (data.status === "victory" || data.status === "death") sendCommand("LOOK", "LOOK");
       else renderRoom();
+      return;
+    }
+
+    case "DEFEND": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const data = safeJson(line.slice(3));
+      if (!data) return;
+      const label = state.npcCache[state.combatNpc]?.name || humanize(state.combatNpc);
+      if (data.status === "death") {
+        state.combatNpc = null;
+        logCombat(`${label} broke through your guard. You wake up back at a safe place.`);
+        sendCommand("LOOK", "LOOK");
+      } else {
+        logCombat(`You brace against ${label}: ${data.blocked} blocked, ${data.npc_damage} through. [You: ${data.attacker_hp} HP]`);
+      }
+      sendCommand("STATUS", "STATUS");
+      renderCombat();
+      return;
+    }
+
+    case "FLEE": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const data = safeJson(line.slice(3));
+      if (!data) return;
+      const label = state.npcCache[state.combatNpc]?.name || humanize(state.combatNpc);
+      if (data.fled) {
+        state.combatNpc = null;
+        logCombat(`You break away from ${label} and fall back.`);
+        showToast({ text: "You got away." });
+        sendCommand("LOOK", "LOOK");
+      } else if (data.status === "death") {
+        state.combatNpc = null;
+        logCombat(`${label} cut you down as you turned to run.`);
+        sendCommand("LOOK", "LOOK");
+      } else {
+        logCombat(`You fail to break away — ${label} hits you for ${data.npc_damage}. [You: ${data.attacker_hp} HP]`);
+        showToast({ text: "You couldn't get away.", type: "error" });
+      }
+      sendCommand("STATUS", "STATUS");
+      renderCombat();
+      return;
+    }
+
+    case "ABANDON_QUEST": {
+      if (isErr) { showToast({ text: friendlyError(line), type: "error" }); return; }
+      const data = safeJson(line.slice(3));
+      showToast({ text: `Abandoned ${humanize(data?.quest_id || "")}.` });
+      sendCommand("QUESTS", "QUESTS");
+      sendCommand("INVENTORY", "INVENTORY");
       return;
     }
 
@@ -833,6 +888,12 @@ function renderHp() {
   statusPill.classList.toggle("dead", status === "dead");
 }
 
+function renderCombat() {
+  const foe = state.combatNpc;
+  combatBarEl.hidden = !foe;
+  if (foe) $("#combat-foe").textContent = state.npcCache[foe]?.name || humanize(foe);
+}
+
 function renderBossIndicator() {
   if (state.activeBoss) {
     bossLabelEl.textContent = `${humanize(state.activeBoss.id)} @ ${humanize(state.activeBoss.room)}`;
@@ -846,9 +907,11 @@ const sleepBtn = $("#sleep-btn");
 
 function applyRoom(room) {
   if (!room) return;
+  if (state.room && room.id !== state.room.id) state.combatNpc = null;
   state.room = room;
   renderRoom();
   renderInventory();
+  renderCombat();
   if (!document.getElementById("minimap-inline").hidden) renderMinimap();
 }
 
@@ -1027,8 +1090,12 @@ function renderQuests() {
       </div>
       <div class="quest-desc" id="quest-desc-${i}" hidden>${escapeHtml(q.description || "")}</div>
       <button class="btn btn-ghost btn-xs quest-info-btn" data-quest-idx="${i}" type="button">details</button>
+      ${done ? "" : `<button class="btn btn-ghost btn-xs quest-info-btn" data-abandon="${escapeHtml(q.quest_id)}" type="button">abandon</button>`}
     </li>`;
   }).join("");
+  $$("[data-abandon]", questListEl).forEach((btn) => {
+    btn.onclick = () => sendCommand("ABANDON_QUEST", `ABANDON_QUEST ${btn.dataset.abandon}`);
+  });
   $$("[data-quest-idx]", questListEl).forEach((btn) => {
     btn.onclick = () => {
       const desc = $(`#quest-desc-${btn.dataset.questIdx}`);
@@ -1241,6 +1308,8 @@ connectForm.addEventListener("submit", (e) => {
 $("#quit-btn").addEventListener("click", () => sendCommand("QUIT", "QUIT"));
 $("#look-refresh").addEventListener("click", () => refreshAll());
 sleepBtn.addEventListener("click", () => sendCommand("SLEEP", "SLEEP"));
+$("#defend-btn").addEventListener("click", () => sendCommand("DEFEND", "DEFEND"));
+$("#flee-btn").addEventListener("click", () => sendCommand("FLEE", "FLEE"));
 $("#inventory-refresh").addEventListener("click", () => sendCommand("INVENTORY", "INVENTORY"));
 $("#shop-refresh").addEventListener("click", () => sendCommand("SHOP", "SHOP"));
 $("#market-refresh").addEventListener("click", () => sendCommand("MARKET", "MARKET"));

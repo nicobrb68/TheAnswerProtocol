@@ -317,6 +317,20 @@ button, input {
   margin: 0.6rem 0 1.5rem;
 }
 
+.combat-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  background: rgba(200, 92, 79, 0.12);
+  border: 1px solid rgba(200, 92, 79, 0.45);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.combat-label { font-size: 0.8rem; color: var(--danger-dim); margin-right: auto; }
+.combat-label strong { color: var(--danger); }
+
 .room-locked {
   font-family: var(--font-mono);
   font-size: 0.8rem;

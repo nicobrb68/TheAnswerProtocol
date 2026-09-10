@@ -19,3 +19,5 @@ pub mod use_item;
 pub mod shop;
 pub mod market;
 pub mod map;
+pub mod defend;
+pub mod flee;

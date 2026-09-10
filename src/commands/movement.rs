@@ -34,6 +34,9 @@ pub async fn handle_move(username: &str, direction: &str, world: &Arc<Mutex<Worl
     if let Some(p) = w.get_mut_player(username) {
         p.current_room = new_room_id.clone();
         p.entered_from = Some(current_room.clone());
+        // Walking away ends the fight.
+        p.in_combat_with = None;
+        p.defending = false;
     }
     if let Some(r) = w.get_mut_room(&current_room) { r.players.retain(|p| p != username); }
     if let Some(r) = w.get_mut_room(&new_room_id) { r.players.push(username.to_string()); }

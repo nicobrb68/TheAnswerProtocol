@@ -268,6 +268,18 @@ Puts an item from the player's inventory up for sale on the player market. The i
 - **Success**: `OK listed=<item_id> price=<amount>`
 - **Errors**: `ERR 404 ITEM_NOT_IN_INVENTORY`
 
+#### `DEFEND`
+
+Spends the round bracing instead of striking. The opponent still attacks, but the blow is halved after armor (minimum 1), and you stay braced for the following strike. Returns `{"attacker_hp", "target_hp", "blocked", "npc_damage", "status"}` with status `defend`, or `death` if the blow still finishes you. Outside a fight: `ERR 415 NOT_IN_COMBAT`.
+
+#### `FLEE`
+
+Attempts to break off combat, succeeding 70 % of the time. On success you fall back to the room you entered from and combat ends: `{"fled": true, "room": "<room_id>", "status": "fled"}`. On failure the NPC lands a free hit and the fight continues: `{"fled": false, "attacker_hp", "npc_damage", "status": "combat"}`. Outside a fight: `ERR 415 NOT_IN_COMBAT`.
+
+#### `ABANDON_QUEST <quest_id>`
+
+Drops an active quest, matched by partial id (`ABANDON_QUEST parcel` works). The quest returns to the giver's pool and can be taken again later. For a `deliver` quest the parcel is handed back, so abandoning is never a way to keep the goods. Returns `{"quest_id", "status": "abandoned"}`, or `ERR 404 QUEST_NOT_ACTIVE` if you do not hold it.
+
 #### `SHOP SELL <item>`
 
 Sells an item from the player's inventory directly to the merchant, for **80% of its value**, rounded down (minimum 1 gold). Payment is immediate. Only works in the merchant's room, defined by the `merchant_room` field of the world file (default: `room.market` — Marketplace); anywhere else it returns `ERR 413 MERCHANT_NOT_HERE`. The server refuses to start if `merchant_room` names a room that does not exist.
@@ -357,8 +369,10 @@ Disconnects from the server. The player is removed from the world, removed from 
 - **EVT COMBAT REWARD**: Not in the RFC. Tells a co-attacker that their share of an NPC's gold was paid when someone else landed the killing blow.
 - **Quest types (`fetch` / `kill` / `deliver`) and the `requires` prerequisite**: The RFC supplies QUEST and QUESTS but leaves progression, completion, rewards and quest chains to the implementer. See Quest System below.
 - **Guarded rooms**: Extension not in the RFC. A room flagged `guarded` only lets a player leave the way they came in until every hostile in it is dead.
+- **DEFEND, FLEE**: Combat commands the RFC names as implementer's choice (§6.1.1). See Combat System.
+- **ABANDON_QUEST**: Quest command the RFC names as implementer's choice (§6.1.2, "COMPLETE_QUEST, ABANDON_QUEST, or similar").
 - **SHOP SELL**: Extension command not in the RFC. Sells an item to the merchant at 80% of its value, restricted to `merchant_room`.
-- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE, ERR 414 ROOM_GUARDED**: Additional error codes not in the RFC.
+- **ERR 409 PLAYER_DEAD, ERR 410 CANNOT_SLEEP_HERE, ERR 413 MERCHANT_NOT_HERE, ERR 414 ROOM_GUARDED, ERR 415 NOT_IN_COMBAT, ERR 404 QUEST_NOT_ACTIVE**: Additional error codes not in the RFC.
 
 ### Events
 
@@ -418,6 +432,8 @@ Disconnects from the server. The player is removed from the world, removed from 
 | 410 | CANNOT_SLEEP_HERE | SLEEP was used outside the designated sleep room |
 | 413 | MERCHANT_NOT_HERE | `SHOP SELL` used outside the merchant's room |
 | 414 | ROOM_GUARDED | Tried to press deeper into a guarded room while its defenders still stand |
+| 415 | NOT_IN_COMBAT | `DEFEND` or `FLEE` used while not fighting |
+| 404 | QUEST_NOT_ACTIVE | `ABANDON_QUEST` on a quest the player does not hold |
 | 900 | CONNECTION_FAILED | TCP connection error |
 | 901 | SEND_FAILED | Failed to serialize or send a response |
 | 902 | FLOODING | Client exceeded the rate limit and was kicked |
@@ -431,15 +447,54 @@ The server tracks commands per second per client using a sliding window:
 
 ## Combat System
 
-Combat in TAP is a simple exchange-based system where each `ATTACK` command results in one round of mutual damage:
+The RFC defines only `ATTACK` and `STATUS` and leaves turn management, initiative, damage formulas, combat states and additional combat commands to the implementer. This is our design.
 
-1. **Player attacks**: The player deals base damage of 10 plus the highest weapon damage bonus from their inventory. The server automatically scans the player's inventory and selects the weapon with the highest damage value. For example, if the player carries an Iron Sword (15 dmg) and a Pickaxe (8 dmg), the total damage is 10 + 15 = 25.
-2. **NPC counter-attacks**: The NPC immediately deals its own damage to the player. Each NPC has a fixed damage value defined in the world data.
-3. **HP update**: Both HP values are reduced simultaneously. HP cannot go below 0 (saturating subtraction).
-4. **Outcome check**:
-   - If the NPC's HP reaches 0: it is defeated, removed from the room, and will respawn in 30 seconds with full HP restored to its maximum.
-   - If the player's HP reaches 0: the player dies, is moved to the spawn room (`room.gate`), and revived with 50 HP. Their status resets to Alive. All room events (combat result, presence leave/enter) are broadcast.
-   - If both survive: the round ends, and the player can attack again.
+### Turn structure and initiative
+
+Combat is **round-based, and a round is driven by one player command** — there is no server tick, so a player is never hit while idle or typing. Initiative is fixed: **the player always acts first**, the NPC answers in the same round. Each round the player picks one action:
+
+| Action | Effect on the round |
+|---|---|
+| `ATTACK <npc>` | Strike, then take the counter-attack |
+| `DEFEND` | Skip your strike and brace — the counter-attack is halved |
+| `FLEE` | Try to break away instead of trading blows |
+| `USE <item>` | Drink or apply an item (does not end the fight) |
+
+### Combat state
+
+A player carries an `in_combat_with` field naming their current opponent.
+
+- **Entered** by `ATTACK` on a hostile NPC.
+- **Left** when the NPC dies, when the player is downed, on a successful `FLEE`, or by simply walking out with `MOVE`.
+- `DEFEND` and `FLEE` outside a fight return `ERR 415 NOT_IN_COMBAT`, so they can never be used as free actions.
+
+Combat is not exclusive: several players may fight the same NPC at once, and every one of them is credited for the kill (see below).
+
+### Damage formulas
+
+```
+player hit      = 10 + best damage bonus carried
+absorbed        = min(best armor carried, npc_damage - 1)     ; at least 1 always lands
+damage taken    = npc_damage - absorbed
+  while braced  = max(1, damage taken / 2)
+```
+
+The armor clamp at `npc_damage - 1` is deliberate: no armor set can make a player invulnerable.
+
+`DEFEND` also leaves you braced for the **next** incoming strike, so holding the line for a round pays off even if you go back to attacking. Against the Forest Wolf (10 damage, no armor) a defended round costs 5 HP instead of 10.
+
+### Fleeing
+
+`FLEE` succeeds **70 % of the time**. On success you retreat to the room you came from — the same exit a guarded room would allow — and combat ends. On failure the NPC gets a free strike and the fight continues. The roll avoids pulling in a random-number crate for a single dice throw: it hashes a freshly built `RandomState`, which the OS seeds and re-keys on every construction. The system clock is deliberately *not* used — `subsec_nanos()` is microsecond-granular on macOS, so `% 100` returned 0 every time and made every escape succeed.
+
+### Rounds and outcomes
+
+1. **Player acts** — strike, brace, or run.
+2. **NPC answers** — a fixed damage value from the world data, reduced by armor and by bracing.
+3. **Outcome**:
+   - NPC at 0 HP: removed from the room, respawns after 30 seconds at full HP. **Every player who damaged it** is credited with the kill and paid its gold, not just whoever struck last — co-attackers who have left the room are told directly with `EVT COMBAT REWARD`.
+   - Player at 0 HP: moved to the spawn room and revived with 50 HP; combat state cleared; room events broadcast.
+   - Both alive: the round ends and the player chooses again.
 
 ### NPC Stats
 
