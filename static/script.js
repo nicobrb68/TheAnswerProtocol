@@ -125,6 +125,7 @@ const ERROR_MESSAGES = {
   "410": "You can't rest here.",
   "900": "Connection failed.",
   "901": "Message failed to send.",
+  "400": "The server did not understand that command.",
   "902": "Slow down — you're sending commands too fast.",
   "413": "There's no merchant here to trade with.",
   "414": "Something here blocks your way — defeat it first.",
@@ -690,7 +691,12 @@ function handleEvent(rest) {
       const [, , , npcId] = defeatedMatch;
       delete state.npcCache[npcId];
       if (state.room) state.room.npcs = (state.room.npcs || []).filter((n) => n !== npcId);
-      renderRoom();
+      if (state.combatNpc === npcId) {
+        state.combatNpc = null;
+        state.riposte = 0;
+      }
+      if (state.activeNpc === npcId) closeNpcPopover();
+      renderCombatAndExits();
       if (state.room?.locked) sendCommand("LOOK", "LOOK");
     } else {
       const hpMatch = combatText.match(/npc=(\S+) hp=(\d+)$/);
@@ -709,6 +715,11 @@ function handleEvent(rest) {
       const [, npcId, gold, total] = m;
       const npcLabel = state.npcCache[npcId]?.name || humanize(npcId);
       state.me.gold = Number(total);
+      if (state.combatNpc === npcId) {
+        state.combatNpc = null;
+        state.riposte = 0;
+        renderCombatAndExits();
+      }
       renderHp();
       const earned = Number(gold);
       logCombat(earned > 0
@@ -747,6 +758,7 @@ function handleEvent(rest) {
       state.room.npcs = [...(state.room.npcs || []), npcId];
     }
     logEvent(`${state.npcCache[npcId]?.name || humanize(npcId)} returns.`);
+    renderRoom();
     sendCommand("LOOK", "LOOK");
     return;
   }
@@ -934,7 +946,12 @@ const sleepBtn = $("#sleep-btn");
 
 function applyRoom(room) {
   if (!room) return;
-  if (state.room && room.id !== state.room.id) state.combatNpc = null;
+  if (state.room && room.id !== state.room.id) {
+    state.combatNpc = null;
+    closeNpcPopover();
+    closeItemPopover();
+    closeSellPopover();
+  }
   state.room = room;
   renderRoom();
   renderInventory();

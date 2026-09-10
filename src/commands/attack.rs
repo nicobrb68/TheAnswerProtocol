@@ -158,6 +158,7 @@ pub async fn handle_attack(
                 if p.in_combat_with.as_deref() == Some(npc_full_id.as_str()) {
                     p.in_combat_with = None;
                     p.defending = false;
+                    p.braced_bonus = 0;
                 }
                 *p.kills.entry(npc_full_id.clone()).or_insert(0) += 1;
                 p.gold += npc_gold_drop;
