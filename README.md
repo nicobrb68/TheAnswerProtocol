@@ -10,6 +10,8 @@ TAP is composed of three binaries:
 
 - **server** — the game server that manages the world state, handles player connections, and enforces the TAP protocol over TCP (port 7534). It accepts any number of simultaneous clients. The world data (rooms, NPCs, items, quests) is loaded from a JSON file at startup.
 - **client_cli** — a terminal client with autocompletion and syntax highlighting powered by rustyline. It connects to a TAP server via TCP and provides an interactive prompt where the user types commands. Commands are highlighted green if valid, red if unknown. Tab-completion suggests all available commands including subcommands like `CHAT GLOBAL` or `GROUP INVITE`.
+
+  **Command interface choice**: of the two approaches the subject allows, we took the first — the CLI sends what you type **straight to the server as RFC 42TAP syntax**, with no translation layer. Typing `ATTACK goblin` puts exactly `ATTACK goblin\n` on the socket, and the raw server reply (`OK {...}` or `ERR <code> <CONSTANT>`) is printed as-is. rustyline only assists *before* the line is sent: completion and green/red highlighting are driven by a list of known commands, so an unknown verb is still transmitted and answered by the server with `ERR 400 UNKNOWN_COMMAND`. This keeps the client a thin, faithful window onto the protocol, which is what makes it interchangeable with another group's server.
 - **client_gui** — a web-based GUI client using Axum as the HTTP server and WebSocket as the bridge to the TCP server. The browser connects via WebSocket to the Axum server, which then opens a TCP connection to the TAP server and relays messages in both directions. The GUI is served as static files (HTML/CSS/JS) on `http://127.0.0.1:3000`. It features a visual room display, clickable direction buttons, a chat panel, inventory display, and an interactive map.
 
 All communication follows the line-oriented TAP protocol: UTF-8 text, one command per line, terminated by `LF` (0x0A). Responses start with `OK` on success or `ERR <code> <CONSTANT>` on failure.
@@ -792,10 +794,13 @@ cargo run --bin server -- src/assets/default_world.json 2>&1 | jq 'select(.field
 
 ## Group Contributions
 
-| Member | Contributions |
+The two of us worked on the same codebase throughout rather than splitting it into separate halves, so most of the server is genuinely shared: the command dispatcher, the world model in `lib.rs`, the error taxonomy and the protocol handling were all touched by both of us, often in the same files across successive commits. The table below records where each of us led, not an exclusive ownership.
+
+| Member | Led on |
 |---|---|
-| **nbilyj** | Server architecture, TCP handling, command dispatcher, event system, combat system, quest system, CLI client, world design, protocol implementation |
-| **nbarbosa** | Web GUI client (Axum + WebSocket bridge), HTML/CSS/JS frontend, group system, sleep system, flood detection |
+| **nbilyj** | Web GUI client in full (Axum server, WebSocket bridge, HTML/CSS/JS, interactive map, combat bar, quest and inventory panels), combat system, quest system, group system, event system, world design and data, README |
+| **nbarbosa** | Chat commands, movement, build tooling (`Makefile` targets), CLI client work, world data, and a large share of the server dispatcher and core structs |
+| **Both** | Server architecture and TCP handling, command dispatcher, protocol and error codes, world validation at startup, testing |
 
 ## Building and Running
 

@@ -24,11 +24,11 @@ impl Highlighter for TapCompleter {
         let first = parts[0].to_uppercase();
 
         let single = ["CONNECT", "LOOK", "MOVE", "WHO", "TAKE", "DROP",
-            "INVENTORY", "TALK", "ATTACK", "STATUS", "QUEST", "QUESTS", "QUIT", "SLEEP",
-            "USE", "EXAMINE", "SELL", "MARKET"];
+            "INVENTORY", "TALK", "ATTACK", "DEFEND", "FLEE", "STATUS", "QUEST", "QUESTS",
+            "ABANDON_QUEST", "QUIT", "SLEEP", "USE", "EXAMINE", "SELL", "MARKET", "MAP"];
         let chat_subs = ["GLOBAL", "ROOM", "GROUP"];
         let group_subs = ["CREATE", "INVITE", "JOIN", "LEAVE", "DISBAND", "INFO", "KICK"];
-        let shop_subs = ["BUY"];
+        let shop_subs = ["BUY", "SELL"];
         let market_subs = ["BUY", "CANCEL"];
 
         let (valid, cmd_end) = 
@@ -115,12 +115,13 @@ async fn main() {
                 "CONNECT".into(), "LOOK".into(), "MOVE".into(),
                 "CHAT GLOBAL".into(), "CHAT ROOM".into(), "CHAT GROUP".into(),
                 "WHO".into(), "TAKE".into(), "DROP".into(), "INVENTORY".into(),
-                "TALK".into(), "ATTACK".into(), "STATUS".into(),
-                "QUEST".into(), "QUESTS".into(),
+                "TALK".into(), "ATTACK".into(), "DEFEND".into(), "FLEE".into(),
+                "STATUS".into(), "MAP".into(),
+                "QUEST".into(), "QUESTS".into(), "ABANDON_QUEST".into(),
                 "GROUP CREATE".into(), "GROUP INVITE".into(), "GROUP KICK".into(),
                 "GROUP JOIN".into(), "GROUP LEAVE".into(), "GROUP DISBAND".into(),
                 "GROUP INFO".into(), "SLEEP".into(), "USE".into(), "EXAMINE".into(),
-                "SHOP".into(), "SHOP BUY".into(), "SELL".into(),
+                "SHOP".into(), "SHOP BUY".into(), "SHOP SELL".into(), "SELL".into(),
                 "MARKET".into(), "MARKET BUY".into(), "MARKET CANCEL".into(),
                 "QUIT".into()
             ],
