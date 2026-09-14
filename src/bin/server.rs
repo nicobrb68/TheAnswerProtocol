@@ -262,18 +262,18 @@ async fn main() {
                     
                     line.clear();
 
-                } else if line_upper.starts_with("QUIT") {
+                } else if line_upper == "QUIT" {
                     if let Err(e) = tx.send("OK bye\n".to_string()) {
                         tracing::warn!(event = "send_failed", ip = %addr, error = %e, "failed to send to client");
                     }
                     break;
                 } else if let Some(name) = &authenticated {
-                    let res = if line_upper.starts_with("LOOK") {
+                    let res = if line_upper == "LOOK" {
                         Some(handle_look(&name, &world).await)
                     } else if line_upper.starts_with("MOVE ") {
                         let direction = get_args(&line_trimmed).to_lowercase();
                         Some(handle_move(&name, &direction, &world, &registry).await)
-                    } else if line_upper.starts_with("WHO") {
+                    } else if line_upper == "WHO" {
                         Some(handle_who(&world).await)
                     } else if line_upper.starts_with("CHAT ") {
                         let args = get_args(&line_trimmed);
@@ -298,9 +298,9 @@ async fn main() {
                     } else if line_upper.starts_with("DROP ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_drop(name, &item_id, &world, &registry).await)
-                    } else if line_upper.starts_with("INVENTORY") {
+                    } else if line_upper == "INVENTORY" {
                         Some(handle_inventory(name, &world).await)
-                    } else if line_upper.starts_with("EXAMINE") {
+                    } else if line_upper.starts_with("EXAMINE ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_examine(name, &item_id, &world).await)
                     } else if line_upper.starts_with("USE ") {
@@ -309,7 +309,7 @@ async fn main() {
                     } else if line_upper.starts_with("ATTACK ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_attack(name, &npc_id, &world, &registry).await)
-                    } else if line_upper.starts_with("STATUS") {
+                    } else if line_upper == "STATUS" {
                         Some(handle_status(name, &world).await)
                     } else if line_upper.starts_with("SHOP SELL ") {
                         let item_id = get_args(get_args(&line_trimmed)).to_lowercase();
@@ -317,7 +317,7 @@ async fn main() {
                     } else if line_upper.starts_with("SHOP BUY ") {
                         let item_id = get_args(get_args(&line_trimmed)).to_lowercase();
                         Some(handle_shop_buy(name, &item_id, &world).await)
-                    } else if line_upper.starts_with("SHOP") {
+                    } else if line_upper == "SHOP" {
                         Some(handle_shop(&world).await)
                     } else if line_upper.starts_with("MARKET CANCEL ") {
                         let index = get_args(get_args(&line_trimmed));
@@ -325,26 +325,26 @@ async fn main() {
                     } else if line_upper.starts_with("MARKET BUY ") {
                         let index = get_args(get_args(&line_trimmed));
                         Some(handle_market_buy(name, index, &world, &registry).await)
-                    } else if line_upper.starts_with("MARKET") {
+                    } else if line_upper == "MARKET" {
                         Some(handle_market(&world).await)
                     } else if line_upper.starts_with("SELL ") {
                         let item_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_sell(name, &item_id, &world, &registry).await)
-                    } else if line_upper.starts_with("SLEEP") {
+                    } else if line_upper == "SLEEP" {
                         Some(handle_sleep(name, &world, &registry).await)
-                    } else if line_upper.starts_with("DEFEND") {
+                    } else if line_upper == "DEFEND" {
                         Some(handle_defend(name, &world, &registry).await)
-                    } else if line_upper.starts_with("FLEE") {
+                    } else if line_upper == "FLEE" {
                         Some(handle_flee(name, &world, &registry).await)
                     } else if line_upper.starts_with("ABANDON_QUEST ") {
                         let qid = get_args(&line_trimmed).to_lowercase();
                         Some(handle_abandon_quest(name, &qid, &world).await)
-                    } else if line_upper.starts_with("QUESTS") {
+                    } else if line_upper == "QUESTS" {
                         Some(handle_quests(name, &world).await)
                     } else if line_upper.starts_with("QUEST ") {
                         let npc_id = get_args(&line_trimmed).to_lowercase();
                         Some(handle_quest(name, &npc_id, &world).await)
-                    } else if line_upper.starts_with("MAP") {
+                    } else if line_upper == "MAP" {
                         Some(handle_map(&world).await)
                     } else {
                         None
