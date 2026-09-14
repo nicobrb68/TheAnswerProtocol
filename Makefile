@@ -24,4 +24,4 @@ clean:
 nc:
 	nc 127.0.0.1 7534
 
-.PHONY: all build install run-server run-client run-client-gui lint clean
+.PHONY: all build install run-server run-client run-client-gui lint nc clean
